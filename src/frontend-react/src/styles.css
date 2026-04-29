@@ -285,6 +285,11 @@ body {
 .predict-form-widget {
   min-width: 0;
 }
+.predict-main-column {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
 .predict-side-widget {
   min-width: 0;
 }
@@ -525,8 +530,24 @@ input[aria-invalid="true"] {
   }
 }
 
-.result { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: rgba(37, 35, 35, 0.24); }
-.result h3 { margin: 0 0 8px; }
+.prediction-result-widget {
+  display: grid;
+  gap: 10px;
+}
+.prediction-result-body {
+  display: grid;
+  gap: 8px;
+}
+.prediction-result-value {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+.prediction-result-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
 .factor-list {
   margin-top: 10px;
   display: grid;
@@ -543,19 +564,52 @@ input[aria-invalid="true"] {
   justify-content: space-between;
   gap: 8px;
   font-size: 12px;
+  align-items: flex-start;
 }
-.factor-bar {
+.factor-title {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.factor-title span {
+  font-weight: 700;
+}
+.factor-title small {
+  color: var(--muted);
+  font-size: 11px;
+  word-break: break-word;
+}
+.factor-meta {
   margin-top: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  overflow: hidden;
+  display: flex;
+  justify-content: flex-start;
 }
-.factor-bar span {
-  display: block;
-  height: 100%;
+.factor-badge {
+  font-size: 10px;
+  line-height: 1;
+  padding: 4px 8px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #76c4ff, #4e8fff);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.factor-badge--increase {
+  border-color: rgba(255, 170, 170, 0.45);
+  color: #ffcdcd;
+  background: rgba(189, 74, 74, 0.18);
+}
+.factor-badge--decrease {
+  border-color: rgba(140, 220, 180, 0.45);
+  color: #d6ffe8;
+  background: rgba(79, 160, 120, 0.18);
+}
+.factor-score {
+  white-space: nowrap;
+}
+.factor-score--increase {
+  color: #ffb8b8;
+}
+.factor-score--decrease {
+  color: #bff5d0;
 }
 .placeholder-page h2 { margin-top: 0; }
 .row { display: flex; gap: 8px; margin-bottom: 10px; }

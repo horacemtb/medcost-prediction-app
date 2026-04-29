@@ -3,6 +3,7 @@ import { medcostApi } from "../../../shared/api/medcost-api";
 import { featureMap } from "../../../shared/config/feature-map";
 import type { PredictionInput, PredictionResponse, RiskFactor } from "../../../shared/types/medcost";
 import { ErrorAlert, FieldMeta, KitButton, KitCheckbox, KitInput, KitSelect } from "../../../shared/ui/kit";
+import { PredictionResultWidget } from "../../../widgets/prediction-result/ui/PredictionResultWidget";
 
 const initialForm = {
   full_name: "",
@@ -195,8 +196,8 @@ export function PredictPage() {
     <section className="dashboard-main">
       {error && <ErrorAlert message={error} />}
       <div className="predict-page-layout">
-        <section className="tile form-tile predict-form-widget">
-          <div className="predict-main">
+        <div className="predict-main-column">
+          <section className="tile form-tile predict-form-widget">
             <div className="predict-topbar">
               <div className="form-tabs" role="tablist" aria-label="Шаги формы">
                 {tabs.map((tab, index) => (
@@ -337,36 +338,21 @@ export function PredictPage() {
             </div>
             )}
 
-          </div>
+          </section>
 
-        {result && (
-          <div className="result">
-            <h3>Прогноз: {result.predicted_cost.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽</h3>
-            <p>Пациент: {result.full_name} | Идентификатор: {result.prediction_id}</p>
-            <p>К прошлому году: {delta >= 0 ? "+" : ""}{delta.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽</p>
-            <p>Уровень риска: <strong>{riskLevel}</strong></p>
-            <KitButton type="button" onClick={loadFactors} disabled={loading}>Показать факторы</KitButton>
-            {!!topFactors.length && (
-              <div className="factor-list">
-                {topFactors.map((f, i) => {
-                  const intensity = Math.min(100, Math.round(Math.abs(f.shap_value) * 8));
-                  return (
-                    <div key={i} className="factor-item">
-                      <div className="factor-head">
-                        <span>{featureMap[f.feature_name] ?? f.feature_name}</span>
-                        <strong>{f.shap_value.toFixed(2)}</strong>
-                      </div>
-                      <div className="factor-bar">
-                        <span style={{ width: `${intensity}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-        </section>
+          {result && (
+            <PredictionResultWidget
+              predictionId={result.prediction_id}
+              fullName={result.full_name}
+              predictedCost={result.predicted_cost}
+              delta={delta}
+              riskLevel={riskLevel}
+              topFactors={topFactors}
+              loading={loading}
+              onLoadFactors={loadFactors}
+            />
+          )}
+        </div>
 
         <aside className="predict-side-widget">
           <section className="tile summary-card summary-sticky">
