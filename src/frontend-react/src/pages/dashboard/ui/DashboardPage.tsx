@@ -1,4 +1,6 @@
-﻿export function DashboardPage() {
+﻿import { InfoSectionCard, MiniStatCard } from "../../../shared/ui/kit";
+
+export function DashboardPage() {
   return (
     <section className="dashboard-main">
       <div className="top-grid">
@@ -20,14 +22,14 @@
         </article>
       </div>
       <div className="mini-grid">
-        <article className="tile mini"><p className="tiny">Основной раздел</p><h3>Дашборд</h3></article>
-        <article className="tile mini"><p className="tiny">Режим</p><h3>Аналитика</h3></article>
-        <article className="tile mini"><p className="tiny">Версия</p><h3>v1</h3></article>
+        <MiniStatCard label="Основной раздел" value="Дашборд" />
+        <MiniStatCard label="Режим" value="Аналитика" />
+        <MiniStatCard label="Версия" value="v1" />
       </div>
-      <section className="tile form-tile">
-        <h3>Навигация</h3>
-        <p className="muted">Расчет вынесен на отдельную страницу «Расчет». История и другие разделы доступны через левое меню.</p>
-      </section>
+      <InfoSectionCard
+        title="Навигация"
+        subtitle="Расчет вынесен на отдельную страницу «Расчет». История и другие разделы доступны через левое меню."
+      />
     </section>
   );
 }

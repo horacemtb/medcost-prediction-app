@@ -2,6 +2,7 @@
 import { medcostApi } from "../../../shared/api/medcost-api";
 import { featureMap } from "../../../shared/config/feature-map";
 import type { PredictionInput, PredictionResponse, RiskFactor } from "../../../shared/types/medcost";
+import { ErrorAlert, FieldMeta, KitButton, KitCheckbox, KitInput, KitSelect } from "../../../shared/ui/kit";
 
 const initialForm = {
   full_name: "",
@@ -192,30 +193,31 @@ export function PredictPage() {
 
   return (
     <section className="dashboard-main">
-      {error && <div className="error">{error}</div>}
+      {error && <ErrorAlert message={error} />}
       <div className="predict-page-layout">
         <section className="tile form-tile predict-form-widget">
           <div className="predict-main">
             <div className="predict-topbar">
               <div className="form-tabs" role="tablist" aria-label="Шаги формы">
                 {tabs.map((tab, index) => (
-                  <button
+                  <KitButton
                     key={tab}
                     role="tab"
                     type="button"
+                    variant="tab"
                     aria-selected={activeTab === tab}
                     className={`tab-btn ${activeTab === tab ? "active" : ""}`}
                     onClick={() => setActiveTab(tab)}
                   >
                     {index + 1}. {tab}
-                  </button>
+                  </KitButton>
                 ))}
               </div>
               <div className="form-actions top-actions">
-                <button onClick={() => { setForm(initialForm); setCostInput(initialForm.previous_year_cost.toLocaleString("ru-RU")); setErrors({}); setResult(null); setFactors([]); setError(""); }}>
+                <KitButton type="button" onClick={() => { setForm(initialForm); setCostInput(initialForm.previous_year_cost.toLocaleString("ru-RU")); setErrors({}); setResult(null); setFactors([]); setError(""); }}>
                   Очистить
-                </button>
-                <button className="primary" disabled={loading} onClick={submit}>{loading ? "Расчет..." : "Рассчитать"}</button>
+                </KitButton>
+                <KitButton type="button" className="primary" variant="primary" disabled={loading} onClick={submit}>{loading ? "Расчет..." : "Рассчитать"}</KitButton>
               </div>
             </div>
 
@@ -224,28 +226,28 @@ export function PredictPage() {
               <h3>Пациент</h3>
               <div className="grid">
                 <label>ФИО пациента
-                  <input
+                  <KitInput
                     value={form.full_name}
                     placeholder="Иванов Иван Иванович"
                     aria-invalid={Boolean(errors.full_name)}
                     onChange={(e) => updateField("full_name", e.target.value)}
                     onBlur={(e) => updateField("full_name", normalizeName(e.target.value))}
                   />
-                  {errors.full_name && <small className="field-error">{errors.full_name}</small>}
+                  <FieldMeta error={errors.full_name} />
                 </label>
                 <label>Возраст
-                  <input type="number" min={18} max={100} value={form.age} aria-invalid={Boolean(errors.age)} onChange={(e) => updateField("age", Number(e.target.value))} />
-                  {errors.age && <small className="field-error">{errors.age}</small>}
+                  <KitInput type="number" min={18} max={100} value={form.age} aria-invalid={Boolean(errors.age)} onChange={(e) => updateField("age", Number(e.target.value))} />
+                  <FieldMeta error={errors.age} />
                 </label>
                 <label>Пол
-                  <select value={form.gender} onChange={(e) => updateField("gender", e.target.value)}>
+                  <KitSelect value={form.gender} onChange={(e) => updateField("gender", e.target.value)}>
                     <option>Женский</option>
                     <option>Мужской</option>
-                  </select>
+                  </KitSelect>
                 </label>
                 <label>ИМТ
-                  <input type="number" min={10} max={60} step={0.1} value={form.bmi} aria-invalid={Boolean(errors.bmi)} onChange={(e) => updateField("bmi", Number(e.target.value))} />
-                  {errors.bmi ? <small className="field-error">{errors.bmi}</small> : <small className="field-hint">Норма: 18.5–24.9</small>}
+                  <KitInput type="number" min={10} max={60} step={0.1} value={form.bmi} aria-invalid={Boolean(errors.bmi)} onChange={(e) => updateField("bmi", Number(e.target.value))} />
+                  <FieldMeta error={errors.bmi} hint="Норма: 18.5–24.9" />
                 </label>
               </div>
             </div>
@@ -256,33 +258,33 @@ export function PredictPage() {
               <h3>Образ жизни</h3>
               <div className="grid">
                 <label>Уровень физической активности
-                  <select value={form.physical_activity_label} onChange={(e) => updateField("physical_activity_label", e.target.value)}>
+                  <KitSelect value={form.physical_activity_label} onChange={(e) => updateField("physical_activity_label", e.target.value)}>
                     <option>Низкий</option>
                     <option>Средний</option>
                     <option>Высокий</option>
-                  </select>
+                  </KitSelect>
                 </label>
                 <label>Тип населённого пункта
-                  <select value={form.city_type_label} onChange={(e) => updateField("city_type_label", e.target.value)}>
+                  <KitSelect value={form.city_type_label} onChange={(e) => updateField("city_type_label", e.target.value)}>
                     <option>Город</option>
                     <option>Пригород</option>
                     <option>Сельская местность</option>
-                  </select>
+                  </KitSelect>
                 </label>
                 <label>Шагов в день
-                  <input type="number" min={0} max={50000} step={100} value={form.daily_steps} aria-invalid={Boolean(errors.daily_steps)} onChange={(e) => updateField("daily_steps", Number(e.target.value))} />
-                  {errors.daily_steps ? <small className="field-error">{errors.daily_steps}</small> : <small className="field-hint">Норма: 7000+</small>}
+                  <KitInput type="number" min={0} max={50000} step={100} value={form.daily_steps} aria-invalid={Boolean(errors.daily_steps)} onChange={(e) => updateField("daily_steps", Number(e.target.value))} />
+                  <FieldMeta error={errors.daily_steps} hint="Норма: 7000+" />
                 </label>
                 <label>Часы сна
-                  <input type="number" min={0} max={24} step={0.5} value={form.sleep_hours} aria-invalid={Boolean(errors.sleep_hours)} onChange={(e) => updateField("sleep_hours", Number(e.target.value))} />
-                  {errors.sleep_hours ? <small className="field-error">{errors.sleep_hours}</small> : <small className="field-hint">Рекомендация: 7–9</small>}
+                  <KitInput type="number" min={0} max={24} step={0.5} value={form.sleep_hours} aria-invalid={Boolean(errors.sleep_hours)} onChange={(e) => updateField("sleep_hours", Number(e.target.value))} />
+                  <FieldMeta error={errors.sleep_hours} hint="Рекомендация: 7–9" />
                 </label>
                 <label>Уровень стресса
                   <div className="stress-field">
                     <input type="range" min={1} max={10} step={1} value={form.stress_level} aria-invalid={Boolean(errors.stress_level)} onChange={(e) => updateField("stress_level", Number(e.target.value))} />
                     <span className="stress-value">{form.stress_level}</span>
                   </div>
-                  {errors.stress_level && <small className="field-error">{errors.stress_level}</small>}
+                  <FieldMeta error={errors.stress_level} />
                 </label>
               </div>
             </div>
@@ -293,7 +295,7 @@ export function PredictPage() {
               <h3>Хронические факторы</h3>
               <div className="checks">
                 {(["smoker", "diabetes", "hypertension", "heart_disease", "asthma"] as const).map((k) => (
-                  <label key={k}><input type="checkbox" checked={form[k]} onChange={(e) => updateField(k, e.target.checked)} /> {featureMap[k]}</label>
+                  <KitCheckbox key={k} label={featureMap[k]} checked={form[k]} onChange={(e) => updateField(k, e.target.checked)} />
                 ))}
               </div>
               <small className="field-hint">
@@ -307,16 +309,16 @@ export function PredictPage() {
               <h3>Расходы и обращения</h3>
               <div className="grid">
                 <label>Визитов к врачу в год
-                  <input type="number" min={0} max={100} step={1} value={form.doctor_visits_per_year} onChange={(e) => updateField("doctor_visits_per_year", Number(e.target.value))} />
+                  <KitInput type="number" min={0} max={100} step={1} value={form.doctor_visits_per_year} onChange={(e) => updateField("doctor_visits_per_year", Number(e.target.value))} />
                 </label>
                 <label>Госпитализаций
-                  <input type="number" min={0} max={50} step={1} value={form.hospital_admissions} onChange={(e) => updateField("hospital_admissions", Number(e.target.value))} />
+                  <KitInput type="number" min={0} max={50} step={1} value={form.hospital_admissions} onChange={(e) => updateField("hospital_admissions", Number(e.target.value))} />
                 </label>
                 <label>Количество лекарств
-                  <input type="number" min={0} max={100} step={1} value={form.medication_count} onChange={(e) => updateField("medication_count", Number(e.target.value))} />
+                  <KitInput type="number" min={0} max={100} step={1} value={form.medication_count} onChange={(e) => updateField("medication_count", Number(e.target.value))} />
                 </label>
                 <label>Расходы за прошлый год
-                  <input
+                  <KitInput
                     inputMode="numeric"
                     value={costInput}
                     aria-invalid={Boolean(errors.previous_year_cost)}
@@ -329,7 +331,7 @@ export function PredictPage() {
                       setCostInput(form.previous_year_cost.toLocaleString("ru-RU"));
                     }}
                   />
-                  {errors.previous_year_cost ? <small className="field-error">{errors.previous_year_cost}</small> : <small className="field-hint">₽</small>}
+                  <FieldMeta error={errors.previous_year_cost} hint="₽" />
                 </label>
               </div>
             </div>
@@ -343,7 +345,7 @@ export function PredictPage() {
             <p>Пациент: {result.full_name} | Идентификатор: {result.prediction_id}</p>
             <p>К прошлому году: {delta >= 0 ? "+" : ""}{delta.toLocaleString("ru-RU", { maximumFractionDigits: 2 })} ₽</p>
             <p>Уровень риска: <strong>{riskLevel}</strong></p>
-            <button onClick={loadFactors} disabled={loading}>Показать факторы</button>
+            <KitButton type="button" onClick={loadFactors} disabled={loading}>Показать факторы</KitButton>
             {!!topFactors.length && (
               <div className="factor-list">
                 {topFactors.map((f, i) => {
@@ -409,3 +411,6 @@ export function PredictPage() {
     </section>
   );
 }
+
+
+

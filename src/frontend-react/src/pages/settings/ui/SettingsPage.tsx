@@ -1,14 +1,10 @@
-﻿export function SettingsPage({ status }: { status: string }) {
+﻿import { InfoSectionCard, MiniStatCard } from "../../../shared/ui/kit";
+
+export function SettingsPage({ status }: { status: string }) {
   return (
     <section className="dashboard-main">
-      <section className="tile form-tile">
-        <h2>Настройки</h2>
-        <p className="muted">Параметры приложения и состояние инфраструктуры.</p>
-      </section>
-      <section className="tile mini">
-        <p className="tiny">Сервис</p>
-        <h3>{status}</h3>
-      </section>
+      <InfoSectionCard title="Настройки" subtitle="Параметры приложения и состояние инфраструктуры." />
+      <MiniStatCard label="Сервис" value={status} />
     </section>
   );
 }
