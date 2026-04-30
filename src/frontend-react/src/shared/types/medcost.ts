@@ -33,6 +33,31 @@ export type RiskFactor = {
   direction: "increase" | "decrease";
 };
 
+export type PredictionDetailsResponse = {
+  prediction_id: number;
+  full_name: string;
+  age: number;
+  gender: number;
+  bmi: number;
+  smoker: boolean;
+  diabetes: boolean;
+  hypertension: boolean;
+  heart_disease: boolean;
+  asthma: boolean;
+  physical_activity_level: string;
+  daily_steps: number;
+  sleep_hours: number;
+  stress_level: number;
+  doctor_visits_per_year: number;
+  hospital_admissions: number;
+  medication_count: number;
+  city_type: string;
+  previous_year_cost: number;
+  predicted_cost: number;
+  created_at: string;
+  risk_factors: RiskFactor[];
+};
+
 export type HistoryItem = {
   id: number;
   full_name: string;

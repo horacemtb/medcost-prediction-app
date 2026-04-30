@@ -7,6 +7,7 @@ import { HistoryPage } from "../pages/history/ui/HistoryPage";
 import { FactorsPage } from "../pages/factors/ui/FactorsPage";
 import { SettingsPage } from "../pages/settings/ui/SettingsPage";
 import { SideNavigation } from "../widgets/side-navigation/ui/SideNavigation";
+import { PredictionDetailsModal, PredictionDetailsModalProvider } from "../widgets/prediction-details-modal";
 
 export default function App() {
   const [status, setStatus] = useState("...");
@@ -17,20 +18,23 @@ export default function App() {
 
   return (
     <div className="scene">
-      <div className="app-shell">
-        <SideNavigation />
-        <main className="dashboard-glass">
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/predict" element={<PredictPage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/factors" element={<FactorsPage />} />
-            <Route path="/settings" element={<SettingsPage status={status} />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <PredictionDetailsModalProvider>
+        <div className="app-shell">
+          <SideNavigation />
+          <main className="dashboard-glass">
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/predict" element={<PredictPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/factors" element={<FactorsPage />} />
+              <Route path="/settings" element={<SettingsPage status={status} />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </main>
+        </div>
+        <PredictionDetailsModal />
+      </PredictionDetailsModalProvider>
     </div>
   );
 }

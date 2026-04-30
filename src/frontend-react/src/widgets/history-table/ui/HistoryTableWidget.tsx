@@ -1,5 +1,7 @@
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { KitButton } from "../../../shared/ui/kit";
+import { usePredictionDetailsModal } from "../../prediction-details-modal";
+import deleteIcon from "../../../shared/assets/delete.svg";
 
 type SortKey = "id" | "full_name" | "age" | "predicted_cost" | "created_at";
 
@@ -20,6 +22,8 @@ export function HistoryTableWidget({
   onSort,
   sortIndicator,
 }: HistoryTableWidgetProps) {
+  const { openPredictionDetails } = usePredictionDetailsModal();
+
   return (
     <section className="tile form-tile history-widget history-widget--table">
       <div className="history-meta history-meta--table">
@@ -63,15 +67,36 @@ export function HistoryTableWidget({
           </thead>
           <tbody>
             {items.map((h) => (
-              <tr key={h.id}>
+              <tr
+                key={h.id}
+                className="history-row"
+                role="button"
+                tabIndex={0}
+                aria-label={`Открыть прогноз ${h.full_name}`}
+                onClick={() => openPredictionDetails(h.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openPredictionDetails(h.id);
+                  }
+                }}
+              >
                 <td>{h.id}</td>
                 <td>{h.full_name}</td>
                 <td>{h.age}</td>
                 <td>{h.predicted_cost.toFixed(2)} ₽</td>
                 <td>{new Date(h.created_at).toLocaleString()}</td>
                 <td>
-                  <KitButton type="button" className="danger" variant="danger" onClick={() => onDelete(h.id)}>
-                    Удалить
+                  <KitButton
+                    type="button"
+                    className="danger"
+                    variant="danger"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(h.id);
+                    }}
+                  >
+                    <img src={deleteIcon} alt="" aria-hidden="true" />
                   </KitButton>
                 </td>
               </tr>
