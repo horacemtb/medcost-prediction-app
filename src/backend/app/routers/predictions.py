@@ -7,6 +7,7 @@ from ..models import PredictionRecord, RiskFactor
 from ..schemas import (
     DeleteResponse,
     HistoryResponse,
+    PredictionDetailsResponse,
     PredictionHistoryItem,
     PredictionInput,
     PredictionResponse,
@@ -35,6 +36,37 @@ FEATURE_FIELDS = [
     "city_type",
     "previous_year_cost",
 ]
+
+
+def _build_or_create_risk_factors(record: PredictionRecord, db: Session) -> list[RiskFactorResponse]:
+    if record.risk_factors:
+        return [
+            RiskFactorResponse(
+                feature_name=f.feature_name,
+                feature_value=f.feature_value,
+                shap_value=f.shap_value,
+                direction="increase" if f.shap_value >= 0 else "decrease",
+            )
+            for f in sorted(record.risk_factors, key=lambda x: x.rank)
+        ]
+
+    ml_service = get_ml_service()
+    feature_payload = {field: getattr(record, field) for field in FEATURE_FIELDS}
+    factors = ml_service.explain_top_factors(feature_payload, top_k=3)
+
+    for idx, factor in enumerate(factors, start=1):
+        db.add(
+            RiskFactor(
+                prediction_id=record.id,
+                feature_name=factor["feature_name"],
+                feature_value=factor["feature_value"],
+                shap_value=factor["shap_value"],
+                rank=idx,
+            )
+        )
+    db.commit()
+
+    return [RiskFactorResponse(**factor) for factor in factors]
 
 
 @router.get("/health")
@@ -70,34 +102,41 @@ def get_prediction_factors(prediction_id: int, db: Session = Depends(get_db)):
     if not record:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
-    if record.risk_factors:
-        return [
-            RiskFactorResponse(
-                feature_name=f.feature_name,
-                feature_value=f.feature_value,
-                shap_value=f.shap_value,
-                direction="increase" if f.shap_value >= 0 else "decrease",
-            )
-            for f in sorted(record.risk_factors, key=lambda x: x.rank)
-        ]
+    return _build_or_create_risk_factors(record, db)
 
-    ml_service = get_ml_service()
-    feature_payload = {field: getattr(record, field) for field in FEATURE_FIELDS}
-    factors = ml_service.explain_top_factors(feature_payload, top_k=3)
 
-    for idx, factor in enumerate(factors, start=1):
-        db.add(
-            RiskFactor(
-                prediction_id=record.id,
-                feature_name=factor["feature_name"],
-                feature_value=factor["feature_value"],
-                shap_value=factor["shap_value"],
-                rank=idx,
-            )
-        )
-    db.commit()
+@router.get("/predictions/{prediction_id}", response_model=PredictionDetailsResponse)
+def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
+    record = db.query(PredictionRecord).filter(PredictionRecord.id == prediction_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Prediction not found")
 
-    return [RiskFactorResponse(**factor) for factor in factors]
+    factors = _build_or_create_risk_factors(record, db)
+
+    return PredictionDetailsResponse(
+        prediction_id=record.id,
+        full_name=record.full_name,
+        age=record.age,
+        gender=record.gender,
+        bmi=record.bmi,
+        smoker=record.smoker,
+        diabetes=record.diabetes,
+        hypertension=record.hypertension,
+        heart_disease=record.heart_disease,
+        asthma=record.asthma,
+        physical_activity_level=record.physical_activity_level,
+        daily_steps=record.daily_steps,
+        sleep_hours=record.sleep_hours,
+        stress_level=record.stress_level,
+        doctor_visits_per_year=record.doctor_visits_per_year,
+        hospital_admissions=record.hospital_admissions,
+        medication_count=record.medication_count,
+        city_type=record.city_type,
+        previous_year_cost=record.previous_year_cost,
+        predicted_cost=record.predicted_cost,
+        created_at=record.created_at,
+        risk_factors=factors,
+    )
 
 
 @router.get("/history", response_model=HistoryResponse)
