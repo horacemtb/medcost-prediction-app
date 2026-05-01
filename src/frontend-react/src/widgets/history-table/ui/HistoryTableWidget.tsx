@@ -1,4 +1,4 @@
-import { memo, useCallback, type MouseEvent } from "react";
+import { memo, useCallback, useEffect, type MouseEvent } from "react";
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { KitButton, KitLoader } from "../../../shared/ui/kit";
 import { usePredictionDetailsModal } from "../../prediction-details-modal";
@@ -22,14 +22,18 @@ type HistoryRowProps = {
   onDelete: (id: number) => void;
 };
 
-const HistoryRow = memo(function HistoryRow({ item, onOpen, onDelete }: HistoryRowProps) {
+const HistoryRow = memo(function HistoryRow({
+  item,
+  onOpen,
+  onDelete,
+}: HistoryRowProps) {
   const handleOpen = useCallback(() => onOpen(item.id), [item.id, onOpen]);
   const handleDelete = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
       onDelete(item.id);
     },
-    [item.id, onDelete]
+    [item.id, onDelete],
   );
 
   return (
@@ -76,7 +80,14 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   sortIndicator,
 }: HistoryTableWidgetProps) {
   const { openPredictionDetails } = usePredictionDetailsModal();
-  const handleOpenPrediction = useCallback((id: number) => openPredictionDetails(id), [openPredictionDetails]);
+  const handleOpenPrediction = useCallback(
+    (id: number) => openPredictionDetails(id),
+    [openPredictionDetails],
+  );
+
+  useEffect(() => {
+    console.log("перерисовка");
+  }, []);
 
   return (
     <section className="tile form-tile history-widget history-widget--table">
@@ -95,14 +106,23 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
             src={refreshIcon}
             alt=""
             aria-hidden="true"
-            className={loading ? "history-refresh-icon history-refresh-icon--loading" : "history-refresh-icon"}
+            className={
+              loading
+                ? "history-refresh-icon history-refresh-icon--loading"
+                : "history-refresh-icon"
+            }
           />
         </KitButton>
       </div>
 
       <div className="history-table-wrap">
         {loading && (
-          <div className="history-loading-overlay" role="status" aria-live="polite" aria-busy="true">
+          <div
+            className="history-loading-overlay"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
             <div className="history-loading-card">
               <KitLoader label="Загрузка истории..." />
             </div>
@@ -112,7 +132,13 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
           <thead>
             <tr>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("id")}>
+                <KitButton
+                  type="button"
+                  className="sort-btn"
+                  variant="sort"
+                  size={24}
+                  onClick={() => onSort("id")}
+                >
                   Идентификатор {sortIndicator("id")}
                 </KitButton>
               </th>
@@ -128,7 +154,13 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                 </KitButton>
               </th>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("age")}>
+                <KitButton
+                  type="button"
+                  className="sort-btn"
+                  variant="sort"
+                  size={24}
+                  onClick={() => onSort("age")}
+                >
                   Возраст {sortIndicator("age")}
                 </KitButton>
               </th>
@@ -159,7 +191,12 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
           </thead>
           <tbody>
             {items.map((item) => (
-              <HistoryRow key={item.id} item={item} onOpen={handleOpenPrediction} onDelete={onDelete} />
+              <HistoryRow
+                key={item.id}
+                item={item}
+                onOpen={handleOpenPrediction}
+                onDelete={onDelete}
+              />
             ))}
             {!loading && !items.length && (
               <tr>

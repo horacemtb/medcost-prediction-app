@@ -1,6 +1,5 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { featureMap } from "../../../shared/config/feature-map";
-import { Modal } from "../../../shared/ui/modal";
 import { KitButton, KitLoader } from "../../../shared/ui/kit";
 import { useMinimumLoading } from "../../../shared/lib/useMinimumLoading";
 import { usePredictionDetailsModal } from "../model/PredictionDetailsModalContext";
@@ -35,9 +34,10 @@ function deriveRiskLevel(predictedCost: number) {
   return "Высокий";
 }
 
-export function PredictionDetailsModal() {
+export function PredictionDetailsWidget() {
   const { open, details, loading, error, closePredictionDetails, retryPredictionDetails } = usePredictionDetailsModal();
-  const visibleLoading = useMinimumLoading(loading && !details, { minMs: 1000 });
+  const visibleLoading = useMinimumLoading(loading, { minMs: 1000 });
+  const showWidget = open || visibleLoading || Boolean(details) || Boolean(error);
 
   const sortedFactors = useMemo(
     () => (details ? [...details.risk_factors].sort((a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value)) : []),
@@ -48,11 +48,20 @@ export function PredictionDetailsModal() {
   const delta = details ? details.predicted_cost - details.previous_year_cost : 0;
   const riskLevel = details ? deriveRiskLevel(details.predicted_cost) : null;
 
+  if (!showWidget) return null;
+
   return (
-    <Modal open={open} title={details?.full_name ?? "Карточка прогноза"} onClose={closePredictionDetails} className="prediction-details-modal">
+    <aside className="tile form-tile prediction-details-modal prediction-details-widget">
+      <div className="prediction-details-widget-head">
+        <h3 className="widget-title">{details?.full_name ?? "Карточка прогноза"}</h3>
+        <KitButton type="button" variant="ghost" onClick={closePredictionDetails}>
+          Закрыть
+        </KitButton>
+      </div>
+
       {visibleLoading && !details ? (
         <div className="prediction-details-state">
-          <KitLoader label="�������� ��������..." />
+          <KitLoader label="Загрузка прогноза..." />
         </div>
       ) : error && !details ? (
         <div className="prediction-details-state prediction-details-state--error">
@@ -134,8 +143,12 @@ export function PredictionDetailsModal() {
           </section>
         </div>
       ) : null}
-    </Modal>
+
+      {visibleLoading && details && (
+        <div className="prediction-details-inline-loading" role="status" aria-live="polite" aria-busy="true">
+          <KitLoader label="Обновляем прогноз..." />
+        </div>
+      )}
+    </aside>
   );
 }
-
-

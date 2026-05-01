@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { medcostApi } from "../../../shared/api/medcost-api";
 import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
 
@@ -16,12 +24,19 @@ type PredictionDetailsModalContextValue = PredictionDetailsModalState & {
   retryPredictionDetails: () => void;
 };
 
-const PredictionDetailsModalContext = createContext<PredictionDetailsModalContextValue | null>(null);
+const PredictionDetailsModalContext =
+  createContext<PredictionDetailsModalContextValue | null>(null);
 
-export function PredictionDetailsModalProvider({ children }: { children: ReactNode }) {
+export function PredictionDetailsModalProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const [predictionId, setPredictionId] = useState<number | null>(null);
-  const [details, setDetails] = useState<PredictionDetailsResponse | null>(null);
+  const [details, setDetails] = useState<PredictionDetailsResponse | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [requestToken, setRequestToken] = useState(0);
@@ -35,12 +50,12 @@ export function PredictionDetailsModalProvider({ children }: { children: ReactNo
   }, []);
 
   const openPredictionDetails = useCallback((id: number) => {
+    if (id === predictionId) return;
     setPredictionId(id);
     setOpen(true);
     setError("");
-    setDetails(null);
     setRequestToken((token) => token + 1);
-  }, []);
+  }, [predictionId]);
 
   const retryPredictionDetails = useCallback(() => {
     if (predictionId === null) return;
@@ -86,17 +101,32 @@ export function PredictionDetailsModalProvider({ children }: { children: ReactNo
       closePredictionDetails,
       retryPredictionDetails,
     }),
-    [closePredictionDetails, details, error, loading, open, openPredictionDetails, predictionId, retryPredictionDetails]
+    [
+      closePredictionDetails,
+      details,
+      error,
+      loading,
+      open,
+      openPredictionDetails,
+      predictionId,
+      retryPredictionDetails,
+    ],
   );
 
-  return <PredictionDetailsModalContext.Provider value={value}>{children}</PredictionDetailsModalContext.Provider>;
+  return (
+    <PredictionDetailsModalContext.Provider value={value}>
+      {children}
+    </PredictionDetailsModalContext.Provider>
+  );
 }
 
 export function usePredictionDetailsModal() {
   const value = useContext(PredictionDetailsModalContext);
 
   if (!value) {
-    throw new Error("usePredictionDetailsModal must be used within PredictionDetailsModalProvider");
+    throw new Error(
+      "usePredictionDetailsModal must be used within PredictionDetailsModalProvider",
+    );
   }
 
   return value;

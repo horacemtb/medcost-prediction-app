@@ -754,8 +754,27 @@ input[aria-invalid="true"] {
   font-weight: 700;
 }
 .history-page-layout {
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   align-content: start;
+}
+.history-page-layout--with-details {
+  grid-template-columns: minmax(0, 1fr) var(--history-details-width, 420px);
+  grid-template-rows: auto;
+  align-items: start;
+  gap: 12px;
+}
+.history-main-column {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  height: 100%;
+  min-width: 0;
+}
+.history-content-layout {
+  min-height: 0;
+  height: 100%;
 }
 .history-widget--table {
   height: 100%;
@@ -947,6 +966,38 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 255,
   display: grid;
   gap: 14px;
 }
+.prediction-details-widget {
+  position: relative;
+  min-height: 0;
+  max-height: 100%;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  min-width: 0;
+  transform: translateX(12px);
+  opacity: 0;
+  animation: history-details-in 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+  contain: layout paint;
+}
+.prediction-details-widget::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+.prediction-details-widget-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.prediction-details-inline-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+}
 
 .prediction-details-state {
   min-height: 220px;
@@ -1071,6 +1122,17 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 255,
   color: #bff5d0;
 }
 
+@keyframes history-details-in {
+  from {
+    transform: translateX(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 900px) {
   .prediction-details-kpis,
   .prediction-details-fields {
@@ -1113,6 +1175,7 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 255,
 @media (max-width: 900px) {
   .predict-page-layout { grid-template-columns: 1fr; }
   .predict-layout { grid-template-columns: 1fr; }
+  .history-page-layout--with-details { grid-template-columns: 1fr; }
   .history-filters { grid-template-columns: 1fr; }
   .history-widget--filters { width: 100%; }
   .history-meta--filters { flex-wrap: wrap; }

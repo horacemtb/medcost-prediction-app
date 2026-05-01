@@ -7,7 +7,7 @@ import { HistoryPage } from "../pages/history/ui/HistoryPage";
 import { FactorsPage } from "../pages/factors/ui/FactorsPage";
 import { SettingsPage } from "../pages/settings/ui/SettingsPage";
 import { SideNavigation } from "../widgets/side-navigation/ui/SideNavigation";
-import { PredictionDetailsModal, PredictionDetailsModalProvider } from "../widgets/prediction-details-modal";
+import { PredictionDetailsModalProvider } from "../widgets/prediction-details-modal";
 
 export default function App() {
   const [status, setStatus] = useState("...");
@@ -33,7 +33,6 @@ export default function App() {
             </Routes>
           </main>
         </div>
-        <PredictionDetailsModal />
       </PredictionDetailsModalProvider>
     </div>
   );
