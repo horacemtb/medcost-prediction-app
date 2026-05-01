@@ -32,6 +32,14 @@ class PredictionResponse(BaseModel):
     created_at: datetime
 
 
+class RecalculatePredictionResponse(BaseModel):
+    prediction_id: int
+    full_name: str
+    old_predicted_cost: float
+    predicted_cost: float
+    created_at: datetime
+
+
 class RiskFactorResponse(BaseModel):
     feature_name: str
     feature_value: str
