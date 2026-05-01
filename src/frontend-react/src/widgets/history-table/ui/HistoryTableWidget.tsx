@@ -28,7 +28,7 @@ export function HistoryTableWidget({
     <section className="tile form-tile history-widget history-widget--table">
       <div className="history-meta history-meta--table">
         <h3 className="widget-title">Таблица истории</h3>
-        <KitButton type="button" onClick={onRefresh} disabled={loading}>
+        <KitButton type="button" size={32} onClick={onRefresh} disabled={loading}>
           {loading ? "Загрузка..." : "Обновить"}
         </KitButton>
       </div>
@@ -38,27 +38,27 @@ export function HistoryTableWidget({
           <thead>
             <tr>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" onClick={() => onSort("id")}>
+                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("id")}>
                   Идентификатор {sortIndicator("id")}
                 </KitButton>
               </th>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" onClick={() => onSort("full_name")}>
+                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("full_name")}>
                   ФИО {sortIndicator("full_name")}
                 </KitButton>
               </th>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" onClick={() => onSort("age")}>
+                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("age")}>
                   Возраст {sortIndicator("age")}
                 </KitButton>
               </th>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" onClick={() => onSort("predicted_cost")}>
+                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("predicted_cost")}>
                   Прогноз {sortIndicator("predicted_cost")}
                 </KitButton>
               </th>
               <th>
-                <KitButton type="button" className="sort-btn" variant="sort" onClick={() => onSort("created_at")}>
+                <KitButton type="button" className="sort-btn" variant="sort" size={24} onClick={() => onSort("created_at")}>
                   Дата {sortIndicator("created_at")}
                 </KitButton>
               </th>
@@ -89,8 +89,10 @@ export function HistoryTableWidget({
                 <td>
                   <KitButton
                     type="button"
-                    className="danger"
-                    variant="danger"
+                    className="history-delete-btn"
+                    variant="icon"
+                    size={24}
+                    aria-label={`Удалить прогноз ${h.full_name}`}
                     onClick={(event) => {
                       event.stopPropagation();
                       onDelete(h.id);
@@ -114,3 +116,5 @@ export function HistoryTableWidget({
     </section>
   );
 }
+
+

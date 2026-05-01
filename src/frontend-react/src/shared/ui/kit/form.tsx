@@ -43,11 +43,12 @@ export function KitSelect({ className = "", children, ...props }: KitSelectProps
 }
 
 type KitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "default" | "primary" | "danger" | "ghost" | "tab" | "sort";
+  variant?: "default" | "primary" | "danger" | "ghost" | "tab" | "sort" | "menu" | "icon";
+  size?: 24 | 32 | 42;
 };
 
-export function KitButton({ className = "", variant = "default", ...props }: KitButtonProps) {
-  return <button className={`kit-button kit-button--${variant} ${className}`.trim()} {...props} />;
+export function KitButton({ className = "", variant = "default", size = 32, ...props }: KitButtonProps) {
+  return <button className={`kit-button kit-button--${variant} kit-button--size-${size} ${className}`.trim()} {...props} />;
 }
 
 type KitCheckboxProps = InputHTMLAttributes<HTMLInputElement> & {
