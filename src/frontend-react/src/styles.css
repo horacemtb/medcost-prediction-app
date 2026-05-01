@@ -833,6 +833,12 @@ input[aria-invalid="true"] {
   overflow-x: auto;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.history-table-wrap::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 .history-loading-overlay {
   position: absolute;

@@ -24,9 +24,11 @@ export function HistoryPage() {
   const [error, setError] = useState("");
   const {
     open: detailsOpen,
+    predictionId: activePredictionId,
     loading: detailsLoading,
     details: detailsData,
     error: detailsError,
+    closePredictionDetails,
   } = usePredictionDetailsModal();
   const visibleLoading = useMinimumLoading(loading, { minMs: 1000 });
   const showDetailsWidget = detailsOpen || detailsLoading || Boolean(detailsData) || Boolean(detailsError);
@@ -55,9 +57,12 @@ export function HistoryPage() {
   const removeItem = useCallback(
     async (id: number) => {
       await medcostApi.deleteHistory(id);
+      if (activePredictionId === id) {
+        closePredictionDetails();
+      }
       await loadHistory();
     },
-    [loadHistory]
+    [activePredictionId, closePredictionDetails, loadHistory]
   );
 
   const toggleSort = useCallback(
