@@ -1,6 +1,7 @@
 ﻿import { useMemo, useState } from "react";
 import { medcostApi } from "../../../shared/api/medcost-api";
 import { featureMap } from "../../../shared/config/feature-map";
+import { useMinimumLoading } from "../../../shared/lib/useMinimumLoading";
 import type { PredictionInput, PredictionResponse, RiskFactor } from "../../../shared/types/medcost";
 import { ErrorAlert, FieldMeta, KitButton, KitCheckbox, KitInput, KitSelect } from "../../../shared/ui/kit";
 import { PredictionResultWidget } from "../../../widgets/prediction-result/ui/PredictionResultWidget";
@@ -68,6 +69,7 @@ export function PredictPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const visibleLoading = useMinimumLoading(loading, { minMs: 1000 });
 
   const delta = useMemo(() => (result ? result.predicted_cost - form.previous_year_cost : 0), [result, form.previous_year_cost]);
   const chronicCount = useMemo(
@@ -218,7 +220,7 @@ export function PredictPage() {
                 <KitButton type="button" onClick={() => { setForm(initialForm); setCostInput(initialForm.previous_year_cost.toLocaleString("ru-RU")); setErrors({}); setResult(null); setFactors([]); setError(""); }}>
                   Очистить
                 </KitButton>
-                <KitButton type="button" className="primary" variant="primary" disabled={loading} onClick={submit}>{loading ? "Расчет..." : "Рассчитать"}</KitButton>
+                <KitButton type="button" className="primary" variant="primary" disabled={visibleLoading} onClick={submit}>{visibleLoading ? "Расчет..." : "Рассчитать"}</KitButton>
               </div>
             </div>
 
@@ -340,15 +342,15 @@ export function PredictPage() {
 
           </section>
 
-          {result && (
+          {(visibleLoading || result) && (
             <PredictionResultWidget
-              predictionId={result.prediction_id}
-              fullName={result.full_name}
-              predictedCost={result.predicted_cost}
+              predictionId={result?.prediction_id}
+              fullName={result?.full_name}
+              predictedCost={result?.predicted_cost}
               delta={delta}
               riskLevel={riskLevel}
               topFactors={topFactors}
-              loading={loading}
+              loading={visibleLoading}
               onLoadFactors={loadFactors}
             />
           )}

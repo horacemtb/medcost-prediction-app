@@ -328,6 +328,29 @@ body {
   height: var(--kit-button-size, 24px);
   min-width: 0;
 }
+.kit-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.kit-loader__spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(91, 184, 255, 0.95);
+  animation: kit-loader-spin 0.9s linear infinite;
+}
+.kit-loader__label {
+  line-height: 1;
+}
+@keyframes kit-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .kit-checkbox {
   height: 32px;
   display: inline-flex;
@@ -632,6 +655,11 @@ input[aria-invalid="true"] {
   display: grid;
   gap: 8px;
 }
+.prediction-result-loading {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+}
 .prediction-result-value {
   margin: 0;
   font-size: 24px;
@@ -775,12 +803,37 @@ input[aria-invalid="true"] {
   width: 18px;
   height: 18px;
 }
+.history-refresh-icon--loading {
+  animation: history-refresh-spin 0.9s linear infinite;
+}
 .history-table-wrap {
+  position: relative;
   width: 100%;
   min-height: 0;
   height: 100%;
   overflow-x: auto;
   overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.history-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  /* background: rgba(0, 0, 0, 0.04); */
+  pointer-events: none;
+}
+.history-loading-card {
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(54, 49, 47, 0.72);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 .sort-btn {
   background: transparent;
@@ -793,6 +846,11 @@ input[aria-invalid="true"] {
   text-align: center;
   color: var(--muted);
   padding: 14px;
+}
+@keyframes history-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 table { width: 100%; min-width: 720px; border-collapse: collapse; margin-top: 10px; }
@@ -896,6 +954,9 @@ th, td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 255,
   place-items: center;
   text-align: center;
   color: var(--muted);
+}
+.prediction-details-state .kit-loader {
+  color: var(--txt);
 }
 
 .prediction-details-state--error {

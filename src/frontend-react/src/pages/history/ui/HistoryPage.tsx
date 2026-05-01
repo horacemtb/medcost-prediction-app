@@ -1,5 +1,6 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { medcostApi } from "../../../shared/api/medcost-api";
+import { useMinimumLoading } from "../../../shared/lib/useMinimumLoading";
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { ErrorAlert } from "../../../shared/ui/kit";
 import { HistoryFiltersWidget } from "../../../widgets/history-filters/ui/HistoryFiltersWidget";
@@ -18,8 +19,9 @@ export function HistoryPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const visibleLoading = useMinimumLoading(loading, { minMs: 1000 });
 
-  async function loadHistory() {
+  const loadHistory = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -30,26 +32,42 @@ export function HistoryPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function removeItem(id: number) {
-    await medcostApi.deleteHistory(id);
-    await loadHistory();
-  }
+  const removeItem = useCallback(
+    async (id: number) => {
+      await medcostApi.deleteHistory(id);
+      await loadHistory();
+    },
+    [loadHistory]
+  );
 
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-      return;
-    }
-    setSortKey(key);
-    setSortOrder("asc");
-  }
+  const toggleSort = useCallback(
+    (key: SortKey) => {
+      if (sortKey === key) {
+        setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+        return;
+      }
+      setSortKey(key);
+      setSortOrder("asc");
+    },
+    [sortKey]
+  );
 
-  function sortIndicator(key: SortKey) {
-    if (sortKey !== key) return "↕";
-    return sortOrder === "asc" ? "↑" : "↓";
-  }
+  const sortIndicator = useCallback(
+    (key: SortKey) => {
+      if (sortKey !== key) return "↕";
+      return sortOrder === "asc" ? "↑" : "↓";
+    },
+    [sortKey, sortOrder]
+  );
+
+  const resetFilters = useCallback(() => {
+    setCostMin("");
+    setCostMax("");
+    setDateFrom("");
+    setDateTo("");
+  }, []);
 
   const filteredAndSorted = useMemo(() => {
     const costMinNum = costMin ? Number(costMin) : null;
@@ -81,7 +99,7 @@ export function HistoryPage() {
 
   useEffect(() => {
     void loadHistory();
-  }, []);
+  }, [loadHistory]);
 
   return (
     <section className="dashboard-main history-page-layout">
@@ -97,17 +115,12 @@ export function HistoryPage() {
         onCostMaxChange={setCostMax}
         onDateFromChange={setDateFrom}
         onDateToChange={setDateTo}
-        onReset={() => {
-          setCostMin("");
-          setCostMax("");
-          setDateFrom("");
-          setDateTo("");
-        }}
+        onReset={resetFilters}
       />
 
       <HistoryTableWidget
         items={filteredAndSorted}
-        loading={loading}
+        loading={visibleLoading}
         onRefresh={loadHistory}
         onDelete={removeItem}
         onSort={toggleSort}

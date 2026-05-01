@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { featureMap } from "../../../shared/config/feature-map";
 import { Modal } from "../../../shared/ui/modal";
-import { KitButton } from "../../../shared/ui/kit";
+import { KitButton, KitLoader } from "../../../shared/ui/kit";
+import { useMinimumLoading } from "../../../shared/lib/useMinimumLoading";
 import { usePredictionDetailsModal } from "../model/PredictionDetailsModalContext";
 
 function formatMoney(value: number) {
@@ -36,6 +37,7 @@ function deriveRiskLevel(predictedCost: number) {
 
 export function PredictionDetailsModal() {
   const { open, details, loading, error, closePredictionDetails, retryPredictionDetails } = usePredictionDetailsModal();
+  const visibleLoading = useMinimumLoading(loading && !details, { minMs: 1000 });
 
   const sortedFactors = useMemo(
     () => (details ? [...details.risk_factors].sort((a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value)) : []),
@@ -48,8 +50,10 @@ export function PredictionDetailsModal() {
 
   return (
     <Modal open={open} title={details?.full_name ?? "Карточка прогноза"} onClose={closePredictionDetails} className="prediction-details-modal">
-      {loading && !details ? (
-        <div className="prediction-details-state">Загрузка прогноза...</div>
+      {visibleLoading && !details ? (
+        <div className="prediction-details-state">
+          <KitLoader label="�������� ��������..." />
+        </div>
       ) : error && !details ? (
         <div className="prediction-details-state prediction-details-state--error">
           <p>{error.includes("404") ? "Прогноз не найден." : error}</p>
@@ -133,3 +137,5 @@ export function PredictionDetailsModal() {
     </Modal>
   );
 }
+
+
