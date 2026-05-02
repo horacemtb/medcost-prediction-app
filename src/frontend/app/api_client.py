@@ -17,6 +17,19 @@ def create_prediction(payload: dict) -> dict:
     return response.json()
 
 
+def recognize_patient_form(file_name: str, file_bytes: bytes, content_type: str | None = None) -> dict:
+    files = {
+        "file": (
+            file_name,
+            file_bytes,
+            content_type or "application/octet-stream",
+        )
+    }
+    response = requests.post(f"{API_BASE_URL}/api/ocr/patient-form", files=files, timeout=60)
+    response.raise_for_status()
+    return response.json()
+
+
 def get_factors(prediction_id: int) -> list[dict]:
     response = requests.get(f"{API_BASE_URL}/api/predictions/{prediction_id}/factors", timeout=60)
     response.raise_for_status()

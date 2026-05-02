@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -58,6 +58,12 @@ class HistoryResponse(BaseModel):
 
 class DeleteResponse(BaseModel):
     message: str
+
+
+class OcrPatientFormResponse(BaseModel):
+    fields: dict[str, Any]
+    raw_text: str
+    warnings: list[str] = []
 
 
 class ErrorResponse(BaseModel):
