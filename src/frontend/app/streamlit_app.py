@@ -8,7 +8,10 @@ from api_client import (
     get_factors,
     get_history,
     healthcheck,
+    get_dataset_percentile,
 )
+
+from dialogs.report_dialog import show_report_dialog
 
 st.set_page_config(page_title="MedCost Prediction App", layout="wide")
 
@@ -88,7 +91,22 @@ with tab_predict:
             )
 
         with col2:
-            smoker = st.checkbox("Курение")
+            # smoker = st.checkbox("Курение", key="smoker_checkbox")
+            
+            smoking_status = st.selectbox(
+                "Статус курения",
+                options=[
+                    "Никогда не курил",
+                    "Курит сейчас",
+                    "Бросил в этом году",
+                    "Бросил 1-2 года назад",
+                    "Бросил больше 3-х лет назад"
+                ],
+                index=0,
+            )
+            
+            # Логика для ML модели
+            smoker = (smoking_status == "Курит сейчас")      
             diabetes = st.checkbox("Диабет")
             hypertension = st.checkbox("Гипертония")
             heart_disease = st.checkbox("Болезни сердца")
@@ -124,6 +142,8 @@ with tab_predict:
                 step=100.0,
             )
 
+
+
         submitted = st.form_submit_button("Рассчитать")
 
     if submitted:
@@ -153,6 +173,7 @@ with tab_predict:
                 "gender": gender_mapping[gender_label],
                 "bmi": float(bmi),
                 "smoker": bool(smoker),
+                "smoker_status": smoking_status,
                 "diabetes": bool(diabetes),
                 "hypertension": bool(hypertension),
                 "heart_disease": bool(heart_disease),
@@ -172,6 +193,37 @@ with tab_predict:
                 result = create_prediction(payload)
                 st.session_state.last_prediction = result
                 st.session_state.factors = None
+                st.session_state.last_patient_data = {
+                'full_name': full_name.strip(),
+                'age': int(age),
+                'gender_label': gender_label,
+                'bmi': float(bmi),
+                'smoker': bool(smoker),
+                "smoker_status": smoking_status,
+                'diabetes': bool(diabetes),
+                'hypertension': bool(hypertension),
+                'heart_disease': bool(heart_disease),
+                'asthma': bool(asthma),
+                'physical_activity_label': physical_activity_label,
+                'daily_steps': int(daily_steps),
+                'sleep_hours': float(sleep_hours),
+                'stress_level': int(stress_level),
+                'doctor_visits_per_year': int(doctor_visits_per_year),
+                'hospital_admissions': int(hospital_admissions),
+                'medication_count': int(medication_count),
+                'city_type_label': city_type_label,
+                'previous_year_cost': float(previous_year_cost)
+            }
+            # ========== ПОЛУЧЕНИЕ КВАНТИЛЯ ЧЕРЕЗ API ==========
+                try:
+                    current_prediction_value = result['predicted_cost']
+                    percentile_response = get_dataset_percentile(current_prediction_value)
+                    
+                    result['percentile'] = percentile_response.get('percentile', 50.0)
+                except requests.RequestException as exc:
+                    st.warning(f"Не удалось рассчитать квантиль: {exc}")
+                    st.session_state.percentile = 50.0  # Значение по умолчанию
+
                 st.success("Прогноз рассчитан и сохранён в БД")
             except requests.RequestException as exc:
                 st.error(f"Ошибка при расчёте прогноза: {exc}")
@@ -243,6 +295,16 @@ with tab_predict:
             existing_factor_columns = [col for col in factor_columns if col in factors_df.columns]
 
             st.table(factors_df[existing_factor_columns])
+
+            if st.button("Сформировать отчёт"):
+                if st.session_state.last_prediction:
+                    @st.dialog("Отчёт о прогнозе медицинских расходов", width="large")
+                    def report_dialog_wrapper():
+                        show_report_dialog()
+                        
+                    report_dialog_wrapper()
+                else:
+                    st.warning("Сначала выполните расчёт прогноза")
     else:
         st.info("После расчёта здесь появится прогноз и объяснение.")
 

@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 COPY src/frontend/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --timeout 600 --no-cache-dir -r /app/requirements.txt
 
 COPY src/frontend/app /app
 COPY src/frontend/.streamlit /app/.streamlit
