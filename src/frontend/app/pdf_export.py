@@ -9,7 +9,6 @@ import traceback
 
 
 # ========== НАСТРОЙКА ШРИФТА ==========
-# Определяем путь к шрифту (проверяем несколько возможных мест)
 """Возвращает путь к файлу шрифта DejaVuSansCondensed.ttf"""
 FONT_PATH = os.path.join(os.path.dirname(__file__), "fonts", "DejaVuSansCondensed.ttf")
     # Проверяем, существует ли файл
@@ -115,10 +114,7 @@ def export_report_to_pdf(report_data):
         
         # ========== 2. ДАННЫЕ О ПАЦИЕНТЕ ==========
         pdf.section_title("2. Данные о пациенте")
-        
-        patient = report_data.get('patient_data', {})
-        
-        # Поочерёдно вызываем каждый add_label_value
+        patient = report_data.get('patient_data', {})      
         pdf.add_label_value("Возраст:", f"{patient.get('age', '-')} лет")
         pdf.add_label_value("Пол:", patient.get('gender', '-'))
         pdf.add_label_value("ИМТ:", f"{patient.get('bmi', '-')} ({patient.get('bmi_interpret', '-')})")
@@ -133,7 +129,6 @@ def export_report_to_pdf(report_data):
             pdf.add_label_value("Хронические заболевания:", ", ".join(risks))
         else:
             pdf.add_label_value("Хронические заболевания:", "нет")
-        
         pdf.ln(5)
         
         # ========== 3. ПРОГНОЗ ==========
@@ -164,7 +159,6 @@ def export_report_to_pdf(report_data):
                     pdf.cell(0, 6, f"-{impact:.1f}% (вклад {value})", 0, 1)
         else:
             pdf.add_label_value("Нет данных", "")
-        
         pdf.ln(5)
                 
         # ========== 5. ДИНАМИКА ==========
@@ -276,7 +270,6 @@ def create_report_data(
             previous_dict = previous_prediction
     
     # ========== 3. ИНТЕРПРЕТАЦИЯ ДАННЫХ ==========
-    
     # Интерпретация ИМТ
     bmi = patient_data.get('bmi', 0)
     if isinstance(bmi, str):
@@ -330,7 +323,6 @@ def create_report_data(
             active_risks.append(label)
 
 
-    # Интерпретация квантиля
     try:
         percentile = float(percentile)
     except:

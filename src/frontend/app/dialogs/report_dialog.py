@@ -6,24 +6,19 @@ from api_client import get_last_prediction_by_name
 
 def get_final_recommendation(risk_profile_score, risk_profile_category, patient_data, percentile, predicted_cost):
     """Формирование детальной итоговой рекомендации"""
-    
     recommendation_parts = []
-    # ========== 1. ОСНОВНОЙ ВЕРДИКТ ==========
     if risk_profile_category == "Низкий":
         recommendation_parts.append("Рекомендуется к страхованию по стандартному полису. ")
         recommendation_parts.append("Пациент демонстрирует низкий уровень медицинского риска. "
                                    "Страхование является экономически выгодным для компании.")
-    
     elif risk_profile_category == "Средний":
         recommendation_parts.append("Рекомендуется к страхованию с повышенными условиями. ")
         recommendation_parts.append("Пациент имеет умеренный уровень риска. "
                                    "Рекомендуется применение повышающего коэффициента к базовой премии.")
-            
-    else:  # Высокий риск
+    else:
         recommendation_parts.append("Не рекомендуется к стандартному страхованию. ")
         recommendation_parts.append("Пациент относится к группе высокого медицинского риска. "
                                    "Стандартное страхование экономически нецелесообразно.")
-        
         
     return "\n".join(recommendation_parts)
 
@@ -33,7 +28,6 @@ def show_report_dialog():
     prediction = st.session_state.get('last_prediction')
     patient_data = st.session_state.get('last_patient_data', {})
     factors = st.session_state.get('factors', [])
-    
 
     if not prediction:
         st.warning("Нет данных для отображения. Сначала выполните расчёт прогноза.")
@@ -279,7 +273,7 @@ def show_report_dialog():
 
     st.divider()
 
-    # ==================== ИТОГ ====================
+    # ==================== РАСЧЁТ КОЭФФИЦИЕНТА РИСКА ====================
     st.markdown("## Итоговая оценка")
     
     # 1. ML Risk
@@ -325,12 +319,12 @@ def show_report_dialog():
     
 
     final_recommendation = get_final_recommendation(
-    risk_profile_score=risk_profile_score,
-    risk_profile_category=risk_profile_category,
-    patient_data=patient_data,
-    percentile=percentile,
-    predicted_cost=prediction.get('predicted_cost', 0)
-)
+                    risk_profile_score=risk_profile_score,
+                    risk_profile_category=risk_profile_category,
+                    patient_data=patient_data,
+                    percentile=percentile,
+                    predicted_cost=prediction.get('predicted_cost', 0)
+                )
     st.markdown(f"**Коэффициент риска:** {risk_profile_score:.2f}")
     st.markdown(f"**Категория:** {risk_profile_category}")
     # st.markdown(f"**Рекомендация:** {risk_profile_text}")
@@ -380,5 +374,5 @@ def show_report_dialog():
         
     # Кнопка закрытия
     st.markdown("---")
-    if st.button("✖️ Закрыть отчёт", use_container_width=True):
+    if st.button("Закрыть отчёт", use_container_width=True):
         st.rerun()
