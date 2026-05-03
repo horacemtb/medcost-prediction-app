@@ -109,9 +109,8 @@ def show_report_dialog():
         # Медицинские показатели (чекбоксы)
         st.markdown("**Медицинские показатели:**")
         diseases = []
-        smoker_status = patient_data.get('smoker_status')
-        if smoker_status != 'Никогда не курил':
-            st.markdown(f"• Курение - {smoker_status}")
+        if patient_data.get('smoker'):
+             diseases.append("Курение")
         if patient_data.get('diabetes'):
             diseases.append("Диабет")
         if patient_data.get('hypertension'):
@@ -278,29 +277,11 @@ def show_report_dialog():
     
     # 1. ML Risk
     ml_risk = percentile / 100
-    # 2. Курение
-    smoking_adjustment = 0
-    if smoker_status == 'Бросил в этом году':
-        smoking_adjustment = 0.08
-    elif smoker_status == "Бросил 1-2 года назад":
-        smoking_adjustment = 0.04
-    elif smoker_status == "Бросил больше 3-х лет назад":
-        smoking_adjustment = 0.02
-    # 3. Учёт динамики расходов
-    if previous_prediction and prev_cost > 0:
-        cost_change_pct = (current_cost - prev_cost) / prev_cost
-        if cost_change_pct > 0.2:  # выросли больше чем на 20%
-            trend_adjustment = 0.08
-        elif cost_change_pct < -0.2:  # снизились больше чем на 20%
-            trend_adjustment = -0.08
-        else:
-            trend_adjustment = 0
-    else:
-        trend_adjustment = 0
+
 
 
     # raw_risk
-    raw_risk = ml_risk + smoking_adjustment + trend_adjustment
+    raw_risk = ml_risk
     raw_risk = max(0.05, raw_risk)
     
     # Risk Profile (логистическая функция)

@@ -91,22 +91,7 @@ with tab_predict:
             )
 
         with col2:
-            # smoker = st.checkbox("Курение", key="smoker_checkbox")
-            
-            smoking_status = st.selectbox(
-                "Статус курения",
-                options=[
-                    "Никогда не курил",
-                    "Курит сейчас",
-                    "Бросил в этом году",
-                    "Бросил 1-2 года назад",
-                    "Бросил больше 3-х лет назад"
-                ],
-                index=0,
-            )
-            
-            # Логика для ML модели
-            smoker = (smoking_status == "Курит сейчас")      
+            smoker = st.checkbox("Курение")   
             diabetes = st.checkbox("Диабет")
             hypertension = st.checkbox("Гипертония")
             heart_disease = st.checkbox("Болезни сердца")
@@ -173,7 +158,6 @@ with tab_predict:
                 "gender": gender_mapping[gender_label],
                 "bmi": float(bmi),
                 "smoker": bool(smoker),
-                "smoker_status": smoking_status,
                 "diabetes": bool(diabetes),
                 "hypertension": bool(hypertension),
                 "heart_disease": bool(heart_disease),
@@ -199,7 +183,6 @@ with tab_predict:
                 'gender_label': gender_label,
                 'bmi': float(bmi),
                 'smoker': bool(smoker),
-                "smoker_status": smoking_status,
                 'diabetes': bool(diabetes),
                 'hypertension': bool(hypertension),
                 'heart_disease': bool(heart_disease),

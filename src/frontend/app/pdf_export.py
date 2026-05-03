@@ -123,7 +123,6 @@ def export_report_to_pdf(report_data):
         pdf.add_label_value("Уровень стресса:", f"{patient.get('stress_level', '-')} ({patient.get('stress_interpret', '-')})")
         pdf.add_label_value("Госпитализаций:", patient.get('hospital_admissions', '-'))
         pdf.add_label_value("Количество лекарств:", patient.get('medication_count', '-'))
-        pdf.add_label_value("Курение:", patient.get('smoker_status', '-'))
         risks = patient.get('active_risks', [])
         if risks and len(risks) > 0:
             pdf.add_label_value("Хронические заболевания:", ", ".join(risks))
@@ -312,6 +311,7 @@ def create_report_data(
     # Активные риски
     active_risks = []
     risk_labels = {
+        'smoker': 'Курение',
         'diabetes': 'Диабет',
         'hypertension': 'Гипертония',
         'heart_disease': 'Болезни сердца',
