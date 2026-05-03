@@ -29,7 +29,7 @@ def get_final_recommendation(risk_profile_score, risk_profile_category, patient_
 
 
 def show_report_dialog():
-       # Получаем данные из session_state
+    # Получаем данные из session_state
     prediction = st.session_state.get('last_prediction')
     patient_data = st.session_state.get('last_patient_data', {})
     factors = st.session_state.get('factors', [])
@@ -62,9 +62,8 @@ def show_report_dialog():
         st.markdown(f"**ID запроса:**  \n{prediction.get('prediction_id', '—')}")
     with col3:
         created_at = prediction.get('created_at', '—')
-        if created_at != '—':
-            created_at = created_at[:19].replace('T', ' ')
-        st.markdown(f"**Дата:**  \n{created_at}")
+        created_at = datetime.fromisoformat(created_at).strftime("%d.%m.%Y %H:%M")
+        st.markdown(f"**Дата:**  \n{str(created_at)}")
     
     st.divider()
     
@@ -169,9 +168,9 @@ def show_report_dialog():
         change = predicted_cost - previous_cost
         change_pct = (change / previous_cost) * 100
         if change > 0:
-            st.markdown(f"**Рост расходов:** +{change:,.2f} ({change_pct:+.1f}%) по сравнению с прошлым годом")
+            st.markdown(f"**Рост расходов:** +{change:,.2f} ({change_pct:+.1f}%) по сравнению с прошлым годом (данные из анкеты)")
         else:
-            st.markdown(f"**Снижение расходов:** {change:,.2f} ({change_pct:+.1f}%) по сравнению с прошлым годом")
+            st.markdown(f"**Снижение расходов:** {change:,.2f} ({change_pct:+.1f}%) по сравнению с прошлым годом (данные из анкеты)")
     
     st.divider()
     
@@ -233,7 +232,7 @@ def show_report_dialog():
             
             with col1:
                 st.subheader("Текущее обращение")
-                st.metric("Прогноз расходов", f"{prediction.get('predicted_cost', 0):,.0f}")
+                st.metric("Прогноз расходов", f"{prediction.get('predicted_cost', 0):,.2f}")
                 current_id = prediction.get('prediction_id', '—')
                 if current_id:
                     st.caption(f"ID: {current_id}")
@@ -249,7 +248,7 @@ def show_report_dialog():
                 prev_ID = previous_prediction.get('id', 0)
                 st.metric(
                     "Прогноз расходов", 
-                    f"{prev_cost:,.0f}"
+                    f"{prev_cost:,.2f}"
                 )
                 if current_id:
                     st.caption(f"ID: {prev_ID}")
@@ -288,9 +287,9 @@ def show_report_dialog():
     # 2. Курение
     smoking_adjustment = 0
     if smoker_status == 'Бросил в этом году':
-        smoking_adjustment = 0.12
+        smoking_adjustment = 0.08
     elif smoker_status == "Бросил 1-2 года назад":
-        smoking_adjustment = 0.06
+        smoking_adjustment = 0.04
     elif smoker_status == "Бросил больше 3-х лет назад":
         smoking_adjustment = 0.02
     # 3. Учёт динамики расходов

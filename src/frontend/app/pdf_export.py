@@ -109,7 +109,8 @@ def export_report_to_pdf(report_data):
         pdf.section_title("1. Информация о пациенте")
         pdf.add_label_value("ФИО:", report_data.get('full_name', '-'))
         pdf.add_label_value("ID запроса:", report_data.get('report_id', '-'))
-        pdf.add_label_value("Дата расчёта:", report_data.get('date', '-'))
+        date_report = report_data.get('date', '-')
+        pdf.add_label_value("Дата расчёта:", str(date_report))
         pdf.ln(5)
         
         # ========== 2. ДАННЫЕ О ПАЦИЕНТЕ ==========
@@ -160,7 +161,7 @@ def export_report_to_pdf(report_data):
                 if direction == 'increase':
                     pdf.cell(0, 6, f"+{impact:.1f}% (вклад {value})", 0, 1)
                 else:
-                    pdf.cell(0, 6, f"-{impact:.1f}% (вклад {value}", 0, 1)
+                    pdf.cell(0, 6, f"-{impact:.1f}% (вклад {value})", 0, 1)
         else:
             pdf.add_label_value("Нет данных", "")
         
@@ -174,7 +175,7 @@ def export_report_to_pdf(report_data):
             prev_date = previous.get('created_at', '-')
             prev_date = datetime.fromisoformat(prev_date).strftime("%d.%m.%Y %H:%M")
             prev_ID = previous.get('id', '0')
-            pdf.add_label_value("Предыдущий прогноз:", f"{prev_cost:,.0f} ")
+            pdf.add_label_value("Предыдущий прогноз:", f"{prev_cost:,.2f} ")
             pdf.add_label_value("ID запроса:", f"{prev_ID:,.0f}")
             pdf.add_label_value("Дата:", str(prev_date))
             pdf.add_label_value("Изменение:", report_data.get('trend_message', '-'))
