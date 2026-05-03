@@ -8,7 +8,11 @@ from api_client import (
     get_factors,
     get_history,
     healthcheck,
+<<<<<<< HEAD
     get_dataset_percentile,
+=======
+    recognize_patient_form,
+>>>>>>> origin/main
 )
 
 from dialogs.report_dialog import show_report_dialog
@@ -21,10 +25,131 @@ if "last_prediction" not in st.session_state:
 if "factors" not in st.session_state:
     st.session_state.factors = None
 
+if "ocr_warnings" not in st.session_state:
+    st.session_state.ocr_warnings = []
+
+if "ocr_raw_text" not in st.session_state:
+    st.session_state.ocr_raw_text = ""
+
+
+GENDER_OPTIONS = ["Женский", "Мужской"]
+PHYSICAL_ACTIVITY_OPTIONS = ["Низкий", "Средний", "Высокий"]
+CITY_TYPE_OPTIONS = ["Город", "Пригород", "Сельская местность"]
+
+GENDER_TO_BACKEND = {
+    "Женский": 0,
+    "Мужской": 1,
+}
+BACKEND_TO_GENDER = {value: key for key, value in GENDER_TO_BACKEND.items()}
+
+PHYSICAL_ACTIVITY_TO_BACKEND = {
+    "Низкий": "Low",
+    "Средний": "Medium",
+    "Высокий": "High",
+}
+BACKEND_TO_PHYSICAL_ACTIVITY = {value: key for key, value in PHYSICAL_ACTIVITY_TO_BACKEND.items()}
+
+CITY_TYPE_TO_BACKEND = {
+    "Город": "Urban",
+    "Пригород": "Semi-Urban",
+    "Сельская местность": "Rural",
+}
+BACKEND_TO_CITY_TYPE = {value: key for key, value in CITY_TYPE_TO_BACKEND.items()}
+
 
 def format_signed_value(value: float) -> str:
     return f"{value:+,.2f}"
 
+
+def ensure_form_defaults() -> None:
+    defaults = {
+        "full_name": "",
+        "age": 35,
+        "gender_label": "Женский",
+        "bmi": 24.5,
+        "physical_activity_label": "Средний",
+        "city_type_label": "Город",
+        "daily_steps": 7000,
+        "sleep_hours": 7.0,
+        "smoker": False,
+        "diabetes": False,
+        "hypertension": False,
+        "heart_disease": False,
+        "asthma": False,
+        "stress_level": 5,
+        "doctor_visits_per_year": 3,
+        "hospital_admissions": 0,
+        "medication_count": 0,
+        "previous_year_cost": 10000.0,
+    }
+    for key, value in defaults.items():
+        st.session_state.setdefault(key, value)
+
+
+def apply_ocr_fields(fields: dict) -> None:
+    string_fields = {"full_name"}
+    int_fields = {
+        "age",
+        "daily_steps",
+        "stress_level",
+        "doctor_visits_per_year",
+        "hospital_admissions",
+        "medication_count",
+    }
+    float_fields = {"bmi", "sleep_hours", "previous_year_cost"}
+    bool_fields = {"smoker", "diabetes", "hypertension", "heart_disease", "asthma"}
+
+    for field_name in string_fields:
+        if field_name in fields:
+            st.session_state[field_name] = str(fields[field_name])
+
+    for field_name in int_fields:
+        if field_name in fields:
+            st.session_state[field_name] = int(fields[field_name])
+
+    for field_name in float_fields:
+        if field_name in fields:
+            st.session_state[field_name] = float(fields[field_name])
+
+    for field_name in bool_fields:
+        if field_name in fields:
+            st.session_state[field_name] = bool(fields[field_name])
+
+    if "gender" in fields:
+        st.session_state.gender_label = BACKEND_TO_GENDER.get(fields["gender"], st.session_state.gender_label)
+    if "physical_activity_level" in fields:
+        st.session_state.physical_activity_label = BACKEND_TO_PHYSICAL_ACTIVITY.get(
+            fields["physical_activity_level"],
+            st.session_state.physical_activity_label,
+        )
+    if "city_type" in fields:
+        st.session_state.city_type_label = BACKEND_TO_CITY_TYPE.get(fields["city_type"], st.session_state.city_type_label)
+
+
+def build_prediction_payload() -> dict:
+    return {
+        "full_name": st.session_state.full_name.strip(),
+        "age": int(st.session_state.age),
+        "gender": GENDER_TO_BACKEND[st.session_state.gender_label],
+        "bmi": float(st.session_state.bmi),
+        "smoker": bool(st.session_state.smoker),
+        "diabetes": bool(st.session_state.diabetes),
+        "hypertension": bool(st.session_state.hypertension),
+        "heart_disease": bool(st.session_state.heart_disease),
+        "asthma": bool(st.session_state.asthma),
+        "physical_activity_level": PHYSICAL_ACTIVITY_TO_BACKEND[st.session_state.physical_activity_label],
+        "daily_steps": int(st.session_state.daily_steps),
+        "sleep_hours": float(st.session_state.sleep_hours),
+        "stress_level": int(st.session_state.stress_level),
+        "doctor_visits_per_year": int(st.session_state.doctor_visits_per_year),
+        "hospital_admissions": int(st.session_state.hospital_admissions),
+        "medication_count": int(st.session_state.medication_count),
+        "city_type": CITY_TYPE_TO_BACKEND[st.session_state.city_type_label],
+        "previous_year_cost": float(st.session_state.previous_year_cost),
+    }
+
+
+ensure_form_defaults()
 
 st.title("MedCost Prediction App")
 st.caption("Прототип аналитической системы для прогноза медицинских расходов")
@@ -40,91 +165,130 @@ with st.sidebar:
 tab_predict, tab_history = st.tabs(["Новый расчёт", "История"])
 
 with tab_predict:
-    st.subheader("Данные пациента")
+    title_col, ocr_col = st.columns([3, 1])
+
+    with title_col:
+        st.subheader("Данные пациента")
+
+    with ocr_col:
+        with st.popover("✨ Распознать анкету"):
+            uploaded_form = st.file_uploader(
+                "Загрузите русскую анкету",
+                type=["png", "jpg", "jpeg"],
+            )
+            recognize_clicked = st.button("Распознать", disabled=uploaded_form is None)
+
+            if recognize_clicked and uploaded_form is not None:
+                try:
+                    ocr_result = recognize_patient_form(
+                        uploaded_form.name,
+                        uploaded_form.getvalue(),
+                        uploaded_form.type,
+                    )
+                    apply_ocr_fields(ocr_result.get("fields", {}))
+                    st.session_state.ocr_warnings = ocr_result.get("warnings", [])
+                    st.session_state.ocr_raw_text = ocr_result.get("raw_text", "")
+                    st.rerun()
+                except requests.RequestException as exc:
+                    st.error(f"Ошибка распознавания анкеты: {exc}")
+
+    if st.session_state.ocr_warnings:
+        with st.expander("Предупреждения OCR"):
+            for warning in st.session_state.ocr_warnings:
+                st.warning(warning)
 
     with st.form("prediction_form"):
         col1, col2 = st.columns(2)
 
         with col1:
-            full_name = st.text_input("ФИО пациента", placeholder="Иванов Иван Иванович")
-            age = st.number_input("Возраст", min_value=18, max_value=100, value=35)
+            full_name = st.text_input("ФИО пациента", placeholder="Иванов Иван Иванович", key="full_name")
+            age = st.number_input("Возраст", min_value=18, max_value=100, key="age")
 
             gender_label = st.selectbox(
                 "Пол",
-                options=["Женский", "Мужской"],
+                options=GENDER_OPTIONS,
+                key="gender_label",
             )
 
             bmi = st.number_input(
                 "BMI",
                 min_value=10.0,
                 max_value=60.0,
-                value=24.5,
                 step=0.1,
+                key="bmi",
             )
 
             physical_activity_label = st.selectbox(
                 "Уровень физической активности",
-                options=["Низкий", "Средний", "Высокий"],
-                index=1,
+                options=PHYSICAL_ACTIVITY_OPTIONS,
+                key="physical_activity_label",
             )
 
             city_type_label = st.selectbox(
                 "Тип населённого пункта",
-                options=["Город", "Пригород", "Сельская местность"],
-                index=0,
+                options=CITY_TYPE_OPTIONS,
+                key="city_type_label",
             )
 
             daily_steps = st.number_input(
                 "Шагов в день",
                 min_value=0,
                 max_value=50000,
-                value=7000,
                 step=100,
+                key="daily_steps",
             )
 
             sleep_hours = st.number_input(
                 "Часы сна",
                 min_value=0.0,
                 max_value=24.0,
-                value=7.0,
                 step=0.5,
+                key="sleep_hours",
             )
 
         with col2:
+<<<<<<< HEAD
             smoker = st.checkbox("Курение")   
             diabetes = st.checkbox("Диабет")
             hypertension = st.checkbox("Гипертония")
             heart_disease = st.checkbox("Болезни сердца")
             asthma = st.checkbox("Астма")
+=======
+            smoker = st.checkbox("Курение", key="smoker")
+            diabetes = st.checkbox("Диабет", key="diabetes")
+            hypertension = st.checkbox("Гипертония", key="hypertension")
+            heart_disease = st.checkbox("Болезни сердца", key="heart_disease")
+            asthma = st.checkbox("Астма", key="asthma")
+>>>>>>> origin/main
 
-            stress_level = st.slider("Уровень стресса", min_value=1, max_value=10, value=5)
+            stress_level = st.slider("Уровень стресса", min_value=1, max_value=10, key="stress_level")
 
             doctor_visits_per_year = st.number_input(
                 "Визитов к врачу в год",
                 min_value=0,
                 max_value=100,
-                value=3,
+                key="doctor_visits_per_year",
             )
 
             hospital_admissions = st.number_input(
                 "Госпитализаций",
                 min_value=0,
                 max_value=50,
-                value=0,
+                key="hospital_admissions",
             )
 
             medication_count = st.number_input(
                 "Количество лекарств",
                 min_value=0,
                 max_value=100,
-                value=0,
+                key="medication_count",
             )
 
             previous_year_cost = st.number_input(
                 "Расходы за прошлый год",
                 min_value=0.0,
-                value=10000.0,
                 step=100.0,
+                key="previous_year_cost",
             )
 
 
@@ -132,48 +296,11 @@ with tab_predict:
         submitted = st.form_submit_button("Рассчитать")
 
     if submitted:
-        if not full_name.strip():
+        if not st.session_state.full_name.strip():
             st.warning("Укажите ФИО пациента")
         else:
-            gender_mapping = {
-                "Женский": 0,
-                "Мужской": 1,
-            }
-
-            physical_activity_mapping = {
-                "Низкий": "Low",
-                "Средний": "Medium",
-                "Высокий": "High",
-            }
-
-            city_type_mapping = {
-                "Город": "Urban",
-                "Пригород": "Semi-Urban",
-                "Сельская местность": "Rural",
-            }
-
-            payload = {
-                "full_name": full_name.strip(),
-                "age": int(age),
-                "gender": gender_mapping[gender_label],
-                "bmi": float(bmi),
-                "smoker": bool(smoker),
-                "diabetes": bool(diabetes),
-                "hypertension": bool(hypertension),
-                "heart_disease": bool(heart_disease),
-                "asthma": bool(asthma),
-                "physical_activity_level": physical_activity_mapping[physical_activity_label],
-                "daily_steps": int(daily_steps),
-                "sleep_hours": float(sleep_hours),
-                "stress_level": int(stress_level),
-                "doctor_visits_per_year": int(doctor_visits_per_year),
-                "hospital_admissions": int(hospital_admissions),
-                "medication_count": int(medication_count),
-                "city_type": city_type_mapping[city_type_label],
-                "previous_year_cost": float(previous_year_cost),
-            }
-
             try:
+                payload = build_prediction_payload()
                 result = create_prediction(payload)
                 st.session_state.last_prediction = result
                 st.session_state.factors = None
