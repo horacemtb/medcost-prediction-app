@@ -11,9 +11,12 @@ def get_final_recommendation(risk_profile_score, risk_profile_category, patient_
         recommendation_parts.append("Рекомендуется к страхованию по стандартному полису. ")
         recommendation_parts.append("Пациент демонстрирует низкий уровень медицинского риска. "
                                    "Страхование является экономически выгодным для компании.")
-    elif risk_profile_category == "Средний":
+    elif risk_profile_category == "Стандартный":
+        recommendation_parts.append("Рекомендуется к страхованию с повышенными условиями")
+        recommendation_parts.append("Пациент имеет умеренный уровень риска. Стандартное страхование требует корректировки.")
+    elif risk_profile_category == "Выше среднего":
         recommendation_parts.append("Рекомендуется к страхованию с повышенными условиями. ")
-        recommendation_parts.append("Пациент имеет умеренный уровень риска. "
+        recommendation_parts.append("Пациент демонстрирует уровень риска значительно выше среднего. "
                                    "Рекомендуется применение повышающего коэффициента к базовой премии.")
     else:
         recommendation_parts.append("Не рекомендуется к стандартному страхованию. ")
@@ -94,7 +97,11 @@ def show_report_dialog():
         
         activity = patient_data.get('physical_activity_label', '—')
         st.markdown(f"**Уровень физ. активности:** {activity}")
-        
+        city_type_label = patient_data.get('city_type_label', '-')
+        st.markdown(f"**Тип населённого пункта:** {city_type_label}")
+        sleep_hours = patient_data.get('sleep_hours')
+        sleep_status = 'Норма' if sleep_hours >= 7 else 'Ниже нормы'
+        st.markdown(f"**Часы сна:** {sleep_hours} - {sleep_status}")
         # Уровень стресса
         stress = patient_data.get('stress_level', 0)
         if stress < 4:
@@ -282,17 +289,18 @@ def show_report_dialog():
 
     # raw_risk
     raw_risk = ml_risk
-    raw_risk = max(0.05, raw_risk)
+    risk_profile_score = max(0.05, raw_risk)
     
-    # Risk Profile (логистическая функция)
-    risk_profile_score = 1 / (1 + np.exp(-6 * (raw_risk - 0.5)))
     
     # Определение категории риск-профиля
     if risk_profile_score < 0.5:
         risk_profile_category = "Низкий"
         risk_profile_text = "Стандартный полис"
+    elif risk_profile_score < 0.75:
+        risk_profile_category = "Стандартный"
+        risk_profile_text = "Стандартный полис"
     elif risk_profile_score < 0.90:
-        risk_profile_category = "Средний"
+        risk_profile_category = "Выше среднего"
         risk_profile_text = "Повышенный коэффициент / одобрение с условиями"
     else:
         risk_profile_category = "Высокий"

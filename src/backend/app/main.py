@@ -19,8 +19,5 @@ app.add_middleware(
 )
 
 app.include_router(predictions_router)
-<<<<<<< HEAD
 app.include_router(ml_router)
-=======
 app.include_router(ocr_router)
->>>>>>> origin/main

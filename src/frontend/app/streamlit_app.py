@@ -8,11 +8,8 @@ from api_client import (
     get_factors,
     get_history,
     healthcheck,
-<<<<<<< HEAD
     get_dataset_percentile,
-=======
     recognize_patient_form,
->>>>>>> origin/main
 )
 
 from dialogs.report_dialog import show_report_dialog
@@ -247,19 +244,11 @@ with tab_predict:
             )
 
         with col2:
-<<<<<<< HEAD
-            smoker = st.checkbox("Курение")   
-            diabetes = st.checkbox("Диабет")
-            hypertension = st.checkbox("Гипертония")
-            heart_disease = st.checkbox("Болезни сердца")
-            asthma = st.checkbox("Астма")
-=======
             smoker = st.checkbox("Курение", key="smoker")
             diabetes = st.checkbox("Диабет", key="diabetes")
             hypertension = st.checkbox("Гипертония", key="hypertension")
             heart_disease = st.checkbox("Болезни сердца", key="heart_disease")
             asthma = st.checkbox("Астма", key="asthma")
->>>>>>> origin/main
 
             stress_level = st.slider("Уровень стресса", min_value=1, max_value=10, key="stress_level")
 

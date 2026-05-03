@@ -119,6 +119,8 @@ def export_report_to_pdf(report_data):
         pdf.add_label_value("Пол:", patient.get('gender', '-'))
         pdf.add_label_value("ИМТ:", f"{patient.get('bmi', '-')} ({patient.get('bmi_interpret', '-')})")
         pdf.add_label_value("Уровень физ. активности:", patient.get('physical_activity', '-'))
+        pdf.add_label_value("Тип населённого пункта:", patient.get('city_type_label', '-'))
+        pdf.add_label_value("Часы сна:", f"{patient.get('sleep_hours', '-')} ({patient.get('sleep_interpret', '-')})")
         pdf.add_label_value("Шагов в день:", f"{patient.get('daily_steps', '-')} ({patient.get('steps_status', '-')})")
         pdf.add_label_value("Уровень стресса:", f"{patient.get('stress_level', '-')} ({patient.get('stress_interpret', '-')})")
         pdf.add_label_value("Госпитализаций:", patient.get('hospital_admissions', '-'))
@@ -292,8 +294,12 @@ def create_report_data(
         daily_steps = int(daily_steps)
     except:
         daily_steps = 0
-    steps_status = "норма" if daily_steps >= 8000 else "мало"
-    
+    steps_status = "норма" if daily_steps >= 8000 else "недостаточно"
+
+    city_type_label = patient_data.get('city_type_label', '-')
+    # Интерпретация часов сна
+    sleep_hours = patient_data.get('sleep_hours', 0)
+    sleep_interpret = 'норма' if sleep_hours >= 7 else 'ниже нормы'
     # Интерпретация стресса
     stress = patient_data.get('stress_level', 5)
     try:
@@ -371,8 +377,11 @@ def create_report_data(
             'physical_activity': str(patient_data.get('physical_activity_label', '-')),
             'daily_steps': str(daily_steps),
             'steps_status': str(steps_status),
+            'city_type_label': str(city_type_label),
             'stress_level': str(stress),
             'stress_interpret': str(stress_interpret),
+            'sleep_hours': f"{sleep_hours:.1f}",
+            'sleep_interpret': str(sleep_interpret),
             'hospital_admissions': str(patient_data.get('hospital_admissions', 0)),
             'medication_count': str(patient_data.get('medication_count', 0)),
             'active_risks': active_risks, 
