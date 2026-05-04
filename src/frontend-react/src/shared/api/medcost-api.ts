@@ -1,4 +1,10 @@
-import type { HistoryResponse, PredictionDetailsResponse, PredictionInput, PredictionResponse, RiskFactor } from "../types/medcost";
+import type {
+  HistoryResponse,
+  PredictionDetailsResponse,
+  PredictionInput,
+  PredictionResponse,
+  RiskFactor,
+} from "../types/medcost";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -20,6 +26,8 @@ export const medcostApi = {
   health: () => req<{ status: string }>("/api/health"),
   predict: (payload: PredictionInput) =>
     req<PredictionResponse>("/api/predict", { method: "POST", body: JSON.stringify(payload) }),
+  recalculatePrediction: (id: number, payload: PredictionInput) =>
+    req<PredictionResponse>(`/api/predictions/${id}/recalculate`, { method: "PUT", body: JSON.stringify(payload) }),
   prediction: (id: number, init?: RequestInit) => req<PredictionDetailsResponse>(`/api/predictions/${id}`, init),
   factors: (id: number) => req<RiskFactor[]>(`/api/predictions/${id}/factors`),
   history: (search?: string) => req<HistoryResponse>(`/api/history${search ? `?search=${encodeURIComponent(search)}` : ""}`),

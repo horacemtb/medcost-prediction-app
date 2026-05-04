@@ -10,7 +10,7 @@ import {
 import { medcostApi } from "../../../shared/api/medcost-api";
 import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
 
-type PredictionDetailsModalState = {
+type PredictionDetailsState = {
   open: boolean;
   predictionId: number | null;
   details: PredictionDetailsResponse | null;
@@ -18,16 +18,16 @@ type PredictionDetailsModalState = {
   error: string;
 };
 
-type PredictionDetailsModalContextValue = PredictionDetailsModalState & {
+type PredictionDetailsContextValue = PredictionDetailsState & {
   openPredictionDetails: (id: number) => void;
   closePredictionDetails: () => void;
   retryPredictionDetails: () => void;
 };
 
-const PredictionDetailsModalContext =
-  createContext<PredictionDetailsModalContextValue | null>(null);
+const PredictionDetailsContext =
+  createContext<PredictionDetailsContextValue | null>(null);
 
-export function PredictionDetailsModalProvider({
+export function PredictionDetailsProvider({
   children,
 }: {
   children: ReactNode;
@@ -114,18 +114,18 @@ export function PredictionDetailsModalProvider({
   );
 
   return (
-    <PredictionDetailsModalContext.Provider value={value}>
+    <PredictionDetailsContext.Provider value={value}>
       {children}
-    </PredictionDetailsModalContext.Provider>
+    </PredictionDetailsContext.Provider>
   );
 }
 
-export function usePredictionDetailsModal() {
-  const value = useContext(PredictionDetailsModalContext);
+export function usePredictionDetails() {
+  const value = useContext(PredictionDetailsContext);
 
   if (!value) {
     throw new Error(
-      "usePredictionDetailsModal must be used within PredictionDetailsModalProvider",
+      "usePredictionDetails must be used within PredictionDetailsProvider",
     );
   }
 

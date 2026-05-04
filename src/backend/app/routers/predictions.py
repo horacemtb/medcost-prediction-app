@@ -11,7 +11,6 @@ from ..schemas import (
     PredictionHistoryItem,
     PredictionInput,
     PredictionResponse,
-    RecalculatePredictionResponse,
     RiskFactorResponse,
 )
 from ..services.ml_service import get_ml_service
@@ -140,15 +139,18 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/predictions/{prediction_id}/recalculate", response_model=RecalculatePredictionResponse)
-def recalculate_prediction(prediction_id: int, db: Session = Depends(get_db)):
+@router.put("/predictions/{prediction_id}/recalculate", response_model=PredictionResponse)
+def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Session = Depends(get_db)):
     record = db.query(PredictionRecord).filter(PredictionRecord.id == prediction_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
     ml_service = get_ml_service()
-    feature_payload = {field: getattr(record, field) for field in FEATURE_FIELDS}
-    old_predicted_cost = record.predicted_cost
+    payload_data = payload.model_dump()
+    for key, value in payload_data.items():
+        setattr(record, key, value)
+
+    feature_payload = {field: payload_data[field] for field in FEATURE_FIELDS}
     record.predicted_cost = ml_service.predict(feature_payload)
 
     # Remove existing factors so they are recalculated for the updated prediction.
@@ -158,10 +160,9 @@ def recalculate_prediction(prediction_id: int, db: Session = Depends(get_db)):
     db.refresh(record)
     _build_or_create_risk_factors(record, db)
 
-    return RecalculatePredictionResponse(
+    return PredictionResponse(
         prediction_id=record.id,
         full_name=record.full_name,
-        old_predicted_cost=old_predicted_cost,
         predicted_cost=record.predicted_cost,
         created_at=record.created_at,
     )

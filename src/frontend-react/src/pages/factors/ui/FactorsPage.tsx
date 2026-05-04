@@ -2,7 +2,7 @@
 
 export function FactorsPage() {
   return (
-    <section className="dashboard-main">
+    <section className="page-shell">
       <PlaceholderCard
         title="Факторы риска"
         subtitle="Раздел подготовлен как отдельная страница. Здесь будет расширенная аналитика факторов."

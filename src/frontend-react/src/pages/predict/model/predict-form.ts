@@ -1,4 +1,5 @@
 import type { PredictionInput } from "../../../shared/types/medcost";
+import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
 
 export const predictTabs = ["Пациент", "Образ жизни", "Факторы", "Расходы"] as const;
 
@@ -84,5 +85,38 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
     medication_count: form.medication_count,
     city_type,
     previous_year_cost: form.previous_year_cost,
+  };
+}
+
+export function mapPredictionDetailsToForm(details: PredictionDetailsResponse): PredictFormState {
+  return {
+    full_name: details.full_name,
+    age: details.age,
+    gender: details.gender === 1 ? "Мужской" : "Женский",
+    bmi: details.bmi,
+    smoker: details.smoker,
+    diabetes: details.diabetes,
+    hypertension: details.hypertension,
+    heart_disease: details.heart_disease,
+    asthma: details.asthma,
+    physical_activity_label:
+      details.physical_activity_level === "High"
+        ? "Высокий"
+        : details.physical_activity_level === "Low"
+          ? "Низкий"
+          : "Средний",
+    daily_steps: details.daily_steps,
+    sleep_hours: details.sleep_hours,
+    stress_level: details.stress_level,
+    doctor_visits_per_year: details.doctor_visits_per_year,
+    hospital_admissions: details.hospital_admissions,
+    medication_count: details.medication_count,
+    city_type_label:
+      details.city_type === "Semi-Urban"
+        ? "Пригород"
+        : details.city_type === "Rural"
+          ? "Сельская местность"
+          : "Город",
+    previous_year_cost: details.previous_year_cost,
   };
 }

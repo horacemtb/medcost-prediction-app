@@ -1,9 +1,10 @@
-import { memo, useCallback, useEffect, type MouseEvent } from "react";
+﻿import { memo, useCallback, type MouseEvent } from "react";
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { KitButton, KitLoader } from "../../../shared/ui/kit";
-import { usePredictionDetailsModal } from "../../prediction-details-modal";
+import { usePredictionDetails } from "../../prediction-details";
 import deleteIcon from "../../../shared/assets/delete.svg";
 import refreshIcon from "../../../shared/assets/refresh.svg";
+import calculateIcon from "../../../shared/assets/calculate.svg";
 
 type SortKey = "id" | "full_name" | "age" | "predicted_cost" | "created_at";
 
@@ -12,6 +13,7 @@ type HistoryTableWidgetProps = {
   loading: boolean;
   onRefresh: () => void;
   onDelete: (id: number) => void;
+  onRecalculate: (id: number) => void;
   onSort: (key: SortKey) => void;
   sortIndicator: (key: SortKey) => string;
 };
@@ -20,12 +22,14 @@ type HistoryRowProps = {
   item: HistoryItem;
   onOpen: (id: number) => void;
   onDelete: (id: number) => void;
+  onRecalculate: (id: number) => void;
 };
 
 const HistoryRow = memo(function HistoryRow({
   item,
   onOpen,
   onDelete,
+  onRecalculate,
 }: HistoryRowProps) {
   const handleOpen = useCallback(() => onOpen(item.id), [item.id, onOpen]);
   const handleDelete = useCallback(
@@ -35,10 +39,17 @@ const HistoryRow = memo(function HistoryRow({
     },
     [item.id, onDelete],
   );
+  const handleRecalculate = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      onRecalculate(item.id);
+    },
+    [item.id, onRecalculate],
+  );
 
   return (
     <tr
-      className="history-row"
+      className="cursor-pointer hover:[&_td]:bg-accent/10 focus-visible:[&_td]:bg-accent/10"
       role="button"
       tabIndex={0}
       aria-label={`Открыть прогноз ${item.full_name}`}
@@ -55,11 +66,21 @@ const HistoryRow = memo(function HistoryRow({
       <td>{item.age}</td>
       <td>{item.predicted_cost.toFixed(2)} ₽</td>
       <td>{new Date(item.created_at).toLocaleString()}</td>
-      <td>
+      <td className="text-left">
         <KitButton
           type="button"
-          className="history-delete-btn"
+          style={{ padding: "0px" }}
           variant="icon"
+          size={24}
+          aria-label={`Перерасчет пациента ${item.full_name}`}
+          onClick={handleRecalculate}
+        >
+          <img src={calculateIcon} alt="" aria-hidden="true" />
+        </KitButton>
+        <KitButton
+          type="button"
+          variant="icon"
+          style={{ padding: "0px" }}
           size={24}
           aria-label={`Удалить прогноз ${item.full_name}`}
           onClick={handleDelete}
@@ -76,27 +97,24 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   loading,
   onRefresh,
   onDelete,
+  onRecalculate,
   onSort,
   sortIndicator,
 }: HistoryTableWidgetProps) {
-  const { openPredictionDetails } = usePredictionDetailsModal();
+  const { openPredictionDetails } = usePredictionDetails();
   const handleOpenPrediction = useCallback(
     (id: number) => openPredictionDetails(id),
     [openPredictionDetails],
   );
 
-  useEffect(() => {
-    console.log("перерисовка");
-  }, []);
-
   return (
-    <section className="tile form-tile history-widget history-widget--table">
-      <div className="history-meta history-meta--table">
+    <section className="tile form-tile grid grid-cols-1 h-full min-h-0 gap-2 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
+      <div className="flex items-center justify-between gap-2">
         <h3 className="widget-title">Таблица истории</h3>
         <KitButton
           type="button"
           variant="icon"
-          size={32}
+          size={24}
           onClick={onRefresh}
           disabled={loading}
           aria-label={loading ? "Обновление..." : "Обновить"}
@@ -106,46 +124,53 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
             src={refreshIcon}
             alt=""
             aria-hidden="true"
-            className={
-              loading
-                ? "history-refresh-icon history-refresh-icon--loading"
-                : "history-refresh-icon"
-            }
+            className={`h-5 w-5 [filter:var(--nav-icon-filter)] ${loading ? "animate-spin" : ""}`.trim()}
           />
         </KitButton>
       </div>
 
-      <div className="history-table-wrap">
+      <div className="relative h-full min-h-0">
         {loading && (
           <div
-            className="history-loading-overlay"
+            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center backdrop-blur-[2px]"
             role="status"
             aria-live="polite"
             aria-busy="true"
           >
-            <div className="history-loading-card">
+            <div className="history-loading-card loading-card">
               <KitLoader label="Загрузка истории..." />
             </div>
           </div>
         )}
-        <table>
-          <thead>
+        <div className="scroll-hidden h-full min-h-0 overflow-auto">
+          <table className="table-fixed">
+          <colgroup>
+            <col className="w-[100px]" />
+            <col />
+            <col className="w-[100px]" />
+            <col className="w-[160px]" />
+            <col className="w-[190px]" />
+            <col className="w-[100px]" />
+          </colgroup>
+          <thead className="sticky top-0 z-20">
             <tr>
-              <th>
+              <th className="bg-bg">
                 <KitButton
                   type="button"
-                  className="sort-btn"
+                  style={{ padding: 0 }}
+                  className="sort-btn w-full justify-start text-left"
                   variant="sort"
                   size={24}
                   onClick={() => onSort("id")}
                 >
-                  Идентификатор {sortIndicator("id")}
+                  ID {sortIndicator("id")}
                 </KitButton>
               </th>
-              <th>
+              <th className="bg-bg">
                 <KitButton
                   type="button"
-                  className="sort-btn"
+                  style={{ padding: 0 }}
+                  className="sort-btn w-full justify-start text-left"
                   variant="sort"
                   size={24}
                   onClick={() => onSort("full_name")}
@@ -153,10 +178,11 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   ФИО {sortIndicator("full_name")}
                 </KitButton>
               </th>
-              <th>
+              <th className="bg-bg">
                 <KitButton
                   type="button"
-                  className="sort-btn"
+                  style={{ padding: 0 }}
+                  className="sort-btn w-full justify-start text-left"
                   variant="sort"
                   size={24}
                   onClick={() => onSort("age")}
@@ -164,10 +190,11 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   Возраст {sortIndicator("age")}
                 </KitButton>
               </th>
-              <th>
+              <th className="bg-bg">
                 <KitButton
                   type="button"
-                  className="sort-btn"
+                  style={{ padding: 0 }}
+                  className="sort-btn w-full justify-start text-left"
                   variant="sort"
                   size={24}
                   onClick={() => onSort("predicted_cost")}
@@ -175,10 +202,11 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   Прогноз {sortIndicator("predicted_cost")}
                 </KitButton>
               </th>
-              <th>
+              <th className="bg-bg">
                 <KitButton
                   type="button"
-                  className="sort-btn"
+                  style={{ padding: 0 }}
+                  className="sort-btn w-full justify-start text-left"
                   variant="sort"
                   size={24}
                   onClick={() => onSort("created_at")}
@@ -186,7 +214,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   Дата {sortIndicator("created_at")}
                 </KitButton>
               </th>
-              <th></th>
+              <th className="bg-bg"></th>
             </tr>
           </thead>
           <tbody>
@@ -196,17 +224,19 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                 item={item}
                 onOpen={handleOpenPrediction}
                 onDelete={onDelete}
+                onRecalculate={onRecalculate}
               />
             ))}
             {!loading && !items.length && (
               <tr>
-                <td colSpan={6} className="history-empty">
+                <td colSpan={6} className="py-4 text-center text-sm text-muted">
                   Ничего не найдено по текущим фильтрам.
                 </td>
               </tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
     </section>
   );

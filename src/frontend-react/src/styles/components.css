@@ -1,0 +1,81 @@
+@layer components {
+  .tile {
+    @apply rounded-2xl border p-3;
+    border-color: color-mix(in srgb, var(--line) 80%, transparent);
+    background: color-mix(in srgb, var(--bg) 86%, #fff 14%);
+  }
+
+  .page-shell {
+    @apply grid h-full min-h-0 gap-3 mx-auto w-full max-w-[1280px];
+  }
+
+  .scroll-hidden {
+    scrollbar-width: none;
+  }
+
+  .scroll-hidden::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .form-tile {
+    background: color-mix(in srgb, var(--bg) 90%, #fff 10%);
+  }
+
+  .widget-title {
+    @apply m-0 text-base font-semibold;
+    color: var(--txt);
+  }
+
+  .kit-button img,
+  .kit-button svg {
+    @apply h-4 w-4 shrink-0;
+  }
+
+  .tiny {
+    @apply m-0 text-xs uppercase tracking-wide;
+    color: var(--muted);
+  }
+
+  .muted {
+    @apply m-0 text-sm;
+    color: var(--muted);
+  }
+
+  .predict-main-column,
+  .predict-side-widget {
+    @apply grid min-w-0 items-start gap-3;
+  }
+
+  .top-actions .kit-button {
+    min-width: 120px;
+  }
+
+  .grid {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-2;
+  }
+
+  .checks {
+    @apply my-2 flex flex-wrap gap-2;
+  }
+
+  .summary-list p {
+    @apply my-1 text-sm;
+    color: var(--muted);
+  }
+
+  .loading-card {
+    @apply inline-flex min-h-[52px] items-center justify-center rounded-xl border px-3 py-2 shadow-lg;
+    border-color: color-mix(in srgb, var(--line) 80%, transparent);
+    background: color-mix(in srgb, var(--bg) 86%, #fff 14%);
+  }
+
+  .kpi-up {
+    color: var(--danger);
+  }
+
+  .kpi-down {
+    @apply text-emerald-500;
+  }
+
+}
