@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type Ref } from "react";
 import { featureMap } from "../../../shared/config/feature-map";
 import {
   buildPredictSummaryView,
@@ -8,11 +8,19 @@ import {
 type PredictSummaryWidgetProps = {
   form: PredictSummaryForm;
   chronicCount: number;
+  ocrLoading?: boolean;
+  ocrWarnings?: string[];
+  ocrError?: string;
+  summaryRef?: Ref<HTMLElement>;
 };
 
 export function PredictSummaryWidget({
   form,
   chronicCount,
+  ocrLoading = false,
+  ocrWarnings = [],
+  ocrError,
+  summaryRef,
 }: PredictSummaryWidgetProps) {
   const summary = useMemo(
     () => buildPredictSummaryView(form, chronicCount),
@@ -20,12 +28,28 @@ export function PredictSummaryWidget({
   );
 
   return (
-    <section className="tile form-tile sticky top-0 gap-3 p-4">
+    <section ref={summaryRef} className="tile form-tile sticky top-0 gap-3 p-4">
       <div className="flex flex-col gap-2 w-full">
         <h3 className="widget-title">Сводка перед расчетом</h3>
         <p className="m-0 text-sm text-muted">
           {summary.normalizedName || "ФИО не заполнено"}
         </p>
+        {ocrLoading && <p className="m-0 text-sm text-muted">Распознаем анкету...</p>}
+        {ocrError && (
+          <div className="rounded-xl border border-danger/50 bg-danger/20 p-2">
+            <p className="m-0 text-xs text-danger">{ocrError}</p>
+          </div>
+        )}
+        {ocrWarnings.length > 0 && (
+          <div className="rounded-xl border border-warning/50 bg-warning/20 p-2">
+            <p className="m-0 text-xs font-semibold text-warning">Предупреждения OCR</p>
+            <ul className="mt-2 list-disc pl-4 text-xs text-warning">
+              {ocrWarnings.map((warning) => (
+                <li key={warning}>{warning}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="rounded-xl border border-line/70 bg-white/5 p-3">
           <div className="flex justify-between text-xs text-muted">
@@ -106,4 +130,3 @@ export function PredictSummaryWidget({
     </section>
   );
 }
-

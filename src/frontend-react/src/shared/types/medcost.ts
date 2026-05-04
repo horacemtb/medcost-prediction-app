@@ -72,3 +72,9 @@ export type HistoryResponse = {
   items: HistoryItem[];
   total: number;
 };
+
+export type OcrPatientFormResponse = {
+  fields: Record<string, unknown>;
+  raw_text: string;
+  warnings: string[];
+};
