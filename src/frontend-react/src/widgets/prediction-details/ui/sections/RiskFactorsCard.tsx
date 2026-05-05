@@ -13,9 +13,9 @@ export function RiskFactorsCard({ factors }: RiskFactorsCardProps) {
         <h3 className="m-0 text-ui-lg font-semibold text-[#1a2741]">
           Ключевые факторы влияния на прогноз
         </h3>
-        <span className="inline-flex items-center gap-2 text-ui-sm text-[#4a9f63]">
-          <span className="size-2.5 rounded-[2px] bg-[#37b45c]" />
-          Снижение прогноза
+        <span className="inline-flex items-center gap-2 text-ui-sm text-[#b42318]">
+          <span className="size-2.5 rounded-[2px] bg-[#b42318]" />
+          Повышение прогноза
         </span>
       </div>
       <p className="m-0 mb-3 text-ui-xs text-[#5f6e86]">
@@ -46,15 +46,15 @@ export function RiskFactorsCard({ factors }: RiskFactorsCardProps) {
 
               <div className="relative h-10">
                 <div className="absolute left-1/2 top-0 h-full w-px bg-[#98a7bf]" />
-                <div className="absolute left-1/2 top-1/2 h-6 w-[calc(50%-2px)] -translate-y-1/2 rounded-r-[4px] bg-[#dbe9dc]" />
+                <div className="absolute right-1/2 top-1/2 h-6 w-[calc(50%-2px)] -translate-y-1/2 rounded-l-[4px] bg-[#dbe9dc]" />
                 <div
-                  className="absolute right-1/2 top-1/2 h-6 -translate-y-1/2 rounded-[4px] bg-[#2fb354]"
+                  className="absolute left-1/2 top-1/2 h-6 -translate-y-1/2 rounded-r-[4px] bg-[#b42318]"
                   style={{ width: `${percent / 2}%` }}
                 />
               </div>
 
               <div className="text-right text-ui-sm font-medium text-[#2d3b55]">
-                -{formatMoney(absValue)}
+                +{formatMoney(absValue)}
               </div>
             </div>
           );
