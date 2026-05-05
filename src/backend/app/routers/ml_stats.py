@@ -1,24 +1,32 @@
-from fastapi import APIRouter
-import pandas as pd
-import numpy as np
-from pathlib import Path
+﻿from pathlib import Path
 
-router = APIRouter(prefix="/api", tags=["ml"]) 
+import pandas as pd
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/api", tags=["ml"])
+
+_DATASET_PATH = Path("/app/app/routers/medical_cost_prediction_dataset.csv")
+_cached_predictions: list[float] | None = None
+
+
+def _get_predictions() -> list[float]:
+    global _cached_predictions
+    if _cached_predictions is None:
+        df = pd.read_csv(_DATASET_PATH)
+        _cached_predictions = [float(v) for v in df["annual_medical_cost"].tolist()]
+    return _cached_predictions
+
+
+def calculate_percentile(predicted_cost: float) -> float:
+    predictions = _get_predictions()
+    if not predictions:
+        return 50.0
+    return (sum(1 for p in predictions if p < predicted_cost) / len(predictions)) * 100
+
 
 @router.post("/percentile")
 async def percentile_from_dataset(prediction_data: dict):
-    """Рассчитать перцентиль на основе тренировочного датасета"""
-    CURRENT_DIR = Path(__file__).parent  # src/backend/app/routers/
-    # Загружаем предсказания из датасета (кешируем)
-    if not hasattr(percentile_from_dataset, "cached_predictions"):
-        df = pd.read_csv("/app/app/routers/medical_cost_prediction_dataset.csv")
-        
-        percentile_from_dataset.cached_predictions = df['annual_medical_cost'].tolist()
-
-    
-    predicted_cost = prediction_data.get('predicted_cost', 0)
-    predictions = percentile_from_dataset.cached_predictions
-    
-    percentile = (sum(1 for p in predictions if p < predicted_cost) / len(predictions)) * 100
-    
+    """Рассчитать перцентиль на основе тренировочного датасета."""
+    predicted_cost = float(prediction_data.get("predicted_cost", 0) or 0)
+    percentile = calculate_percentile(predicted_cost)
     return {"percentile": percentile}

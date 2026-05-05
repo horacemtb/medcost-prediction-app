@@ -64,6 +64,14 @@ class PredictionDetailsResponse(BaseModel):
     risk_factors: list[RiskFactorResponse]
 
 
+class PredictionAssessmentResponse(BaseModel):
+    prediction_id: int
+    risk_category: str
+    percentile: float
+    recommendation_title: str
+    recommendation_description: str
+
+
 class PredictionHistoryItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -28,7 +28,9 @@ export function CostsSection({
     <div className="form-section">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="flex flex-col">
-          <span className="flex items-center">Визитов к врачу в год</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Визитов к врачу в год
+          </span>
           <KitInput
             type="number"
             min={0}
@@ -42,7 +44,9 @@ export function CostsSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Госпитализаций</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Госпитализаций
+          </span>
           <KitInput
             type="number"
             min={0}
@@ -56,7 +60,9 @@ export function CostsSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Количество лекарств</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Количество лекарств
+          </span>
           <KitInput
             type="number"
             min={0}
@@ -70,7 +76,9 @@ export function CostsSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Расходы за прошлый год, ₽</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Расходы за прошлый год, ₽
+          </span>
           <KitInput
             inputMode="numeric"
             value={costInput}
@@ -84,4 +92,3 @@ export function CostsSection({
     </div>
   );
 }
-

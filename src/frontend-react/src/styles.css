@@ -11,6 +11,7 @@
 }
 
 :root {
+  color-scheme: light;
   --bg: #f3f6fb;
   --txt: #1f2c44;
   --muted: #627188;
@@ -20,18 +21,6 @@
   --danger: #d56d6d;
   --nav-icon-filter: brightness(0) saturate(100%) invert(28%) sepia(16%) saturate(620%) hue-rotate(177deg) brightness(93%) contrast(89%);
   --nav-icon-filter-active: brightness(0) saturate(100%) invert(56%) sepia(58%) saturate(928%) hue-rotate(128deg) brightness(93%) contrast(91%);
-}
-
-html[data-theme="dark"] {
-  --bg: #0f172a;
-  --txt: #e2e8f0;
-  --muted: #94a3b8;
-  --placeholder: #64748b;
-  --line: #334155;
-  --accent: #38bdf8;
-  --danger: #f87171;
-  --nav-icon-filter: brightness(0) saturate(100%) invert(73%) sepia(12%) saturate(422%) hue-rotate(176deg) brightness(93%) contrast(88%);
-  --nav-icon-filter-active: brightness(0) saturate(100%) invert(72%) sepia(29%) saturate(2625%) hue-rotate(161deg) brightness(98%) contrast(94%);
 }
 
 @layer base {
@@ -61,6 +50,7 @@ html[data-theme="dark"] {
     width: 100%;
     min-width: 720px;
     border-collapse: collapse;
+    font-size: 0.875rem;
   }
 
   th,
@@ -68,7 +58,6 @@ html[data-theme="dark"] {
     text-align: left;
     padding: 8px;
     border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
-    font-size: 12px;
   }
 
   input[type="date"]::-webkit-datetime-edit {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { medcostApi } from "../../../shared/api/medcost-api";
 import { consumePendingOcrFile } from "../../../shared/lib/pending-ocr-file";
@@ -137,7 +137,9 @@ export function usePredictPageState() {
   const [form, setForm] = useState<PredictFormState>(initialPredictForm);
   const [activeTab, setActiveTab] = useState<PredictTabId>(predictTabs[0]);
   const [costInput, setCostInput] = useState(
-    initialPredictForm.previous_year_cost.toLocaleString("ru-RU"),
+    initialPredictForm.previous_year_cost
+      ? initialPredictForm.previous_year_cost.toLocaleString("ru-RU")
+      : "",
   );
   const [result, setResult] = useState<PredictionResponse | null>(null);
   const [formPredictionId, setFormPredictionId] = useState<number | null>(null);
@@ -227,21 +229,61 @@ export function usePredictPageState() {
     const state = location.state as {
       prefillDetails?: PredictionDetailsResponse;
       ocrError?: string;
+      openReport?: boolean;
+      forceNew?: boolean;
     } | null;
+    if (state?.forceNew) {
+      setForm(initialPredictForm);
+      setCostInput(
+        initialPredictForm.previous_year_cost
+          ? initialPredictForm.previous_year_cost.toLocaleString("ru-RU")
+          : "",
+      );
+      setResult(null);
+      setFormPredictionId(null);
+      setErrors({});
+      setError("");
+      setOcrError("");
+      setOcrWarnings([]);
+      setOcrRawText("");
+      setShouldScrollToSummary(false);
+      closePredictionDetails();
+      navigate(location.pathname, { replace: true, state: null });
+      return;
+    }
+
     const details = state?.prefillDetails;
     if (!details) return;
 
     const nextForm = mapPredictionDetailsToForm(details);
     setForm(nextForm);
     setCostInput(nextForm.previous_year_cost.toLocaleString("ru-RU"));
-    setResult(null);
+    if (state?.openReport) {
+      setResult({
+        prediction_id: details.prediction_id,
+        full_name: details.full_name,
+        predicted_cost: details.predicted_cost,
+        created_at: details.created_at,
+      });
+      openPredictionDetails(details.prediction_id);
+    } else {
+      setResult(null);
+    }
     setFormPredictionId(details.prediction_id);
     setErrors({});
     setError("");
-    closePredictionDetails();
+    if (!state?.openReport) {
+      closePredictionDetails();
+    }
 
     navigate(location.pathname, { replace: true, state: null });
-  }, [closePredictionDetails, location.pathname, location.state, navigate]);
+  }, [
+    closePredictionDetails,
+    location.pathname,
+    location.state,
+    navigate,
+    openPredictionDetails,
+  ]);
 
   useEffect(() => {
     const state = location.state as {
@@ -331,12 +373,18 @@ export function usePredictPageState() {
   );
 
   const handleCostInputBlur = useCallback(() => {
-    setCostInput(form.previous_year_cost.toLocaleString("ru-RU"));
+    setCostInput(
+      form.previous_year_cost ? form.previous_year_cost.toLocaleString("ru-RU") : "",
+    );
   }, [form.previous_year_cost]);
 
   const handleReset = useCallback(() => {
     setForm(initialPredictForm);
-    setCostInput(initialPredictForm.previous_year_cost.toLocaleString("ru-RU"));
+    setCostInput(
+      initialPredictForm.previous_year_cost
+        ? initialPredictForm.previous_year_cost.toLocaleString("ru-RU")
+        : "",
+    );
     setResult(null);
     setFormPredictionId(null);
     setErrors({});
@@ -398,9 +446,37 @@ export function usePredictPageState() {
     }
   }, [handleReset, result]);
 
-  const exportPrediction = useCallback((details: PredictionDetailsResponse) => {
-    exportPredictionPdf(details);
-  }, []);
+  const exportPrediction = useCallback(
+    async (details: PredictionDetailsResponse) => {
+      await exportPredictionPdf(details);
+    },
+    [],
+  );
+
+  const recognizePatientForm = useCallback(
+    async (file: File) => {
+      setOcrLoading(true);
+      setShouldScrollToSummary(true);
+      setOcrError("");
+      setOcrWarnings([]);
+      setOcrRawText("");
+      setResult(null);
+
+      try {
+        const response = await medcostApi.ocrPatientForm(file);
+        applyOcrFields(response.fields);
+        setOcrWarnings(response.warnings ?? []);
+        setOcrRawText(response.raw_text ?? "");
+      } catch (e) {
+        setOcrError(
+          e instanceof Error ? e.message : "Не удалось распознать анкету.",
+        );
+      } finally {
+        setOcrLoading(false);
+      }
+    },
+    [applyOcrFields],
+  );
 
   const resetShouldScrollToSummary = useCallback(() => {
     setShouldScrollToSummary(false);
@@ -433,6 +509,7 @@ export function usePredictPageState() {
     recalculate,
     deleteCurrentPrediction,
     exportPrediction,
+    recognizePatientForm,
     resetShouldScrollToSummary,
   };
 }

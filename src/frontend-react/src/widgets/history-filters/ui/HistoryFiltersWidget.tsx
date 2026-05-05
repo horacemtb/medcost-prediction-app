@@ -82,7 +82,7 @@ export function HistoryFiltersWidget({
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-ui-xs text-muted">
         <span>Показано: {shownCount}</span>
         {hasFilters && (
           <KitButton type="button" onClick={onReset}>

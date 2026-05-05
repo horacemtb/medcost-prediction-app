@@ -1,4 +1,51 @@
 @layer components {
+  .text-ui-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .text-ui-sm {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .text-ui-md {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .text-ui-lg {
+    font-size: 1.125rem;
+    line-height: 1.35;
+  }
+
+  .text-ui-display {
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .text-ui-kpi {
+    font-size: clamp(2.5rem, 3.5vw, 3.375rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .text-ui-brand {
+    font-size: clamp(1.5rem, 2vw, 2.25rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .text-ui-nav {
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+  }
+
   .tile {
     @apply rounded-2xl border p-3;
     border-color: color-mix(in srgb, var(--line) 80%, transparent);
@@ -6,7 +53,7 @@
   }
 
   .page-shell {
-    @apply grid h-full min-h-0 gap-3 mx-auto w-full max-w-[1280px];
+    @apply grid h-full min-h-0 w-full gap-4;
   }
 
   .scroll-hidden {
@@ -23,7 +70,9 @@
   }
 
   .widget-title {
-    @apply m-0 text-base font-semibold;
+    @apply m-0 font-semibold;
+    font-size: 1rem;
+    line-height: 1.5rem;
     color: var(--txt);
   }
 
@@ -33,12 +82,16 @@
   }
 
   .tiny {
-    @apply m-0 text-xs uppercase tracking-wide;
+    @apply m-0 uppercase tracking-wide;
+    font-size: 0.75rem;
+    line-height: 1rem;
     color: var(--muted);
   }
 
   .muted {
-    @apply m-0 text-sm;
+    @apply m-0;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
     color: var(--muted);
   }
 
@@ -51,16 +104,14 @@
     min-width: 120px;
   }
 
-  .grid {
-    @apply grid grid-cols-1 gap-3 md:grid-cols-2;
-  }
-
   .checks {
     @apply my-2 flex flex-wrap gap-2;
   }
 
   .summary-list p {
-    @apply my-1 text-sm;
+    @apply my-1;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
     color: var(--muted);
   }
 

@@ -1,7 +1,6 @@
 ﻿import { memo, useCallback, type MouseEvent } from "react";
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { KitButton, KitLoader } from "../../../shared/ui/kit";
-import { usePredictionDetails } from "../../prediction-details";
 import deleteIcon from "../../../shared/assets/delete.svg";
 import refreshIcon from "../../../shared/assets/refresh.svg";
 import calculateIcon from "../../../shared/assets/calculate.svg";
@@ -12,6 +11,7 @@ type HistoryTableWidgetProps = {
   items: HistoryItem[];
   loading: boolean;
   onRefresh: () => void;
+  onOpen: (id: number) => void;
   onDelete: (id: number) => void;
   onRecalculate: (id: number) => void;
   onSort: (key: SortKey) => void;
@@ -96,17 +96,12 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   items,
   loading,
   onRefresh,
+  onOpen,
   onDelete,
   onRecalculate,
   onSort,
   sortIndicator,
 }: HistoryTableWidgetProps) {
-  const { openPredictionDetails } = usePredictionDetails();
-  const handleOpenPrediction = useCallback(
-    (id: number) => openPredictionDetails(id),
-    [openPredictionDetails],
-  );
-
   return (
     <section className="tile form-tile grid grid-cols-1 h-full min-h-0 gap-2 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
       <div className="flex items-center justify-between gap-2">
@@ -144,97 +139,97 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
         )}
         <div className="scroll-hidden h-full min-h-0 overflow-auto">
           <table className="table-fixed">
-          <colgroup>
-            <col className="w-[100px]" />
-            <col />
-            <col className="w-[100px]" />
-            <col className="w-[160px]" />
-            <col className="w-[190px]" />
-            <col className="w-[100px]" />
-          </colgroup>
-          <thead className="sticky top-0 z-20">
-            <tr>
-              <th className="bg-bg">
-                <KitButton
-                  type="button"
-                  style={{ padding: 0 }}
-                  className="sort-btn w-full justify-start text-left"
-                  variant="sort"
-                  size={24}
-                  onClick={() => onSort("id")}
-                >
-                  ID {sortIndicator("id")}
-                </KitButton>
-              </th>
-              <th className="bg-bg">
-                <KitButton
-                  type="button"
-                  style={{ padding: 0 }}
-                  className="sort-btn w-full justify-start text-left"
-                  variant="sort"
-                  size={24}
-                  onClick={() => onSort("full_name")}
-                >
-                  ФИО {sortIndicator("full_name")}
-                </KitButton>
-              </th>
-              <th className="bg-bg">
-                <KitButton
-                  type="button"
-                  style={{ padding: 0 }}
-                  className="sort-btn w-full justify-start text-left"
-                  variant="sort"
-                  size={24}
-                  onClick={() => onSort("age")}
-                >
-                  Возраст {sortIndicator("age")}
-                </KitButton>
-              </th>
-              <th className="bg-bg">
-                <KitButton
-                  type="button"
-                  style={{ padding: 0 }}
-                  className="sort-btn w-full justify-start text-left"
-                  variant="sort"
-                  size={24}
-                  onClick={() => onSort("predicted_cost")}
-                >
-                  Прогноз {sortIndicator("predicted_cost")}
-                </KitButton>
-              </th>
-              <th className="bg-bg">
-                <KitButton
-                  type="button"
-                  style={{ padding: 0 }}
-                  className="sort-btn w-full justify-start text-left"
-                  variant="sort"
-                  size={24}
-                  onClick={() => onSort("created_at")}
-                >
-                  Дата {sortIndicator("created_at")}
-                </KitButton>
-              </th>
-              <th className="bg-bg"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <HistoryRow
-                key={item.id}
-                item={item}
-                onOpen={handleOpenPrediction}
-                onDelete={onDelete}
-                onRecalculate={onRecalculate}
-              />
-            ))}
-            {!loading && !items.length && (
+            <colgroup>
+              <col className="w-[100px]" />
+              <col />
+              <col className="w-[100px]" />
+              <col className="w-[160px]" />
+              <col className="w-[190px]" />
+              <col className="w-[100px]" />
+            </colgroup>
+            <thead className="sticky top-0 z-20">
               <tr>
-                <td colSpan={6} className="py-4 text-center text-sm text-muted">
-                  Ничего не найдено по текущим фильтрам.
-                </td>
+                <th className="bg-bg">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("id")}
+                  >
+                    ID {sortIndicator("id")}
+                  </KitButton>
+                </th>
+                <th className="bg-bg">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("full_name")}
+                  >
+                    ФИО {sortIndicator("full_name")}
+                  </KitButton>
+                </th>
+                <th className="bg-bg">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("age")}
+                  >
+                    Возраст {sortIndicator("age")}
+                  </KitButton>
+                </th>
+                <th className="bg-bg">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("predicted_cost")}
+                  >
+                    Прогноз {sortIndicator("predicted_cost")}
+                  </KitButton>
+                </th>
+                <th className="bg-bg">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("created_at")}
+                  >
+                    Дата {sortIndicator("created_at")}
+                  </KitButton>
+                </th>
+                <th className="bg-bg"></th>
               </tr>
-            )}
-          </tbody>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <HistoryRow
+                  key={item.id}
+                  item={item}
+                  onOpen={onOpen}
+                  onDelete={onDelete}
+                  onRecalculate={onRecalculate}
+                />
+              ))}
+              {!loading && !items.length && (
+                <tr>
+                  <td colSpan={6} className="py-4 text-center text-ui-sm text-muted">
+                    Ничего не найдено по текущим фильтрам.
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
       </div>

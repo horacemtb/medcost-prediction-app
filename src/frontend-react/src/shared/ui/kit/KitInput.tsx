@@ -6,7 +6,7 @@ export const KitInput = forwardRef<HTMLInputElement, KitInputProps>(function Kit
   return (
     <input
       ref={ref}
-      className={`h-8 w-full rounded-xl border border-line/70 bg-transparent px-3 text-[14px] text-txt outline-none transition placeholder:[color:var(--placeholder)] focus:border-accent/70 focus:ring-2 focus:ring-accent/25 ${className}`.trim()}
+      className={`h-8 w-full rounded-xl border border-line/70 bg-transparent px-3 text-ui-sm text-txt outline-none transition placeholder:[color:var(--placeholder)] focus:border-accent/70 focus:ring-2 focus:ring-accent/25 ${className}`.trim()}
       {...props}
     />
   );

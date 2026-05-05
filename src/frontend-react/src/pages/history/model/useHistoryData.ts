@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { medcostApi } from "../../../shared/api/medcost-api";
 import { useMinimumLoading } from "../../../shared/lib/useMinimumLoading";
 import type { HistoryItem } from "../../../shared/types/medcost";
@@ -17,11 +17,11 @@ export function useHistoryData({
   const [error, setError] = useState("");
   const visibleLoading = useMinimumLoading(loading, { minMs: 1000 });
 
-  const loadHistory = useCallback(async () => {
+  const loadHistory = useCallback(async (search?: string) => {
     setLoading(true);
     setError("");
     try {
-      const data = await medcostApi.history();
+      const data = await medcostApi.history(search);
       setHistory(data.items);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка");
@@ -31,12 +31,12 @@ export function useHistoryData({
   }, []);
 
   const removeItem = useCallback(
-    async (id: number) => {
+    async (id: number, search?: string) => {
       await medcostApi.deleteHistory(id);
       if (activePredictionId === id) {
         closePredictionDetails();
       }
-      await loadHistory();
+      await loadHistory(search);
     },
     [activePredictionId, closePredictionDetails, loadHistory],
   );

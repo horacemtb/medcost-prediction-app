@@ -1,4 +1,4 @@
-import type { PredictionInput } from "../../../shared/types/medcost";
+﻿import type { PredictionInput } from "../../../shared/types/medcost";
 import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
 
 export const predictTabs = ["Пациент", "Образ жизни", "Факторы", "Расходы"] as const;
@@ -7,23 +7,23 @@ export type PredictTabId = (typeof predictTabs)[number];
 
 export const initialPredictForm = {
   full_name: "",
-  age: 35,
-  gender: "Женский",
-  bmi: 24.5,
+  age: 0,
+  gender: "",
+  bmi: 0,
   smoker: false,
   diabetes: false,
   hypertension: false,
   heart_disease: false,
   asthma: false,
-  physical_activity_label: "Средний",
-  daily_steps: 7000,
-  sleep_hours: 7,
-  stress_level: 5,
-  doctor_visits_per_year: 3,
+  physical_activity_label: "",
+  daily_steps: 0,
+  sleep_hours: 0,
+  stress_level: 1,
+  doctor_visits_per_year: 0,
   hospital_admissions: 0,
   medication_count: 0,
-  city_type_label: "Город",
-  previous_year_cost: 10000,
+  city_type_label: "",
+  previous_year_cost: 0,
 };
 
 export type PredictFormState = typeof initialPredictForm;
@@ -42,11 +42,14 @@ export function validatePredictForm(values: PredictFormState): PredictFormErrors
   const next: PredictFormErrors = {};
   const fullName = normalizeName(values.full_name);
   if (!fullName || fullName.length < 5) next.full_name = "Укажите полное ФИО (минимум 5 символов).";
+  if (!values.gender) next.gender = "Укажите пол.";
+  if (!values.physical_activity_label) next.physical_activity_label = "Укажите уровень физической активности.";
+  if (!values.city_type_label) next.city_type_label = "Укажите тип населенного пункта.";
   if (values.age < 18 || values.age > 100) next.age = "Возраст должен быть от 18 до 100.";
-  if (values.bmi < 10 || values.bmi > 60) next.bmi = "ИМТ должен быть в диапазоне 10–60.";
-  if (values.daily_steps < 0 || values.daily_steps > 50000) next.daily_steps = "Шагов в день должно быть 0–50000.";
-  if (values.sleep_hours < 0 || values.sleep_hours > 24) next.sleep_hours = "Сон должен быть в диапазоне 0–24 часов.";
-  if (values.stress_level < 1 || values.stress_level > 10) next.stress_level = "Стресс должен быть в диапазоне 1–10.";
+  if (values.bmi < 10 || values.bmi > 60) next.bmi = "ИМТ должен быть в диапазоне 10-60.";
+  if (values.daily_steps < 0 || values.daily_steps > 50000) next.daily_steps = "Шагов в день должно быть 0-50000.";
+  if (values.sleep_hours < 0 || values.sleep_hours > 24) next.sleep_hours = "Сон должен быть в диапазоне 0-24 часов.";
+  if (values.stress_level < 1 || values.stress_level > 10) next.stress_level = "Стресс должен быть в диапазоне 1-10.";
   if (values.previous_year_cost < 0) next.previous_year_cost = "Расходы не могут быть отрицательными.";
   return next;
 }

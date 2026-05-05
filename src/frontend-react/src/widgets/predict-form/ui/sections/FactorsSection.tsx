@@ -21,7 +21,7 @@ export function FactorsSection({ form, chronicCount, onUpdateField }: FactorsSec
           />
         ))}
       </div>
-      <small className="mt-3 block text-xs text-muted">
+      <small className="mt-3 block text-ui-xs text-muted">
         {chronicCount ? `Отмечено факторов: ${chronicCount}` : "Факторы не выбраны"}
       </small>
     </div>

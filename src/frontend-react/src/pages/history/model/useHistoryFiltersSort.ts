@@ -1,15 +1,23 @@
-import { useCallback, useMemo, useState } from "react";
+﻿import { useCallback, useMemo, useState } from "react";
 import type { HistoryItem } from "../../../shared/types/medcost";
 import { parseHistoryDate } from "./history-utils";
 import type { SortKey, SortOrder } from "./history-types";
 
-export function useHistoryFiltersSort(history: HistoryItem[]) {
+type UseHistoryFiltersSortParams = {
+  initialSortKey?: SortKey;
+  initialSortOrder?: SortOrder;
+};
+
+export function useHistoryFiltersSort(
+  history: HistoryItem[],
+  params: UseHistoryFiltersSortParams = {},
+) {
   const [costMin, setCostMin] = useState("");
   const [costMax, setCostMax] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("created_at");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [sortKey, setSortKey] = useState<SortKey>(params.initialSortKey ?? "created_at");
+  const [sortOrder, setSortOrder] = useState<SortOrder>(params.initialSortOrder ?? "desc");
 
   const toggleSort = useCallback(
     (key: SortKey) => {

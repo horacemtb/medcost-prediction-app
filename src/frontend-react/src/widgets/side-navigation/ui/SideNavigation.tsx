@@ -1,123 +1,112 @@
-﻿import { useCallback, useRef } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import addChart from "../../../shared/assets/addChart.svg";
-import history from "../../../shared/assets/history.svg";
-import setting from "../../../shared/assets/settings.svg";
-import { setPendingOcrFile } from "../../../shared/lib/pending-ocr-file";
+﻿import { useMemo } from "react";
+import { NavLink } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ClipboardPlus,
+  History as HistoryIcon,
+  LayoutDashboard,
+  Settings,
+} from "lucide-react";
+import { KitButton } from "../../../shared/ui/kit/KitButton";
+
+type SideNavigationProps = {
+  collapsed: boolean;
+  onToggle: () => void;
+};
 
 const navItems = [
-  { to: "/predict", label: "Расчет", icon: addChart },
-  { to: "/history", label: "История", icon: history },
-  { to: "/settings", label: "Настройки", icon: setting },
+  { to: "/dashboard", label: "Статистика", icon: LayoutDashboard },
+  { to: "/predict", label: "Новый прогноз", icon: ClipboardPlus },
+  { to: "/history", label: "История", icon: HistoryIcon },
+  { to: "/settings", label: "Настройки", icon: Settings },
 ];
 
-export function SideNavigation() {
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleOpenOcrChooser = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const handleOcrFileChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      event.target.value = "";
-      if (!file) return;
-
-      const fileName = file.name.toLowerCase();
-      const isSupportedMime =
-        file.type === "image/png" || file.type === "image/jpeg";
-      const isSupportedExt =
-        fileName.endsWith(".png") ||
-        fileName.endsWith(".jpg") ||
-        fileName.endsWith(".jpeg");
-
-      if (!isSupportedMime && !isSupportedExt) {
-        navigate("/predict", {
-          state: {
-            ocrError: "Поддерживаются только файлы PNG и JPEG для OCR.",
-          },
-        });
-        return;
-      }
-
-      setPendingOcrFile(file);
-      navigate("/predict");
-    },
-    [navigate],
+export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
+  const asideClassName = useMemo(
+    () =>
+      [
+        "flex min-h-screen flex-col justify-between bg-white py-7 transition-[padding,width] duration-200",
+        collapsed ? "px-3" : "px-6",
+      ].join(" "),
+    [collapsed],
   );
 
   return (
-    <aside
-      className="h-fit lg:sticky lg:top-1/2 lg:-translate-y-1/2"
-      aria-label="Боковая навигация"
-    >
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg"
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-        onChange={handleOcrFileChange}
-      />
-      <nav className="grid grid-cols-3 gap-2 lg:grid-cols-1 lg:gap-3">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `inline-flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-2xl px-3 py-3 text-center text-[14px] font-medium transition ${
-                isActive
-                  ? "bg-accent/15 text-txt"
-                  : "bg-white/5 text-muted hover:bg-white/10 hover:text-txt"
-              }`
-            }
-            title={item.label}
-            aria-label={item.label}
-          >
-            {({ isActive }) => (
-              <>
-                <span
-                  className="inline-grid size-[42px] place-items-center rounded-xl bg-white/5"
-                  aria-hidden="true"
-                >
-                  <img
-                    src={item.icon}
-                    alt=""
-                    className={
-                      isActive
-                        ? "size-[42px] [filter:var(--nav-icon-filter-active)]"
-                        : "size-[42px] [filter:var(--nav-icon-filter)]"
-                    }
-                  />
-                </span>
-                <span className="leading-tight">{item.label}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
-        <button
-          type="button"
-          onClick={handleOpenOcrChooser}
-          className="inline-flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-2xl bg-white/5 px-3 py-3 text-center text-[14px] font-medium text-muted transition hover:bg-white/10 hover:text-txt"
-          title="Распознать анкету"
-          aria-label="Распознать анкету"
-        >
-          <span
-            className="inline-grid size-[42px] place-items-center rounded-xl bg-white/5"
-            aria-hidden="true"
-          >
-            <img
-              src={addChart}
-              alt=""
-              className="size-[42px] [filter:var(--nav-icon-filter)]"
-            />
+    <aside className={asideClassName}>
+      <div>
+        <div className={collapsed ? "mb-12 flex justify-center px-0" : "mb-14 flex items-center gap-3 px-2"}>
+          <span className="inline-grid size-11 place-items-center overflow-hidden rounded-xl bg-[#0d1f49]">
+            <img src="/favicon.svg" alt="" className="size-11" aria-hidden="true" />
           </span>
-          <span className="leading-tight">Распознать анкету</span>
-        </button>
-      </nav>
+          {!collapsed ? (
+            <div className="min-w-0">
+              <p className="m-0 text-ui-brand tracking-tight text-[#1f2c44]">
+                PrecisionAI
+              </p>
+              <p className="m-0 text-ui-xs font-semibold uppercase tracking-[0.26em] text-[#8391aa]">
+                Cost Intelligence
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        <nav className={collapsed ? "grid grid-cols-1 justify-items-center gap-3" : "grid grid-cols-1 gap-3"}>
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                [
+                  "relative inline-flex min-h-12 items-center rounded-xl py-2 text-ui-nav transition",
+                  collapsed ? "justify-center px-0 w-12" : "gap-3 px-3 w-full",
+                  isActive
+                    ? "text-[#4f6ff2]"
+                    : "text-[#78879e] hover:bg-white/80 hover:text-[#526683]",
+                ].join(" ")
+              }
+              title={item.label}
+              aria-label={item.label}
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className="inline-grid size-5 place-items-center"
+                    aria-hidden="true"
+                  >
+                    <item.icon
+                      className={
+                        isActive
+                          ? "size-5 text-[#4f6ff2]"
+                          : "size-5 text-[#6f7e98]"
+                      }
+                      strokeWidth={2.2}
+                    />
+                  </span>
+                  {!collapsed ? <span className="leading-tight">{item.label}</span> : <span className="sr-only">{item.label}</span>}
+                  {isActive ? (
+                    <span className={collapsed ? "absolute right-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]" : "absolute right-0 top-1/2 h-12 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]"} />
+                  ) : null}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      <div className={collapsed ? "flex justify-center" : "flex justify-end pr-1"}>
+        <KitButton
+          type="button"
+          variant="ghost"
+          size={24}
+          className={collapsed ? "h-10 w-10 rounded-full border border-line/70 bg-white/80" : "h-10 w-10 rounded-full border border-line/70 bg-white/80"}
+          onClick={onToggle}
+          aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
+          title={collapsed ? "Развернуть меню" : "Свернуть меню"}
+        >
+          {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+        </KitButton>
+      </div>
     </aside>
   );
 }

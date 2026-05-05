@@ -6,6 +6,6 @@ type KitFieldLabelProps = {
 };
 
 export function KitFieldLabel({ children, className = "" }: KitFieldLabelProps) {
-  return <span className={`mb-1 block text-sm text-muted ${className}`.trim()}>{children}</span>;
+  return <span className={`mb-1 block text-ui-sm text-muted ${className}`.trim()}>{children}</span>;
 }
 

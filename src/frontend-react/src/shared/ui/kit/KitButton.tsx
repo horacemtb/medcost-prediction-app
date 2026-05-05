@@ -7,10 +7,10 @@ type KitButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function KitButton({ className = "", variant = "default", size = 32, ...props }: KitButtonProps) {
   const base =
-    "kit-button inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-medium leading-none transition-colors transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-0 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60";
+    "kit-button inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-ui-sm font-medium leading-none transition-colors transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-0 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60";
 
   const sizes: Record<24 | 32 | 42, string> = {
-    24: "h-9 min-w-9 px-2 text-xs",
+    24: "h-9 min-w-9 px-2 text-ui-xs",
     32: "h-9 min-w-9 px-3",
     42: "h-9 min-w-10 px-3",
   };

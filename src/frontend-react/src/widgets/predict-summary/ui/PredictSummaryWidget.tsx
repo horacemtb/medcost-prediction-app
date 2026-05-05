@@ -29,21 +29,21 @@ export function PredictSummaryWidget({
 
   return (
     <section ref={summaryRef} className="tile form-tile sticky top-0 gap-3 p-4">
-      <div className="flex flex-col gap-2 w-full">
+      <div className="flex w-full flex-col gap-2">
         <h3 className="widget-title">Сводка перед расчетом</h3>
-        <p className="m-0 text-sm text-muted">
+        <p className="m-0 text-ui-sm text-muted">
           {summary.normalizedName || "ФИО не заполнено"}
         </p>
-        {ocrLoading && <p className="m-0 text-sm text-muted">Распознаем анкету...</p>}
+        {ocrLoading && <p className="m-0 text-ui-sm text-muted">Распознаем анкету...</p>}
         {ocrError && (
           <div className="rounded-xl border border-danger/50 bg-danger/20 p-2">
-            <p className="m-0 text-xs text-danger">{ocrError}</p>
+            <p className="m-0 text-ui-xs text-danger">{ocrError}</p>
           </div>
         )}
         {ocrWarnings.length > 0 && (
           <div className="rounded-xl border border-warning/50 bg-warning/20 p-2">
-            <p className="m-0 text-xs font-semibold text-warning">Предупреждения OCR</p>
-            <ul className="mt-2 list-disc pl-4 text-xs text-warning">
+            <p className="m-0 text-ui-xs font-semibold text-warning">Предупреждения OCR</p>
+            <ul className="mt-2 list-disc pl-4 text-ui-xs text-warning">
               {ocrWarnings.map((warning) => (
                 <li key={warning}>{warning}</li>
               ))}
@@ -52,7 +52,7 @@ export function PredictSummaryWidget({
         )}
 
         <div className="rounded-xl border border-line/70 bg-white/5 p-3">
-          <div className="flex justify-between text-xs text-muted">
+          <div className="flex justify-between text-ui-xs text-muted">
             <span>
               Заполнено: {summary.completion.done}/{summary.completion.total}
             </span>
@@ -68,38 +68,38 @@ export function PredictSummaryWidget({
 
         <div className="grid grid-cols-1 gap-2">
           <article className="rounded-xl border border-line/70 bg-white/5 p-2">
-            <span className="block text-[11px] text-muted">Возраст</span>
-            <strong className="text-base text-txt">{form.age}</strong>
+            <span className="block text-ui-xs text-muted">Возраст</span>
+            <strong className="text-ui-lg text-txt">{form.age}</strong>
           </article>
           <article className="rounded-xl border border-line/70 bg-white/5 p-2">
-            <span className="block text-[11px] text-muted">ИМТ</span>
-            <strong className="text-base text-txt">{form.bmi}</strong>
+            <span className="block text-ui-xs text-muted">ИМТ</span>
+            <strong className="text-ui-lg text-txt">{form.bmi}</strong>
           </article>
           <article className="rounded-xl border border-line/70 bg-white/5 p-2">
-            <span className="block text-[11px] text-muted">Расходы</span>
-            <strong className="text-base text-txt">
+            <span className="block text-ui-xs text-muted">Расходы</span>
+            <strong className="text-ui-lg text-txt">
               {form.previous_year_cost.toLocaleString("ru-RU")} ₽
             </strong>
           </article>
           <article className="rounded-xl border border-line/70 bg-white/5 p-2">
-            <span className="block text-[11px] text-muted">Факторы</span>
-            <strong className="text-base text-txt">{chronicCount}</strong>
+            <span className="block text-ui-xs text-muted">Факторы</span>
+            <strong className="text-ui-lg text-txt">{chronicCount}</strong>
           </article>
         </div>
 
         <div className="grid grid-cols-1 gap-2 rounded-xl border border-line/70 bg-white/5 p-3">
-          <p className="m-0 text-sm text-muted">
+          <p className="m-0 text-ui-sm text-muted">
             Категория ИМТ:{" "}
             <strong className="text-txt">{summary.bmiCategory}</strong>
           </p>
-          <p className="m-0 text-sm text-muted">
+          <p className="m-0 text-ui-sm text-muted">
             Стресс: <strong className="text-txt">{summary.stressCategory}</strong>
           </p>
-          <p className="m-0 text-sm text-muted">
+          <p className="m-0 text-ui-sm text-muted">
             Активность:{" "}
             <strong className="text-txt">{form.physical_activity_label}</strong>
           </p>
-          <p className="m-0 text-sm text-muted">
+          <p className="m-0 text-ui-sm text-muted">
             Профиль:{" "}
             <strong className="text-txt">{summary.predictedProfile}</strong>
           </p>
@@ -110,7 +110,7 @@ export function PredictSummaryWidget({
             {summary.chronicFactors.map((k) => (
               <span
                 key={k}
-                className="rounded-lg border border-line/80 px-2 py-1 text-xs text-muted"
+                className="rounded-lg border border-line/80 px-2 py-1 text-ui-xs text-muted"
               >
                 {featureMap[k]}
               </span>
@@ -120,7 +120,7 @@ export function PredictSummaryWidget({
         {summary.summaryIssues.length > 0 && (
           <div className="mt-2 rounded-xl border border-danger/50 bg-danger/20 p-2">
             {summary.summaryIssues.map((issue) => (
-              <p key={issue} className="my-1 text-xs text-danger">
+              <p key={issue} className="my-1 text-ui-xs text-danger">
                 {issue}
               </p>
             ))}

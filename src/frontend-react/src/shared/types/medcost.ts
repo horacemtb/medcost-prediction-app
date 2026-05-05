@@ -78,3 +78,11 @@ export type OcrPatientFormResponse = {
   raw_text: string;
   warnings: string[];
 };
+
+export type PredictionAssessmentResponse = {
+  prediction_id: number;
+  risk_category: string;
+  percentile: number;
+  recommendation_title: string;
+  recommendation_description: string;
+};

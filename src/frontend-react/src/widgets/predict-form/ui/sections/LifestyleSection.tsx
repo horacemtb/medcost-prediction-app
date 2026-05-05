@@ -22,7 +22,9 @@ export function LifestyleSection({
     <div className="form-section">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="flex flex-col">
-          <span className="flex items-center">Уровень физической активности</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Уровень физической активности
+          </span>
           <KitSelect
             value={form.physical_activity_label}
             onChange={(e) =>
@@ -36,7 +38,9 @@ export function LifestyleSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Тип населённого пункта</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Тип населенного пункта
+          </span>
           <KitSelect
             value={form.city_type_label}
             onChange={(e) => onUpdateField("city_type_label", e.target.value)}
@@ -48,7 +52,9 @@ export function LifestyleSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Шагов в день</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Шагов в день
+          </span>
           <KitInput
             type="number"
             min={0}
@@ -62,7 +68,9 @@ export function LifestyleSection({
         </label>
 
         <label className="flex flex-col">
-          <span className="flex items-center">Часы сна</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Часы сна
+          </span>
           <KitInput
             type="number"
             min={0}
@@ -76,7 +84,9 @@ export function LifestyleSection({
         </label>
 
         <label className="flex flex-col md:col-span-2">
-          <span className="flex items-center">Уровень стресса</span>
+          <span className="flex items-center text-ui-sm font-medium text-txt">
+            Уровень стресса
+          </span>
           <div className="flex items-center gap-2">
             <input
               className="flex-1"
@@ -100,4 +110,3 @@ export function LifestyleSection({
     </div>
   );
 }
-

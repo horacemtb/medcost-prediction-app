@@ -1,12 +1,13 @@
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException, Query
+﻿from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_
+from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import PredictionRecord, RiskFactor
 from ..schemas import (
     DeleteResponse,
     HistoryResponse,
+    PredictionAssessmentResponse,
     PredictionDetailsResponse,
     PredictionHistoryItem,
     PredictionInput,
@@ -14,6 +15,7 @@ from ..schemas import (
     RiskFactorResponse,
 )
 from ..services.ml_service import get_ml_service
+from .ml_stats import calculate_percentile
 
 router = APIRouter(prefix="/api", tags=["predictions"])
 
@@ -36,6 +38,52 @@ FEATURE_FIELDS = [
     "city_type",
     "previous_year_cost",
 ]
+
+
+def _risk_category_by_percentile(percentile: float) -> str:
+    # Mirrors frontend/pdf_export.py create_report_data thresholds.
+    if percentile <= 50:
+        return "Низкий"
+    if percentile <= 75:
+        return "Стандартный"
+    if percentile <= 95:
+        return "Высокий риск"
+    return "Экстремальный риск (топ-5%)"
+
+
+def _build_recommendation(risk_profile_category: str) -> dict[str, str]:
+    if risk_profile_category == "Низкий":
+        return {
+            "title": "Рекомендуется к страхованию по стандартному полису.",
+            "description": (
+                "Пациент демонстрирует низкий уровень медицинского риска. "
+                "Страхование является экономически выгодным для компании."
+            ),
+        }
+    if risk_profile_category == "Стандартный":
+        return {
+            "title": "Рекомендуется к страхованию с повышенными условиями.",
+            "description": (
+                "Пациент имеет умеренный уровень риска. "
+                "Стандартное страхование требует корректировки."
+            ),
+        }
+    if risk_profile_category == "Высокий риск":
+        return {
+            "title": "Рекомендуется к страхованию с повышенными условиями.",
+            "description": (
+                "Пациент демонстрирует уровень риска значительно выше среднего. "
+                "Рекомендуется применение повышающего коэффициента к базовой премии."
+            ),
+        }
+    return {
+        "title": "Не рекомендуется к стандартному страхованию.",
+        "description": (
+            "Пациент относится к группе высокого медицинского риска. "
+            "Стандартное страхование экономически нецелесообразно."
+        ),
+    }
+
 
 
 def _build_or_create_risk_factors(record: PredictionRecord, db: Session) -> list[RiskFactorResponse]:
@@ -139,6 +187,24 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
     )
 
 
+@router.get("/predictions/{prediction_id}/assessment", response_model=PredictionAssessmentResponse)
+def get_prediction_assessment(prediction_id: int, db: Session = Depends(get_db)):
+    record = db.query(PredictionRecord).filter(PredictionRecord.id == prediction_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Prediction not found")
+
+    percentile = float(calculate_percentile(record.predicted_cost))
+    category = _risk_category_by_percentile(percentile)
+    recommendation = _build_recommendation(category)
+    return PredictionAssessmentResponse(
+        prediction_id=record.id,
+        risk_category=category,
+        percentile=percentile,
+        recommendation_title=recommendation["title"],
+        recommendation_description=recommendation["description"],
+    )
+
+
 @router.put("/predictions/{prediction_id}/recalculate", response_model=PredictionResponse)
 def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Session = Depends(get_db)):
     record = db.query(PredictionRecord).filter(PredictionRecord.id == prediction_id).first()
@@ -153,7 +219,6 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
     feature_payload = {field: payload_data[field] for field in FEATURE_FIELDS}
     record.predicted_cost = ml_service.predict(feature_payload)
 
-    # Remove existing factors so they are recalculated for the updated prediction.
     for factor in list(record.risk_factors):
         db.delete(factor)
     db.commit()

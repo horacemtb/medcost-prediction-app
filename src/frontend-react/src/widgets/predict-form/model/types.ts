@@ -7,6 +7,7 @@ export type PredictFormWidgetProps = {
   errors: PredictFormErrors;
   costInput: string;
   loading: boolean;
+  ocrLoading: boolean;
   chronicCount: number;
   formPredictionId: number | null;
   onTabChange: (tab: PredictTabId) => void;
@@ -16,4 +17,5 @@ export type PredictFormWidgetProps = {
   onCostInputBlur: () => void;
   onReset: () => void;
   onSubmit: () => void;
+  onRecognizeForm: (file: File) => void;
 };

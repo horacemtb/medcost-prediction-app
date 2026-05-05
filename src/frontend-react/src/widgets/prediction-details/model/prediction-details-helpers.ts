@@ -30,6 +30,42 @@ export function deriveRiskLevel(predictedCost: number) {
   return "Высокий";
 }
 
+export function deriveRiskProfileCategory(predictedCost: number) {
+  if (predictedCost < 15000) return "Низкий";
+  if (predictedCost < 30000) return "Стандартный";
+  if (predictedCost < 50000) return "Выше среднего";
+  return "Высокий";
+}
+
+export function buildRecommendation(riskProfileCategory: string) {
+  if (riskProfileCategory === "Низкий") {
+    return {
+      title: "Рекомендуется к страхованию по стандартному полису.",
+      description:
+        "Пациент демонстрирует низкий уровень медицинского риска. Страхование является экономически выгодным для компании.",
+    };
+  }
+  if (riskProfileCategory === "Стандартный") {
+    return {
+      title: "Рекомендуется к страхованию с повышенными условиями.",
+      description:
+        "Пациент имеет умеренный уровень риска. Стандартное страхование требует корректировки.",
+    };
+  }
+  if (riskProfileCategory === "Выше среднего") {
+    return {
+      title: "Рекомендуется к страхованию с повышенными условиями.",
+      description:
+        "Пациент демонстрирует уровень риска значительно выше среднего. Рекомендуется применение повышающего коэффициента к базовой премии.",
+    };
+  }
+  return {
+    title: "Не рекомендуется к стандартному страхованию.",
+    description:
+      "Пациент относится к группе высокого медицинского риска. Стандартное страхование экономически нецелесообразно.",
+  };
+}
+
 export function getChronicCount(details: PredictionDetailsResponse) {
   return [
     details.smoker,
