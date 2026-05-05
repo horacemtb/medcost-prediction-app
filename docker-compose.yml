@@ -28,14 +28,21 @@ services:
       db:
         condition: service_healthy
 
-  frontend:
+  frontend-react:
     build:
       context: .
-      dockerfile: src/frontend/Dockerfile
-    container_name: medcost_frontend
-    environment:
-      API_BASE_URL: http://backend:8000
-    ports:
-      - "8501:8501"
+      dockerfile: src/frontend-react/Dockerfile
+    container_name: medcost_frontend_react
     depends_on:
+      - backend
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: medcost_nginx
+    volumes:
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8501:80"
+    depends_on:
+      - frontend-react
       - backend

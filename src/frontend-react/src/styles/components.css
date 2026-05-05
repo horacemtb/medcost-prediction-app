@@ -1,0 +1,132 @@
+@layer components {
+  .text-ui-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .text-ui-sm {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .text-ui-md {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  .text-ui-lg {
+    font-size: 1.125rem;
+    line-height: 1.35;
+  }
+
+  .text-ui-display {
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .text-ui-kpi {
+    font-size: clamp(2.5rem, 3.5vw, 3.375rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .text-ui-brand {
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .text-ui-nav {
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+  }
+
+  .tile {
+    @apply rounded-2xl border p-3;
+    border-color: color-mix(in srgb, var(--line) 80%, transparent);
+    background: color-mix(in srgb, var(--bg) 86%, #fff 14%);
+  }
+
+  .page-shell {
+    @apply grid h-full min-h-0 w-full gap-4;
+  }
+
+  .scroll-hidden {
+    scrollbar-width: none;
+  }
+
+  .scroll-hidden::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .form-tile {
+    background: color-mix(in srgb, var(--bg) 90%, #fff 10%);
+  }
+
+  .widget-title {
+    @apply m-0 font-semibold;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--txt);
+  }
+
+  .kit-button img,
+  .kit-button svg {
+    @apply h-4 w-4 shrink-0;
+  }
+
+  .tiny {
+    @apply m-0 uppercase tracking-wide;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--muted);
+  }
+
+  .muted {
+    @apply m-0;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    color: var(--muted);
+  }
+
+  .predict-main-column,
+  .predict-side-widget {
+    @apply grid min-w-0 items-start gap-3;
+  }
+
+  .top-actions .kit-button {
+    min-width: 120px;
+  }
+
+  .checks {
+    @apply my-2 flex flex-wrap gap-2;
+  }
+
+  .summary-list p {
+    @apply my-1;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    color: var(--muted);
+  }
+
+  .loading-card {
+    @apply inline-flex min-h-[52px] items-center justify-center rounded-xl border px-3 py-2 shadow-lg;
+    border-color: color-mix(in srgb, var(--line) 80%, transparent);
+    background: color-mix(in srgb, var(--bg) 86%, #fff 14%);
+  }
+
+  .kpi-up {
+    color: var(--danger);
+  }
+
+  .kpi-down {
+    @apply text-emerald-500;
+  }
+
+}

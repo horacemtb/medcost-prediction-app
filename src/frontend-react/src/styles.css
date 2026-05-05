@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@import "./styles/components.css";
+
+@theme {
+  --color-bg: var(--bg);
+  --color-txt: var(--txt);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #f3f6fb;
+  --txt: #1f2c44;
+  --muted: #627188;
+  --placeholder: #7a889e;
+  --line: #d6deea;
+  --accent: #10b6ad;
+  --danger: #d56d6d;
+  --nav-icon-filter: brightness(0) saturate(100%) invert(28%) sepia(16%) saturate(620%) hue-rotate(177deg) brightness(93%) contrast(89%);
+  --nav-icon-filter-active: brightness(0) saturate(100%) invert(56%) sepia(58%) saturate(928%) hue-rotate(128deg) brightness(93%) contrast(91%);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+    color: var(--txt);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 96%, #fff 4%) 0%, var(--bg) 100%);
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+
+  input[type="date"]::-webkit-datetime-edit {
+    color: var(--placeholder);
+  }
+
+  input[type="date"]:focus::-webkit-datetime-edit,
+  input[type="date"][value]:not([value=""])::-webkit-datetime-edit {
+    color: var(--txt);
+  }
+}

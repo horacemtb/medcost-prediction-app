@@ -39,6 +39,39 @@ class RiskFactorResponse(BaseModel):
     direction: str
 
 
+class PredictionDetailsResponse(BaseModel):
+    prediction_id: int
+    full_name: str
+    age: int
+    gender: int
+    bmi: float
+    smoker: bool
+    diabetes: bool
+    hypertension: bool
+    heart_disease: bool
+    asthma: bool
+    physical_activity_level: str
+    daily_steps: int
+    sleep_hours: float
+    stress_level: int
+    doctor_visits_per_year: int
+    hospital_admissions: int
+    medication_count: int
+    city_type: str
+    previous_year_cost: float
+    predicted_cost: float
+    created_at: datetime
+    risk_factors: list[RiskFactorResponse]
+
+
+class PredictionAssessmentResponse(BaseModel):
+    prediction_id: int
+    risk_category: str
+    percentile: float
+    recommendation_title: str
+    recommendation_description: str
+
+
 class PredictionHistoryItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

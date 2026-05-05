@@ -1,24 +1,51 @@
-from fastapi import APIRouter
-import pandas as pd
+﻿from pathlib import Path
 import numpy as np
-from pathlib import Path
+import pandas as pd
+from fastapi import APIRouter
+router = APIRouter(prefix="/api", tags=["ml"])
 
-router = APIRouter(prefix="/api", tags=["ml"]) 
+_DATASET_PATH = Path("/app/app/routers/medical_cost_prediction_dataset.csv")
+_cached_predictions: np.ndarray | None = None
+
+
+def _get_predictions() -> np.ndarray:
+    global _cached_predictions
+
+    if _cached_predictions is None:
+        df = pd.read_csv(_DATASET_PATH)
+
+        predictions = (
+            pd.to_numeric(df["annual_medical_cost"], errors="coerce")
+            .dropna()
+            .to_numpy(dtype=float)
+        )
+
+        _cached_predictions = np.sort(predictions)
+
+    return _cached_predictions
+
+
+def calculate_percentile(predicted_cost: float) -> float:
+    predictions = _get_predictions()
+
+    if predictions.size == 0:
+        return 50.0
+
+    count_less = np.searchsorted(
+        predictions,
+        predicted_cost,
+        side="left",
+    )
+
+    return float((count_less / predictions.size) * 100)
+
 
 @router.post("/percentile")
-async def percentile_from_dataset(prediction_data: dict):
-    """Рассчитать перцентиль на основе тренировочного датасета"""
-    CURRENT_DIR = Path(__file__).parent  # src/backend/app/routers/
-    # Загружаем предсказания из датасета (кешируем)
-    if not hasattr(percentile_from_dataset, "cached_predictions"):
-        df = pd.read_csv("/app/app/routers/medical_cost_prediction_dataset.csv")
-        
-        percentile_from_dataset.cached_predictions = df['annual_medical_cost'].tolist()
+def percentile_from_dataset(prediction_data: dict):
+    """
+    Рассчитать процентиль на основе тренировочного датасета.
+    """
+    predicted_cost = float(prediction_data.get("predicted_cost", 0) or 0)
+    percentile = calculate_percentile(predicted_cost)
 
-    
-    predicted_cost = prediction_data.get('predicted_cost', 0)
-    predictions = percentile_from_dataset.cached_predictions
-    
-    percentile = (sum(1 for p in predictions if p < predicted_cost) / len(predictions)) * 100
-    
     return {"percentile": percentile}
