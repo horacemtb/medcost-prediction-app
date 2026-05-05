@@ -42,7 +42,10 @@ export function AnnualForecastBlock({
           {formatMoney(predictedCost)}
           <span className="ml-2 text-ui-sm font-semibold">₽</span>
           <span className="ml-2 text-ui-sm font-medium text-[#4a5974]">
-            / в год
+            / в
+          </span>
+          <span className="ml-2 text-ui-sm font-medium text-[#4a5974]">
+            год
           </span>
         </p>
         <p className="m-0 mt-4 max-w-[640px] text-ui-xs text-[#5a6882]">
