@@ -42,9 +42,6 @@ export function RiskFactorsCard({ factors }: RiskFactorsCardProps) {
                 <span className="truncate font-medium">
                   {index + 1}. {name}
                 </span>
-                <span className="rounded-full bg-[#dff4e4] px-2 py-0.5 text-ui-xs font-semibold text-[#2f9c52]">
-                  -{(absValue * 100).toFixed(1)}%
-                </span>
               </div>
 
               <div className="relative h-10">
