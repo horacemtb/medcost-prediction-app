@@ -26,7 +26,7 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
   const asideClassName = useMemo(
     () =>
       [
-        "flex min-h-screen flex-col justify-between bg-white py-7 transition-[padding,width] duration-200",
+        "flex min-h-0 md:min-h-screen flex-col justify-between bg-white py-7 transition-[padding,width] duration-200",
         collapsed ? "px-3" : "px-6",
       ].join(" "),
     [collapsed],

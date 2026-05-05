@@ -70,7 +70,7 @@ export default function App() {
     <div className="min-h-screen bg-[#f6f8fd] text-txt">
       <PredictionDetailsProvider>
         <div
-          className="grid min-h-screen w-full grid-cols-1 gap-0 lg:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
+          className="grid min-h-screen w-full grid-cols-1 gap-0 md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
           style={shellStyle}
         >
           <SideNavigation
