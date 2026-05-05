@@ -28,13 +28,13 @@ services:
       db:
         condition: service_healthy
 
-  frontend:
+  frontend-react:
     build:
       context: .
-      dockerfile: src/frontend/Dockerfile
-    container_name: medcost_frontend
+      dockerfile: src/frontend-react/Dockerfile
+    container_name: medcost_frontend_react
     environment:
-      API_BASE_URL: http://backend:8000
+      VITE_API_BASE_URL: http://backend:8000
     ports:
       - "8501:8501"
     depends_on:
