@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import os
 from functools import lru_cache
 
 import joblib
 import pandas as pd
-import shap
+try:
+    import shap
+except Exception:  
+    shap = None
 from fastapi import HTTPException
 
 MODEL_PATH = os.getenv("MODEL_PATH", "/app/models/rf_pipeline.joblib")
@@ -18,6 +23,8 @@ class MLService:
         self.pipeline = joblib.load(model_path)
         self.preprocessor = self.pipeline.named_steps["preprocess"]
         self.model = self.pipeline.named_steps["model"]
+        if shap is None:
+            raise RuntimeError("shap is required to initialize the real MLService")
         self.explainer = shap.TreeExplainer(self.model)
 
     def predict(self, payload: dict) -> float:
@@ -96,6 +103,39 @@ class MLService:
 
 @lru_cache(maxsize=1)
 def get_ml_service() -> MLService:
+    
+    ml_fake = os.getenv("ML_FAKE", "0").lower() in ("1", "true", "yes")
+    if ml_fake:
+        class FakeMLService:
+            def predict(self, payload: dict) -> float:
+                
+                try:
+                    nums = [v for v in payload.values() if isinstance(v, (int, float))]
+                    return round(float(sum(nums)) if nums else 100.0, 2)
+                except Exception:
+                    return 100.0
+
+            def explain_top_factors(self, payload: dict, top_k: int = 3) -> list[dict]:
+                
+                keys = list(payload.keys())
+                res = []
+                for i in range(min(top_k, len(keys))):
+                    key = keys[i]
+                    val = payload.get(key)
+                    res.append({
+                        "feature_name": key,
+                        "feature_value": str(val),
+                        "shap_value": round(1.0 / (i + 1), 3),
+                        "direction": "increase",
+                    })
+                if not res:
+                    res = [
+                        {"feature_name": "bmi", "feature_value": "N/A", "shap_value": 0.5, "direction": "increase"}
+                    ]
+                return res
+
+        return FakeMLService()
+
     try:
         return MLService(MODEL_PATH)
     except FileNotFoundError as exc:

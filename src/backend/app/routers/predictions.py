@@ -1,9 +1,10 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, Query
+﻿from fastapi import APIRouter, Depends, HTTPException, Query, Body
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from ..database import get_db
-from ..models import PredictionRecord, RiskFactor
+from ..models import PredictionRecord, RiskFactor, Patient
+from sqlalchemy.exc import IntegrityError
 from ..schemas import (
     DeleteResponse,
     HistoryResponse,
@@ -123,14 +124,64 @@ def healthcheck():
 
 
 @router.post("/predict", response_model=PredictionResponse)
-def create_prediction(payload: PredictionInput, db: Session = Depends(get_db)):
+def create_prediction(
+    payload: PredictionInput = Body(
+        ...,
+        example={
+            "full_name": "Иван Иванов",
+            "age": 45,
+            "gender": 1,
+            "bmi": 27.5,
+            "smoker": False,
+            "diabetes": False,
+            "hypertension": False,
+            "heart_disease": False,
+            "asthma": False,
+            "physical_activity_level": "Medium",
+            "daily_steps": 6000,
+            "sleep_hours": 7.0,
+            "stress_level": 4,
+            "doctor_visits_per_year": 2,
+            "hospital_admissions": 0,
+            "medication_count": 1,
+            "city_type": "Urban",
+            "previous_year_cost": 1200.0,
+            "snils": "123-456-789 00",
+            "phone": "+7-900-000-00-00",
+            "address": "г. Москва",
+        },
+    ),
+    db: Session = Depends(get_db),
+):
+    
+    snils = getattr(payload, "snils", None)
+    patient = None
+    if snils:
+        patient = db.query(Patient).filter(Patient.snils == snils).first()
+
+    if not patient and (payload.full_name or payload.phone or payload.address):
+        patient = Patient(full_name=payload.full_name, snils=snils, phone=payload.phone, address=payload.address)
+        db.add(patient)
+        try:
+            db.commit()
+            db.refresh(patient)
+        except IntegrityError:
+            
+            db.rollback()
+            if snils:
+                patient = db.query(Patient).filter(Patient.snils == snils).first()
+
+    
     ml_service = get_ml_service()
     feature_payload = payload.model_dump(include=set(FEATURE_FIELDS))
     predicted_cost = ml_service.predict(feature_payload)
 
+    
+    record_payload = {k: v for k, v in payload.model_dump().items() if k in set(FEATURE_FIELDS + ["full_name", "previous_year_cost"]) }
     record = PredictionRecord(
-        **payload.model_dump(),
+        **record_payload,
         predicted_cost=predicted_cost,
+        patient_id=patient.id if patient else None,
     )
     db.add(record)
     db.commit()
@@ -140,6 +191,7 @@ def create_prediction(payload: PredictionInput, db: Session = Depends(get_db)):
         prediction_id=record.id,
         full_name=record.full_name,
         predicted_cost=record.predicted_cost,
+        patient_id=record.patient_id,
         created_at=record.created_at,
     )
 
@@ -163,6 +215,7 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
 
     return PredictionDetailsResponse(
         prediction_id=record.id,
+        patient_id=record.patient_id,
         full_name=record.full_name,
         age=record.age,
         gender=record.gender,
@@ -213,8 +266,10 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
 
     ml_service = get_ml_service()
     payload_data = payload.model_dump()
+    
     for key, value in payload_data.items():
-        setattr(record, key, value)
+        if key in set(FEATURE_FIELDS + ["full_name", "previous_year_cost"]):
+            setattr(record, key, value)
 
     feature_payload = {field: payload_data[field] for field in FEATURE_FIELDS}
     record.predicted_cost = ml_service.predict(feature_payload)
@@ -229,6 +284,7 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
         prediction_id=record.id,
         full_name=record.full_name,
         predicted_cost=record.predicted_cost,
+        patient_id=record.patient_id,
         created_at=record.created_at,
     )
 

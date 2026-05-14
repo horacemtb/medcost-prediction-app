@@ -23,12 +23,17 @@ class PredictionInput(BaseModel):
     medication_count: int = Field(..., ge=0, le=100)
     city_type: Literal["Urban", "Semi-Urban", "Rural"]
     previous_year_cost: float = Field(..., ge=0)
+    
+    snils: str | None = Field(None, example="123-456-789 00")
+    phone: str | None = Field(None, example="+7-900-000-00-00")
+    address: str | None = Field(None, example="г. Москва, ул. Ленина, д.1")
 
 
 class PredictionResponse(BaseModel):
     prediction_id: int
     full_name: str
     predicted_cost: float
+    patient_id: int | None = None
     created_at: datetime
 
 
@@ -41,6 +46,7 @@ class RiskFactorResponse(BaseModel):
 
 class PredictionDetailsResponse(BaseModel):
     prediction_id: int
+    patient_id: int | None = None
     full_name: str
     age: int
     gender: int
@@ -101,3 +107,20 @@ class OcrPatientFormResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     detail: str
+
+
+class PatientCreate(BaseModel):
+    full_name: str
+    snils: str | None = None
+    phone: str | None = None
+    address: str | None = None
+
+
+class PatientResponse(BaseModel):
+    id: int
+    full_name: str
+    snils: str | None = None
+    phone: str | None = None
+    address: str | None = None
+    created_at: datetime
+    updated_at: datetime
