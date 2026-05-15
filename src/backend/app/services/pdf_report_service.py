@@ -28,6 +28,8 @@ FEATURE_RU_LABELS = {
 }
 FONT_CANDIDATES = [
     ROOT_DIR / "fonts" / "DejaVuSansCondensed.ttf",
+    
+    Path(__file__).resolve().parents[3] / "frontend" / "app" / "fonts" / "DejaVuSansCondensed.ttf",
     Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
 ]
 
@@ -82,8 +84,8 @@ class PDFReport(FPDF):
 
         font_path = get_font_path()
         if font_path:
-            self.add_font("DejaVu", "", font_path)
-            self.add_font("DejaVu", "B", font_path)
+            self.add_font("DejaVu", "", font_path, uni=True)
+            self.add_font("DejaVu", "B", font_path, uni=True)
             self._font_family = "DejaVu"
             self._supports_utf8 = True
 

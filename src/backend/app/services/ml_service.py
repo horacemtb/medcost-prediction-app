@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import os
 from functools import lru_cache
 
 import joblib
 import pandas as pd
-import shap
+try:
+    import shap
+except Exception:  
+    shap = None
 from fastapi import HTTPException
 
 MODEL_PATH = os.getenv("MODEL_PATH", "/app/models/rf_pipeline.joblib")
@@ -18,6 +23,8 @@ class MLService:
         self.pipeline = joblib.load(model_path)
         self.preprocessor = self.pipeline.named_steps["preprocess"]
         self.model = self.pipeline.named_steps["model"]
+        if shap is None:
+            raise RuntimeError("shap is required to initialize the real MLService")
         self.explainer = shap.TreeExplainer(self.model)
 
     def predict(self, payload: dict) -> float:

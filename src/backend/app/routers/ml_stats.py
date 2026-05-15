@@ -2,9 +2,14 @@
 import numpy as np
 import pandas as pd
 from fastapi import APIRouter
+
+from ..database import SessionLocal
+from ..models import SyntheticCohort
+
 router = APIRouter(prefix="/api", tags=["ml"])
 
-_DATASET_PATH = Path("/app/app/routers/medical_cost_prediction_dataset.csv")
+
+
 _cached_predictions: np.ndarray | None = None
 
 
@@ -12,15 +17,23 @@ def _get_predictions() -> np.ndarray:
     global _cached_predictions
 
     if _cached_predictions is None:
-        df = pd.read_csv(_DATASET_PATH)
+            session = SessionLocal()
+            try:
+                rows = session.query(SyntheticCohort.annual_medical_cost).filter(
+                    SyntheticCohort.annual_medical_cost != None
+                ).all()
+                vals = [float(r[0]) for r in rows] if rows else []
+                arr = np.array(vals, dtype=float)
+            finally:
+                session.close()
 
-        predictions = (
-            pd.to_numeric(df["annual_medical_cost"], errors="coerce")
-            .dropna()
-            .to_numpy(dtype=float)
-        )
+        
+        
 
-        _cached_predictions = np.sort(predictions)
+            if arr.size:
+                _cached_predictions = np.sort(arr)
+            else:
+                _cached_predictions = np.array([], dtype=float)
 
     return _cached_predictions
 

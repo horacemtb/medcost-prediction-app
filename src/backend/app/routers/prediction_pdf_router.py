@@ -60,16 +60,29 @@ def export_prediction_pdf(prediction_id: int, db: Session = Depends(get_db)) -> 
     if not record:
         raise HTTPException(status_code=404, detail="Prediction not found")
 
-    previous = (
-        db.query(PredictionRecord)
-        .filter(
-            PredictionRecord.full_name == record.full_name,
-            PredictionRecord.id != record.id,
-            PredictionRecord.created_at < record.created_at,
+    
+    if getattr(record, "patient_id", None):
+        previous = (
+            db.query(PredictionRecord)
+            .filter(
+                PredictionRecord.patient_id == record.patient_id,
+                PredictionRecord.id != record.id,
+                PredictionRecord.created_at < record.created_at,
+            )
+            .order_by(PredictionRecord.created_at.desc())
+            .first()
         )
-        .order_by(PredictionRecord.created_at.desc())
-        .first()
-    )
+    else:
+        previous = (
+            db.query(PredictionRecord)
+            .filter(
+                PredictionRecord.full_name == record.full_name,
+                PredictionRecord.id != record.id,
+                PredictionRecord.created_at < record.created_at,
+            )
+            .order_by(PredictionRecord.created_at.desc())
+            .first()
+        )
 
     factors = sorted(record.risk_factors, key=lambda x: x.rank)[:3]
     total_abs_shap = sum(abs(f.shap_value) for f in factors) or 1.0
