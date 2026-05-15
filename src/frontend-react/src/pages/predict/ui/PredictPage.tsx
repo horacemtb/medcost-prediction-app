@@ -51,6 +51,8 @@ export function PredictPage() {
               costInput={state.costInput}
               loading={state.visibleLoading}
               ocrLoading={state.visibleOcrLoading}
+              ocrWarnings={state.ocrWarnings}
+              ocrError={state.ocrError}
               chronicCount={state.chronicCount}
               formPredictionId={state.formPredictionId}
               onTabChange={state.setActiveTab}

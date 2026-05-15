@@ -48,6 +48,9 @@ class PredictionDetailsResponse(BaseModel):
     prediction_id: int
     patient_id: int | None = None
     full_name: str
+    snils: str | None = None
+    phone: str | None = None
+    address: str | None = None
     age: int
     gender: int
     bmi: float
