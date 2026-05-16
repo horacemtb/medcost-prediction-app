@@ -7,6 +7,9 @@ export type PredictTabId = (typeof predictTabs)[number];
 
 export const initialPredictForm = {
   full_name: "",
+  snils: "",
+  phone: "",
+  address: "",
   age: 0,
   gender: "",
   bmi: 0,
@@ -71,6 +74,9 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
 
   return {
     full_name: form.full_name,
+    snils: form.snils.trim() || null,
+    phone: form.phone.trim() || null,
+    address: form.address.trim() || null,
     age: form.age,
     gender,
     bmi: form.bmi,
@@ -94,6 +100,9 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
 export function mapPredictionDetailsToForm(details: PredictionDetailsResponse): PredictFormState {
   return {
     full_name: details.full_name,
+    snils: details.snils ?? "",
+    phone: details.phone ?? "",
+    address: details.address ?? "",
     age: details.age,
     gender: details.gender === 1 ? "Мужской" : "Женский",
     bmi: details.bmi,

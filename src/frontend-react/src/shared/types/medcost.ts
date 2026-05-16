@@ -1,5 +1,8 @@
 ﻿export type PredictionInput = {
   full_name: string;
+  snils?: string | null;
+  phone?: string | null;
+  address?: string | null;
   age: number;
   gender: number;
   bmi: number;
@@ -23,6 +26,7 @@ export type PredictionResponse = {
   prediction_id: number;
   full_name: string;
   predicted_cost: number;
+  patient_id?: number | null;
   created_at: string;
 };
 
@@ -35,7 +39,11 @@ export type RiskFactor = {
 
 export type PredictionDetailsResponse = {
   prediction_id: number;
+  patient_id?: number | null;
   full_name: string;
+  snils?: string | null;
+  phone?: string | null;
+  address?: string | null;
   age: number;
   gender: number;
   bmi: number;

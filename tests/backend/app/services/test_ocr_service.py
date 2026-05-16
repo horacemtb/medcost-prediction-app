@@ -19,6 +19,9 @@ class OcrTextParserTest(unittest.TestCase):
         raw_text = """
         АНКЕТА ПАЦИЕНТА
         1. ФИО пациента: Полиграф Полиграфыч
+        2. СНИЛС: 941-466-113 04
+        3. Адрес: г. Тамбов, ул. Пушкина-Колотушкина, д. 24, кв. 42
+        4. Телефон: 88005553535
         2. Возраст: 35
         3. Пол: Мужской
         9. BMI (индекс массы тела): 24,80
@@ -36,6 +39,9 @@ class OcrTextParserTest(unittest.TestCase):
         fields, warnings = parse_patient_form_text(raw_text)
 
         self.assertEqual(fields["full_name"], "Полиграф Полиграфыч")
+        self.assertEqual(fields["snils"], "941-466-113 04")
+        self.assertEqual(fields["address"], "г. Тамбов, ул. Пушкина-Колотушкина, д. 24, кв. 42")
+        self.assertEqual(fields["phone"], "88005553535")
         self.assertEqual(fields["age"], 35)
         self.assertEqual(fields["gender"], 1)
         self.assertEqual(fields["bmi"], 24.8)
@@ -49,6 +55,40 @@ class OcrTextParserTest(unittest.TestCase):
         self.assertEqual(fields["medication_count"], 0)
         self.assertEqual(fields["previous_year_cost"], 10000.0)
         self.assertNotIn("Уровень физической активности", " ".join(warnings))
+
+    def test_parses_new_contact_fields_and_formats_snils(self):
+        raw_text = """
+        ФИО пациента: Иванов Иван Иванович
+        СНИЛС: 12345678901
+        Адрес: г. Воронеж, ул. Ленина, д. 10, кв. 5
+        Телефон: +7 (900) 123-45-67
+        """
+
+        fields, warnings = parse_patient_form_text(raw_text)
+
+        self.assertEqual(fields["full_name"], "Иванов Иван Иванович")
+        self.assertEqual(fields["snils"], "123-456-789 01")
+        self.assertEqual(fields["address"], "г. Воронеж, ул. Ленина, д. 10, кв. 5")
+        self.assertEqual(fields["phone"], "+79001234567")
+        self.assertNotIn("СНИЛС", " ".join(warnings))
+        self.assertNotIn("Адрес", " ".join(warnings))
+        self.assertNotIn("Телефон", " ".join(warnings))
+
+    def test_skips_form_title_when_full_name_value_is_on_later_line(self):
+        raw_text = """
+        ФИО пациента:
+
+        АНКЕТА ПАЦИЕНТА
+
+        Иванов Иван Иванович
+
+        СНИЛС: 123-456-789 01
+        """
+
+        fields, warnings = parse_patient_form_text(raw_text)
+
+        self.assertEqual(fields["full_name"], "Иванов Иван Иванович")
+        self.assertNotIn("ФИО пациента", " ".join(warnings))
 
     def test_uses_russian_tesseract_language_only(self):
         self.assertEqual(OCR_LANGUAGE, "rus")
@@ -115,6 +155,9 @@ class OcrTextParserTest(unittest.TestCase):
             "medication_count": 2,
             "city_type": "Rural",
             "previous_year_cost": 25680.0,
+            "snils": "123-456-789 01",
+            "phone": "89001234567",
+            "address": "г. Воронеж, ул. Ленина, д. 10",
         }
 
         fields, warnings = validate_patient_fields(source_fields)
