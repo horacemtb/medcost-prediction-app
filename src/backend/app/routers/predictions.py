@@ -15,6 +15,7 @@ from ..schemas import (
     RiskFactorResponse,
 )
 from ..services.ml_service import get_ml_service
+from ..services.dadata_service import clean_full_name, clean_address, clean_phone
 from .ml_stats import calculate_percentile
 
 router = APIRouter(prefix="/api", tags=["predictions"])
@@ -163,9 +164,9 @@ def _clean_optional_text(value: str | None) -> str | None:
 
 
 def _apply_patient_data(patient: Patient, payload: PredictionInput) -> None:
-    patient.full_name = payload.full_name
-    patient.phone = _clean_optional_text(payload.phone)
-    patient.address = _clean_optional_text(payload.address)
+    patient.full_name = clean_full_name(payload.full_name)
+    patient.phone = clean_phone(_clean_optional_text(payload.phone))
+    patient.address = clean_address(_clean_optional_text(payload.address))
 
 
 def _resolve_patient(payload: PredictionInput, db: Session) -> Patient | None:
@@ -176,10 +177,10 @@ def _resolve_patient(payload: PredictionInput, db: Session) -> Patient | None:
     patient = db.query(Patient).filter(Patient.snils == snils).first()
     if patient is None:
         patient = Patient(
-            full_name=payload.full_name,
+            full_name=clean_full_name(payload.full_name),
             snils=snils,
-            phone=_clean_optional_text(payload.phone),
-            address=_clean_optional_text(payload.address),
+            phone=clean_phone(_clean_optional_text(payload.phone)),
+            address=clean_address(_clean_optional_text(payload.address)),
         )
         db.add(patient)
         db.flush()
