@@ -143,7 +143,7 @@ export function PredictFormWidget({
       )}
 
       <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-[1.1fr_1.5fr]">
-        <article className="rounded-2xl border border-line/65 bg-white/55 p-4">
+        <article className="rounded-2xl border border-line/65 bg-white/70 p-4">
           <h4 className="mb-3 inline-flex items-center gap-2 text-ui-lg font-semibold text-txt">
             <UserRound className="size-5 text-[#2f64ef]" />
             1. Основные данные
@@ -294,7 +294,7 @@ export function PredictFormWidget({
         </article>
 
         <div className="grid gap-3">
-          <article className="rounded-2xl border border-line/65 bg-white/55 p-4">
+          <article className="rounded-2xl border border-line/65 bg-white/70 p-4">
             <h4 className="mb-3 inline-flex items-center gap-2 text-ui-lg font-semibold text-txt">
               <HeartPulse className="size-5 text-[#2f64ef]" />
               2. Сопутствующие факторы
@@ -325,7 +325,7 @@ export function PredictFormWidget({
             </small>
           </article>
 
-          <article className="rounded-2xl border border-line/65 bg-white/55 p-4">
+          <article className="rounded-2xl border border-line/65 bg-white/70 p-4">
             <h4 className="mb-3 inline-flex items-center gap-2 text-ui-lg font-semibold text-txt">
               <Activity className="size-5 text-[#2f64ef]" />
               3. Поведенческие и медицинские показатели

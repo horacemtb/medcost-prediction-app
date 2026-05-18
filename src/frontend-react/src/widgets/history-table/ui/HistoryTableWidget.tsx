@@ -103,7 +103,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   sortIndicator,
 }: HistoryTableWidgetProps) {
   return (
-    <section className="tile form-tile grid grid-cols-1 h-full min-h-0 gap-2 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
+    <section className="tile grid grid-cols-1 h-full min-h-0 gap-2 bg-white/70 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
       <div className="flex items-center justify-between gap-2">
         <h3 className="widget-title">Таблица истории</h3>
         <KitButton
@@ -149,7 +149,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
             </colgroup>
             <thead className="sticky top-0 z-20">
               <tr>
-                <th className="bg-bg">
+                <th className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -161,7 +161,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     ID {sortIndicator("id")}
                   </KitButton>
                 </th>
-                <th className="bg-bg">
+                <th className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -173,7 +173,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     ФИО {sortIndicator("full_name")}
                   </KitButton>
                 </th>
-                <th className="bg-bg">
+                <th className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -185,7 +185,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Возраст {sortIndicator("age")}
                   </KitButton>
                 </th>
-                <th className="bg-bg">
+                <th className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -197,7 +197,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Прогноз {sortIndicator("predicted_cost")}
                   </KitButton>
                 </th>
-                <th className="bg-bg">
+                <th className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -209,7 +209,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Дата {sortIndicator("created_at")}
                   </KitButton>
                 </th>
-                <th className="bg-bg"></th>
+                <th className="bg-transparent"></th>
               </tr>
             </thead>
             <tbody>

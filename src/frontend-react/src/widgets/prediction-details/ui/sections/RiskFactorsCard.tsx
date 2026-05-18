@@ -11,7 +11,7 @@ export function RiskFactorsCard({ factors }: RiskFactorsCardProps) {
     ...factors.map((factor) => Math.abs(factor.shap_value)),
   );
   return (
-    <article className="min-w-0 rounded-2xl border border-line/70 bg-white/55 p-4">
+    <article className="min-w-0 rounded-2xl border border-line/70 bg-white/70 p-4">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="m-0 text-ui-lg font-semibold text-[#1a2741]">
           Ключевые факторы влияния на прогноз

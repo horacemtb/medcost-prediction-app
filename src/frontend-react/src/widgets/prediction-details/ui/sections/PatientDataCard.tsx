@@ -17,7 +17,7 @@ export function PatientDataCard({ details }: PatientDataCardProps) {
   ].filter((row) => row.value);
 
   return (
-    <article className="rounded-2xl border border-line/70 bg-[#eef4ff] p-5">
+    <article className="rounded-2xl border border-line/70 bg-white/70 p-5">
       <p className="m-0 text-ui-xs uppercase tracking-[0.15em] text-[#677da1]">
         Данные пациента
       </p>
