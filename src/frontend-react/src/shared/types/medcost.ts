@@ -94,3 +94,52 @@ export type PredictionAssessmentResponse = {
   recommendation_title: string;
   recommendation_description: string;
 };
+
+export type OverviewResponse = {
+  synthetic: {
+    // Общее количество записей в синтетической когорте.
+    count: number;
+    // Среднее значение годовых медицинских расходов в синтетической когорте.
+    avg_annual_medical_cost: number;
+    // Медиана годовых медицинских расходов в синтетической когорте.
+    median_annual_medical_cost: number;
+    // Количество курящих пациентов в синтетической когорте.
+    smokers_count: number;
+    // Количество пациентов с диабетом в синтетической когорте.
+    diabetes_count: number;
+    // Количество пациентов с гипертонией в синтетической когорте.
+    hypertension_count: number;
+    // Количество пациентов с сердечными заболеваниями в синтетической когорте.
+    heart_disease_count: number;
+    // Количество пациентов с астмой в синтетической когорте.
+    asthma_count: number;
+    // Распределение по полу: ключ — пол (или "unknown"), значение — количество.
+    gender_distribution: Record<string, number>;
+    annual_cost_histogram: {
+      // Границы бинов гистограммы годовых расходов (обычно bins + 1 значений).
+      bins: number[];
+      // Количество записей в каждом бине гистограммы.
+      counts: number[];
+    };
+  };
+  predictions: {
+    // Общее количество сохраненных предсказаний.
+    count: number;
+    // Среднее значение предсказанной стоимости.
+    avg_predicted_cost: number;
+    // Медиана предсказанной стоимости.
+    median_predicted_cost: number;
+    predicted_cost_histogram: {
+      // Границы бинов гистограммы предсказанных значений.
+      bins: number[];
+      // Количество предсказаний в каждом бине.
+      counts: number[];
+    };
+    top_factors: Array<{
+      // Название фактора риска, который встречался в объяснениях модели.
+      feature_name: string;
+      // Сколько раз фактор встречался среди факторов риска.
+      count: number;
+    }>;
+  };
+};
