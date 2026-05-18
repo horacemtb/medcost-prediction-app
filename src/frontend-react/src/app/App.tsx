@@ -67,10 +67,10 @@ export default function App() {
   } as CSSProperties;
 
   return (
-    <div className="min-h-screen bg-[#f6f8fd] text-txt">
+    <div className="min-h-screen overflow-x-hidden bg-[#f6f8fd] text-txt">
       <PredictionDetailsProvider>
         <div
-          className="grid min-h-screen w-full grid-cols-1 gap-0 transition-[grid-template-columns] duration-300 ease-in-out md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
+          className="grid min-h-screen w-full grid-cols-1 gap-0 overflow-x-hidden transition-[grid-template-columns] duration-300 ease-in-out md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
           style={shellStyle}
         >
           <SideNavigation
