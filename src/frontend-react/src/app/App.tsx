@@ -63,21 +63,26 @@ export default function App() {
   }, [location.pathname, navigate]);
 
   const shellStyle = {
-    "--sidebar-width": sidebarCollapsed ? "96px" : "292px",
+    "--sidebar-width": "292px",
   } as CSSProperties;
 
   return (
     <div className="min-h-screen bg-[#f6f8fd] text-txt">
       <PredictionDetailsProvider>
         <div
-          className="grid min-h-screen w-full grid-cols-1 gap-0 md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
+          className="grid min-h-screen w-full grid-cols-1 gap-0 transition-[grid-template-columns] duration-300 ease-in-out md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
           style={shellStyle}
         >
           <SideNavigation
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((value) => !value)}
           />
-          <div className="min-w-0 border-l border-[#e8ecf4] bg-[#f6f8fd]">
+          <div
+            className={[
+              "relative z-10 min-w-0 border-l border-[#e8ecf4] bg-[#f6f8fd] transition-[margin-left,width] duration-300 ease-in-out",
+              sidebarCollapsed ? "md:-ml-[196px] md:w-[calc(100%+196px)]" : "",
+            ].join(" ")}
+          >
             <header className="flex h-[78px] items-center justify-between gap-4 border-b border-[#e8ecf4] bg-white px-8">
               <div className="flex h-11 w-full max-w-[680px] items-center rounded-2xl bg-[#f1f4fa] px-4">
                 <Search className="mr-3 size-5 text-[#74839b]" />

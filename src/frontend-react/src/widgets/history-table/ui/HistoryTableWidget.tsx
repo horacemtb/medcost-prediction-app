@@ -65,7 +65,15 @@ const HistoryRow = memo(function HistoryRow({
       <td>{item.full_name}</td>
       <td>{item.age}</td>
       <td>{item.predicted_cost.toFixed(2)} ₽</td>
-      <td>{new Date(item.created_at).toLocaleString()}</td>
+      <td>
+        {new Date(item.created_at).toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </td>
       <td className="text-left">
         <KitButton
           type="button"
@@ -137,15 +145,15 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
             </div>
           </div>
         )}
-        <div className="scroll-hidden h-full min-h-0 overflow-auto">
-          <table className="table-fixed">
+        <div className="h-full min-h-0 overflow-auto">
+          <table className="table-fixed w-full min-w-[890px]">
             <colgroup>
-              <col className="w-[100px]" />
-              <col />
+              <col className="w-[120px]" />
+              <col className="w-[200px]" />
               <col className="w-[100px]" />
               <col className="w-[160px]" />
               <col className="w-[190px]" />
-              <col className="w-[100px]" />
+              <col className="w-[120px]" />
             </colgroup>
             <thead className="sticky top-0 z-20">
               <tr>

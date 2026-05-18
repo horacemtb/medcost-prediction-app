@@ -16,9 +16,9 @@ export function SettingsPage({ status }: SettingsPageProps) {
 
   return (
     <section className="page-shell justify-items-start">
-      <article className="tile w-full max-w-[420px] rounded-2xl border border-line/70 bg-white/70 p-4">
+      <article className="tile h-[80px] w-[280px] rounded-2xl border border-line/70 bg-white/70 p-4">
         <p className="tiny">Сервер</p>
-        <p className={`m-0 mt-2 text-ui-lg font-semibold ${statusClass}`}>{statusText}</p>
+        <p className={`m-0 mt-2 text-ui-lg font-semibold md:mt-2 ${statusClass}`}>{statusText}</p>
       </article>
     </section>
   );

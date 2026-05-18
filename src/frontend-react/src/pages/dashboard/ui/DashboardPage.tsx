@@ -51,7 +51,7 @@ export function DashboardPage() {
   return (
     <section className="grid gap-4">
       <ExecutiveOverviewWidget overview={overview} />
-      <div className="grid gap-4 xl:grid-cols-[35%_65%]">
+      <div className="grid gap-4 min-[1200px]:grid-cols-[35%_65%]">
         <RiskProfileWidget overview={overview} />
         <div className="grid gap-4">
           <PopulationPredictionDriftWidget overview={overview} />

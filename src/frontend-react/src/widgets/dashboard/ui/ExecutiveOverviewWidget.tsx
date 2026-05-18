@@ -54,7 +54,7 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-4">
+      <div className="mt-4 grid gap-3 min-[760px]:grid-cols-2 min-[1200px]:grid-cols-4">
         <MiniStatCard label="Исторические данные" value={overview.synthetic.count.toLocaleString()} />
         <MiniStatCard label="Прогнозы" value={overview.predictions.count.toLocaleString()} />
         <MiniStatCard
@@ -67,7 +67,7 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
         />
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="mt-5 grid gap-4 min-[1200px]:grid-cols-2">
         <article className="rounded-2xl border border-line/70 bg-white p-3">
           <div className="flex items-center gap-2">
             <p className="tiny">Распределение исторических расходов</p>
