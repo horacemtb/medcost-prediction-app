@@ -1,5 +1,6 @@
 ﻿import {
   Activity,
+  AlertTriangle,
   Calculator,
   HeartPulse,
   ScanText,
@@ -9,6 +10,7 @@
 import { useRef, type ChangeEvent } from "react";
 import { featureMap } from "../../../shared/config/feature-map";
 import {
+  AddressSuggestInput,
   FieldMeta,
   KitButton,
   KitCheckbox,
@@ -61,6 +63,8 @@ export function PredictFormWidget({
   costInput,
   loading,
   ocrLoading,
+  ocrWarnings,
+  ocrError,
   chronicCount,
   formPredictionId,
   onUpdateField,
@@ -112,6 +116,33 @@ export function PredictFormWidget({
         профиля рисков.
       </p>
 
+      {ocrError && (
+        <div className="mt-4 rounded-xl border border-[#f3b4b4] bg-[#fff1f1] p-3 text-ui-sm text-[#9f1f1f]">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <p className="m-0">{ocrError}</p>
+          </div>
+        </div>
+      )}
+
+      {!ocrError && ocrWarnings.length > 0 && (
+        <div className="mt-4 rounded-xl border border-[#f4d28b] bg-[#fff8e8] p-3 text-ui-sm text-[#7a4b00]">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <div>
+              <p className="m-0 font-semibold">
+                Некоторые поля анкеты не распознаны.
+              </p>
+              <ul className="m-0 mt-2 list-disc space-y-1 pl-5">
+                {ocrWarnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-[1.1fr_1.5fr]">
         <article className="rounded-2xl border border-line/65 bg-white/55 p-4">
           <h4 className="mb-3 inline-flex items-center gap-2 text-ui-lg font-semibold text-txt">
@@ -132,6 +163,36 @@ export function PredictFormWidget({
                 onBlur={(e) => onFullNameBlur(e.target.value)}
               />
               <FieldMeta error={errors.full_name} />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-ui-sm font-medium text-txt">СНИЛС</span>
+              <KitInput
+                value={form.snils}
+                placeholder="123-456-789 01"
+                className="h-10 bg-white/70"
+                onChange={(e) => onUpdateField("snils", e.target.value)}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-ui-sm font-medium text-txt">Телефон</span>
+              <KitInput
+                value={form.phone}
+                placeholder="89001234567"
+                className="h-10 bg-white/70"
+                onChange={(e) => onUpdateField("phone", e.target.value)}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-ui-sm font-medium text-txt">Адрес</span>
+              <AddressSuggestInput
+                value={form.address}
+                placeholder="г. Москва, ул. Ленина, д. 1"
+                className="h-10 bg-white/70"
+                onChange={(value) => onUpdateField("address", value)}
+              />
             </label>
 
             <StepperField

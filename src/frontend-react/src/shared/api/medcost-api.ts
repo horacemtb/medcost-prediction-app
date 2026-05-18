@@ -51,6 +51,11 @@ async function reqBlob(path: string, init?: RequestInit): Promise<Blob> {
   return res.blob();
 }
 
+export type DadataSuggestion = {
+  value: string;
+  data?: Record<string, unknown>;
+};
+
 export const medcostApi = {
   health: () => req<{ status: string }>("/api/health"),
   predict: (payload: PredictionInput) =>
@@ -73,4 +78,6 @@ export const medcostApi = {
       body: JSON.stringify({ predicted_cost }),
     }),
   exportPredictionPdf: (id: number) => reqBlob(`/api/predictions/${id}/pdf`),
+  suggestAddress: (query: string, count = 5) =>
+    req<{ suggestions: DadataSuggestion[] }>(`/api/dadata/suggestions?query=${encodeURIComponent(query)}&count=${count}`),
 };

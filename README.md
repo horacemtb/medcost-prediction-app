@@ -25,7 +25,17 @@ git clone https://github.com/horacemtb/medcost-prediction-app.git
 cd medcost-prediction-app
 ```
 
-2. **Выполнить команду:**
+2. **Настроить переменные окружения:**
+
+Скопируйте файл `.env.example` в `.env` и подставьте свои значения:
+
+```
+cp .env.example .env
+```
+
+Файл `.env` не отслеживается git — ключи не попадут в репозиторий.
+
+3. **Выполнить команду:**
 
 ```
 docker compose up --build
@@ -37,7 +47,7 @@ docker compose up --build
 http://localhost:8501
 ```
 
-3. **После завершения работы выполнить команду:**
+4. **После завершения работы выполнить команду:**
 
 ```
 docker compose down

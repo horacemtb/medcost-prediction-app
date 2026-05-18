@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 import re
 from ..database import get_db
 from ..models import PredictionRecord, RiskFactor, Patient
-from sqlalchemy.exc import IntegrityError
 from ..schemas import (
     DeleteResponse,
     HistoryResponse,
@@ -16,6 +15,7 @@ from ..schemas import (
     RiskFactorResponse,
 )
 from ..services.ml_service import get_ml_service
+from ..services.dadata_service import clean_full_name, clean_address, clean_phone
 from .ml_stats import calculate_percentile
 
 router = APIRouter(prefix="/api", tags=["predictions"])
@@ -148,6 +148,47 @@ def normalize_snils(snils: str | None) -> str | None:
         return None
     return digits
 
+
+def format_snils(snils: str | None) -> str | None:
+    digits = normalize_snils(snils)
+    if digits is None:
+        return snils
+    return f"{digits[:3]}-{digits[3:6]}-{digits[6:9]} {digits[9:]}"
+
+
+def _clean_optional_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    cleaned = value.strip()
+    return cleaned or None
+
+
+def _apply_patient_data(patient: Patient, payload: PredictionInput) -> None:
+    patient.full_name = clean_full_name(payload.full_name)
+    patient.phone = clean_phone(_clean_optional_text(payload.phone))
+    patient.address = clean_address(_clean_optional_text(payload.address))
+
+
+def _resolve_patient(payload: PredictionInput, db: Session) -> Patient | None:
+    snils = normalize_snils(payload.snils)
+    if not snils:
+        return None
+
+    patient = db.query(Patient).filter(Patient.snils == snils).first()
+    if patient is None:
+        patient = Patient(
+            full_name=clean_full_name(payload.full_name),
+            snils=snils,
+            phone=clean_phone(_clean_optional_text(payload.phone)),
+            address=clean_address(_clean_optional_text(payload.address)),
+        )
+        db.add(patient)
+        db.flush()
+    else:
+        _apply_patient_data(patient, payload)
+
+    return patient
+
 @router.get("/health")
 def healthcheck():
     return {"status": "ok"}
@@ -161,23 +202,7 @@ def create_prediction(
     ),
     db: Session = Depends(get_db),
 ):
-    
-    snils = normalize_snils(getattr(payload, "snils", None))
-    patient = None
-    if snils:
-        patient = db.query(Patient).filter(Patient.snils == snils).first()
-        if not patient:
-            patient = Patient(
-                full_name=payload.full_name,
-                snils=snils,
-                phone=payload.phone,
-                address=payload.address,
-            )
-            db.add(patient)
-            db.flush()
-            
-    
-
+    patient = _resolve_patient(payload, db)
     
     ml_service = get_ml_service()
     feature_payload = payload.model_dump(include=set(FEATURE_FIELDS))
@@ -219,11 +244,15 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Prediction not found")
 
     factors = _build_or_create_risk_factors(record, db)
+    patient = record.patient
 
     return PredictionDetailsResponse(
         prediction_id=record.id,
         patient_id=record.patient_id,
         full_name=record.full_name,
+        snils=format_snils(patient.snils) if patient else None,
+        phone=patient.phone if patient else None,
+        address=patient.address if patient else None,
         age=record.age,
         gender=record.gender,
         bmi=record.bmi,
@@ -273,6 +302,8 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
 
     ml_service = get_ml_service()
     payload_data = payload.model_dump()
+    patient = _resolve_patient(payload, db)
+    record.patient_id = patient.id if patient is not None else None
     
     for key, value in payload_data.items():
         if key in set(FEATURE_FIELDS + ["full_name", "previous_year_cost"]):

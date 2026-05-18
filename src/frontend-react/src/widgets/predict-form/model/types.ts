@@ -8,6 +8,8 @@ export type PredictFormWidgetProps = {
   costInput: string;
   loading: boolean;
   ocrLoading: boolean;
+  ocrWarnings: string[];
+  ocrError: string;
   chronicCount: number;
   formPredictionId: number | null;
   onTabChange: (tab: PredictTabId) => void;

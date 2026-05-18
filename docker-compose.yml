@@ -22,6 +22,8 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/medcost_db
       MODEL_PATH: /app/models/rf_pipeline.joblib
+      DADATA_API_KEY: ${DADATA_API_KEY:-}
+      DADATA_API_SECRET: ${DADATA_API_SECRET:-}
     ports:
       - "8000:8000"
     depends_on:

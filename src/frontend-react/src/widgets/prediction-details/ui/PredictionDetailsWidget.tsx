@@ -49,14 +49,6 @@ export function PredictionDetailsWidget({
         ? "bg-[#fff2d8] text-[#8f5a00]"
         : "bg-[#e7f8ee] text-[#18794e]";
 
-  const displayFactors = useMemo(() => {
-    const decreasing = sortedFactors
-      .filter((factor) => factor.direction === "decrease")
-      .slice(0, 3);
-    if (decreasing.length > 0) return decreasing;
-    return sortedFactors.slice(0, 3);
-  }, [sortedFactors]);
-
   const percentile = assessment?.percentile ?? null;
 
   useEffect(() => {

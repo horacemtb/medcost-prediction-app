@@ -6,6 +6,8 @@ from typing import Any
 
 
 OCR_LANGUAGE = "rus"
+OCR_FALLBACK_LANGUAGE = "rus_standard"
+OCR_CONFIG = "--oem 1"
 
 CHECKBOX_LABELS = {
     "smoker": ("курение",),
@@ -17,6 +19,9 @@ CHECKBOX_LABELS = {
 
 FIELD_LABELS = {
     "full_name": "ФИО пациента",
+    "snils": "СНИЛС",
+    "address": "Адрес",
+    "phone": "Телефон",
     "age": "Возраст",
     "gender": "Пол",
     "bmi": "BMI",
@@ -52,6 +57,7 @@ FLOAT_FIELD_RANGES = {
 }
 
 BOOL_FIELDS = {"smoker", "diabetes", "hypertension", "heart_disease", "asthma"}
+OPTIONAL_TEXT_FIELDS = {"snils", "address", "phone"}
 
 
 @dataclass(frozen=True)
@@ -116,9 +122,58 @@ def _find_line_value(text: str, pattern: str) -> str | None:
     return value or None
 
 
+def _clean_line_value(value: str) -> str:
+    value = re.sub(r"[_—-]{2,}.*$", "", value).strip()
+    return re.sub(r"\s+", " ", value).strip()
+
+
 def _clean_name(value: str) -> str:
     value = re.sub(r"[^А-Яа-яЁё \-]", " ", value)
     return re.sub(r"\s+", " ", value).strip()
+
+
+def _is_form_title(value: str) -> bool:
+    return re.sub(r"[^а-яё]", "", value.casefold()) == "анкетапациента"
+
+
+def _looks_like_label(value: str) -> bool:
+    return bool(re.match(r"^\s*(?:\d+[\.,]\s*)?[А-Яа-яЁё ]{2,40}\s*:", value))
+
+
+def _find_full_name(text: str) -> str | None:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    for index, line in enumerate(lines):
+        if not re.search(r"ФИО\s+пациента", line, flags=re.IGNORECASE):
+            continue
+
+        _, _, after_colon = line.partition(":")
+        candidates = [after_colon, *lines[index + 1 : index + 4]]
+        for candidate in candidates:
+            cleaned = _clean_name(candidate)
+            if not cleaned or _is_form_title(cleaned) or _looks_like_label(candidate):
+                continue
+            return cleaned
+    return None
+
+
+def _normalize_snils(value: str) -> str | None:
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 11:
+        return None
+    return f"{digits[:3]}-{digits[3:6]}-{digits[6:9]} {digits[9:]}"
+
+
+def _clean_address(value: str) -> str:
+    return _clean_line_value(value)
+
+
+def _normalize_phone(value: str) -> str | None:
+    cleaned = re.sub(r"[^\d+]", "", value)
+    if cleaned.startswith("+"):
+        digits = re.sub(r"\D", "", cleaned[1:])
+        return f"+{digits}" if digits else None
+    digits = re.sub(r"\D", "", cleaned)
+    return digits or None
 
 
 def _normalize_gender(value: str) -> int | None:
@@ -157,12 +212,32 @@ def parse_patient_form_text(raw_text: str) -> tuple[dict[str, Any], list[str]]:
     fields: dict[str, Any] = {}
     warnings: list[str] = []
 
+    full_name = _find_full_name(text)
+    if full_name:
+        fields["full_name"] = full_name
+    else:
+        warnings.append("Не удалось распознать поле: ФИО пациента")
+
+    optional_extractors = {
+        "snils": (r"СНИЛС\s*:?\s*([^\n]+)", _normalize_snils),
+        "address": (r"Адрес\s*:?\s*([^\n]+)", _clean_address),
+        "phone": (r"Телефон\s*:?\s*([^\n]+)", _normalize_phone),
+    }
+
+    for field_name, (pattern, normalizer) in optional_extractors.items():
+        value = _find_line_value(text, pattern)
+        if value is None:
+            continue
+
+        try:
+            normalized = normalizer(value)
+        except (TypeError, ValueError):
+            normalized = None
+
+        if normalized:
+            fields[field_name] = normalized
+
     extractors = {
-        "full_name": (
-            r"ФИО\s+пациента\s*:?\s*([А-Яа-яЁё \-]+)",
-            _clean_name,
-            "ФИО пациента",
-        ),
         "age": (r"Возраст\s*:?\s*(\d{1,3})", normalize_int, "Возраст"),
         "gender": (r"(?:^|\n)\s*(?:\d+\.\s*)?Пол\s*:?\s*([А-Яа-яЁё]+)", _normalize_gender, "Пол"),
         "bmi": (
@@ -176,7 +251,7 @@ def parse_patient_form_text(raw_text: str) -> tuple[dict[str, Any], list[str]]:
             "Уровень стресса",
         ),
         "physical_activity_level": (
-            r"Уровень\s+физической\s+активности\s*:?\s*([А-Яа-яЁё]+)",
+            r"Уровень\s+физической\s+активности\s*:?\s*[^А-Яа-яЁё\n]*([А-Яа-яЁё]+)",
             _normalize_activity,
             "Уровень физической активности",
         ),
@@ -192,12 +267,12 @@ def parse_patient_form_text(raw_text: str) -> tuple[dict[str, Any], list[str]]:
             "Часы сна",
         ),
         "doctor_visits_per_year": (
-            r"Визитов\s+к\s+врачу\s+в\s+год\s*:?\s*(\d+)",
+            r"Визитов\s+к\s+врачу\s+в\s+год\s*:?\s*[^\d\n]*(\d+)",
             normalize_int,
             "Визитов к врачу в год",
         ),
-        "hospital_admissions": (r"Госпитализаций\s*:?\s*(\d+)", normalize_int, "Госпитализаций"),
-        "medication_count": (r"Количество\s+лекарств\s*:?\s*(\d+)", normalize_int, "Количество лекарств"),
+        "hospital_admissions": (r"Госпитализаций\s*:?\s*[^\d\n]*(\d+)", normalize_int, "Госпитализаций"),
+        "medication_count": (r"Количество\s+лекарств\s*:?\s*[^\d\n]*(\d+)", normalize_int, "Количество лекарств"),
         "previous_year_cost": (
             r"Расходы\s+за\s+прошлый\s+год[^\n:]*:?\s*(\d[\d ]*(?:[,.]\d+)?)",
             normalize_decimal,
@@ -245,6 +320,13 @@ def validate_patient_fields(fields: dict[str, Any]) -> tuple[dict[str, Any], lis
             validated["full_name"] = full_name
         else:
             warnings.append(_range_warning("full_name", fields["full_name"]))
+
+    for field_name in ("snils", "address", "phone"):
+        if field_name not in fields:
+            continue
+        value = str(fields[field_name]).strip()
+        if value:
+            validated[field_name] = value
 
     for field_name, (min_value, max_value) in INT_FIELD_RANGES.items():
         if field_name not in fields:
@@ -302,6 +384,27 @@ def validate_patient_fields(fields: dict[str, Any]) -> tuple[dict[str, Any], lis
             warnings.append(_invalid_warning(field_name, value))
 
     return validated, warnings
+
+
+def _filter_resolved_parse_warnings(warnings: list[str], fields: dict[str, Any]) -> list[str]:
+    recognized_labels = {
+        FIELD_LABELS[field_name]
+        for field_name in fields
+        if field_name in FIELD_LABELS
+    }
+    unresolved_optional_labels = {
+        FIELD_LABELS[field_name]
+        for field_name in OPTIONAL_TEXT_FIELDS
+        if field_name not in fields
+    }
+    filtered: list[str] = []
+    for warning in warnings:
+        if warning.startswith("Не удалось распознать поле: ") or warning.startswith("Не удалось нормализовать поле: "):
+            label = warning.rsplit(": ", 1)[-1]
+            if label in recognized_labels or label in unresolved_optional_labels:
+                continue
+        filtered.append(warning)
+    return filtered
 
 
 def _normalized_word(value: str) -> str:
@@ -518,14 +621,32 @@ def extract_patient_form(image_bytes: bytes) -> dict[str, Any]:
         raise ValueError("Не удалось прочитать изображение анкеты") from exc
 
     try:
-        raw_text = pytesseract.image_to_string(image, lang=OCR_LANGUAGE)
-        ocr_data = pytesseract.image_to_data(image, lang=OCR_LANGUAGE, output_type=pytesseract.Output.DICT)
+        raw_text = pytesseract.image_to_string(image, lang=OCR_LANGUAGE, config=OCR_CONFIG)
+        ocr_data = pytesseract.image_to_data(
+            image,
+            lang=OCR_LANGUAGE,
+            config=OCR_CONFIG,
+            output_type=pytesseract.Output.DICT,
+        )
     except pytesseract.pytesseract.TesseractNotFoundError as exc:
         raise RuntimeError("Tesseract OCR is not installed") from exc
     except pytesseract.TesseractError as exc:
         raise RuntimeError(f"Tesseract OCR failed: {exc}") from exc
 
     text_fields, text_warnings = parse_patient_form_text(raw_text)
+    fallback_raw_text = ""
+    if text_warnings:
+        try:
+            fallback_raw_text = pytesseract.image_to_string(image, lang=OCR_FALLBACK_LANGUAGE, config=OCR_CONFIG)
+        except pytesseract.TesseractError:
+            fallback_raw_text = ""
+
+    if fallback_raw_text:
+        fallback_fields, fallback_warnings = parse_patient_form_text(fallback_raw_text)
+        text_fields = {**fallback_fields, **text_fields}
+        text_warnings = [*text_warnings, *fallback_warnings]
+        text_warnings = _filter_resolved_parse_warnings(text_warnings, text_fields)
+
     checkbox_fields, checkbox_warnings = detect_checkbox_fields(image, ocr_data)
 
     fields, validation_warnings = validate_patient_fields({**text_fields, **checkbox_fields})

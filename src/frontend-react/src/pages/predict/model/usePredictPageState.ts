@@ -24,6 +24,9 @@ import {
 
 const fieldAliases: Record<keyof PredictFormState, string[]> = {
   full_name: ["full_name", "fullName", "fio", "name"],
+  snils: ["snils", "СНИЛС"],
+  phone: ["phone", "telephone", "телефон"],
+  address: ["address", "адрес"],
   age: ["age"],
   gender: ["gender", "sex"],
   bmi: ["bmi"],
@@ -163,6 +166,12 @@ export function usePredictPageState() {
         pickField(fields, fieldAliases.full_name),
         prev.full_name,
       ),
+      snils: toStringSafe(pickField(fields, fieldAliases.snils), prev.snils),
+      phone: toStringSafe(pickField(fields, fieldAliases.phone), prev.phone),
+      address: toStringSafe(
+        pickField(fields, fieldAliases.address),
+        prev.address,
+      ),
       age: toNumberSafe(pickField(fields, fieldAliases.age), prev.age),
       gender: mapGender(pickField(fields, fieldAliases.gender), prev.gender),
       bmi: toNumberSafe(pickField(fields, fieldAliases.bmi), prev.bmi),
@@ -263,6 +272,7 @@ export function usePredictPageState() {
         prediction_id: details.prediction_id,
         full_name: details.full_name,
         predicted_cost: details.predicted_cost,
+        patient_id: details.patient_id,
         created_at: details.created_at,
       });
       openPredictionDetails(details.prediction_id);
@@ -397,7 +407,13 @@ export function usePredictPageState() {
   }, [closePredictionDetails]);
 
   const submit = useCallback(async () => {
-    const normalized = { ...form, full_name: normalizeName(form.full_name) };
+    const normalized = {
+      ...form,
+      full_name: normalizeName(form.full_name),
+      snils: form.snils.trim(),
+      phone: form.phone.trim(),
+      address: form.address.trim(),
+    };
     const validationErrors = validatePredictForm(normalized);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length) return;
