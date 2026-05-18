@@ -16,11 +16,13 @@ type Props = {
 };
 
 function toHistogramData(bins: number[], counts: number[]) {
+  const formatNumber = (value: number) => Math.round(value).toLocaleString("ru-RU");
+
   return counts.map((count, index) => {
     const left = bins[index] ?? 0;
     const right = bins[index + 1] ?? left;
     return {
-      name: `${Math.round(left).toLocaleString()}-${Math.round(right).toLocaleString()}`,
+      name: `${formatNumber(left)} - ${formatNumber(right)}`,
       count,
     };
   });
@@ -87,7 +89,7 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
                 <XAxis dataKey="name" hide />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#4c7cf0" radius={[6, 6, 0, 0]} />
+                <Bar name="Количество" dataKey="count" fill="#4c7cf0" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -114,7 +116,7 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
                 <XAxis dataKey="name" hide />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Bar dataKey="count" fill="#10b6ad" radius={[6, 6, 0, 0]} />
+                <Bar name="Количество" dataKey="count" fill="#10b6ad" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
