@@ -974,7 +974,104 @@ http://localhost:8501
 
 ---
 
+## 📊 Дашборд и статистики
 
+В backend уже подготовлен endpoint:
+
+```text
+GET /api/stats/overview
+```
+
+Он возвращает два независимых блока:
+
+### 1. `synthetic`
+Референсная статистика по таблице с историческими данными `synthetic_cohort`:
+
+- количество записей;
+- средние и медианные расходы `annual_medical_cost`;
+- счётчики по:
+  - курению,
+  - диабету,
+  - гипертонии,
+  - болезням сердца,
+  - астме;
+- распределение по полу;
+- гистограмма расходов.
+
+### 2. `predictions`
+Live-статистика по пользовательским прогнозам:
+
+- количество сохранённых прогнозов;
+- средний и медианный `predicted_cost`;
+- гистограмма предсказанных расходов;
+- топ-факторы по таблице `risk_factors`.
+
+### Почему статистики разделены
+
+Это важно методологически:
+
+- `synthetic_cohort` — референсная когорта;
+- `predictions` — реальные пользовательские расчёты внутри приложения.
+
+---
+
+## 🧪 Отладка и ручная проверка
+
+### Проверка состояния контейнеров
+```bash
+docker compose ps
+```
+
+### Логи backend
+```bash
+docker compose logs -f backend
+```
+
+### Подключение к PostgreSQL
+```bash
+docker compose exec db psql -U postgres -d medcost_db
+```
+
+### Полезные SQL-команды
+
+Показать таблицы:
+```sql
+\dt
+```
+
+Посмотреть структуру:
+```sql
+\d patients
+\d predictions
+\d risk_factors
+\d synthetic_cohort
+```
+
+Проверить связку пациентов и прогнозов:
+```sql
+SELECT
+    p.id AS prediction_id,
+    p.patient_id,
+    p.full_name,
+    pt.full_name AS patient_name,
+    pt.snils,
+    p.predicted_cost,
+    p.created_at
+FROM predictions p
+LEFT JOIN patients pt ON p.patient_id = pt.id
+ORDER BY p.id DESC;
+```
+
+Проверить дубли по `snils`:
+```sql
+SELECT snils, COUNT(*)
+FROM patients
+WHERE snils IS NOT NULL
+GROUP BY snils
+HAVING COUNT(*) > 1;
+```
+
+---
 
 ## 📈 Алгоритмы машинного обучения
 
@@ -1794,17 +1891,6 @@ PSI = sum_i (p_i - q_i) * ln(p_i / q_i)
 6. **Для интерпретации** стоит использовать SHAP и permutation importance: они помогают понять, какие признаки действительно влияют на прогноз, и позволяют строить версии моделей с сокрашённым набором признаков.
 
 ---
-
-
-
-
-
-
-
-
-
-
-
 
 ## 🖼️ Основной функционал и пользовательские сценарии
 
