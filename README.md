@@ -875,6 +875,106 @@ Dadata активируется через переменные окружени
 
 ---
 
+## 📦 Контейнеризация и развёртывание
+
+### Общая схема
+
+Проект поднимается через **Docker Compose** и состоит из четырёх сервисов:
+
+- `db`
+- `backend`
+- `frontend-react`
+- `nginx`
+
+### `docker-compose.yml`
+
+#### `db`
+- образ: `postgres:16`
+- хранит все данные приложения;
+- имеет `healthcheck`, чтобы backend стартовал после готовности БД.
+
+#### `backend`
+- собирается из `src/backend/Dockerfile`;
+- поднимает FastAPI на порту `8000`;
+- получает:
+  - `DATABASE_URL`
+  - `MODEL_PATH`
+
+#### `frontend-react`
+- собирается из `src/frontend-react/Dockerfile`;
+- запускает Vite dev-сервер на `8501` внутри контейнера.
+
+#### `nginx`
+- проксирует:
+  - `/` → `frontend-react`
+  - `/api/` → `backend`
+- наружу публикуется на порту `8501`.
+
+### Схема контейнеров
+
+![Контейнерная схема](assets/images/container-diagram.png)
+
+### Backend Dockerfile
+
+Backend image:
+
+- основан на `python:3.11-slim`;
+- устанавливает `tesseract-ocr`, `tesseract-ocr-rus`, `fonts-dejavu-core`;
+- обновляет русский tessdata-файл;
+- ставит Python-зависимости;
+- копирует backend-код и артефакт модели;
+- запускает `uvicorn`.
+
+### Frontend Dockerfile
+
+Frontend image:
+
+- основан на `node:20-alpine`;
+- устанавливает npm-зависимости;
+- копирует React/Vite-проект;
+- запускает Vite dev server.
+
+> Для production-режима React-приложение можно собирать в static build и отдавать напрямую из Nginx. В текущей версии выбран более гибкий способ: frontend работает в отдельном контейнере, а Nginx проксирует к нему запросы. Такой вариант удобен для активной разработки и дальнейшего перехода к production-контуру.
+
+### Nginx
+
+Конфигурация `infra/nginx/default.conf` делает две вещи:
+
+1. проксирует `/api/*` на `backend:8000`;
+2. проксирует все остальные запросы на `frontend-react:8501`.
+
+Это позволяет использовать один внешний адрес:
+
+```text
+http://localhost:8501
+```
+
+для всего приложения.
+
+---
+
+## 🔐 Переменные окружения
+
+### Backend
+
+| Переменная | Назначение |
+|---|---|
+| `DATABASE_URL` | Строка подключения к PostgreSQL |
+| `MODEL_PATH` | Путь к сохранённому `.joblib` pipeline |
+| `DADATA_API_KEY` | Ключ доступа к Dadata Cleaner / Suggestions |
+| `DADATA_API_SECRET` | Секрет Dadata |
+
+### Frontend
+
+| Переменная | Назначение |
+|---|---|
+| `VITE_API_BASE_URL` | Базовый URL backend API |
+
+> В текущем nginx-сценарии frontend может работать и с пустым `VITE_API_BASE_URL`, используя относительные пути `/api/*`.
+
+---
+
+
 
 ## 📈 Алгоритмы машинного обучения
 
