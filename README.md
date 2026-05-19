@@ -1904,16 +1904,24 @@ PSI = sum_i (p_i - q_i) * ln(p_i / q_i)
 
 3. История и поиск
 
-![История и поиск](assets/images/case_3.png)
+![История и поиск](assets\images\new_secuence_3.png)
 
 4. Формирование отчёта в виде PDF-файла
 
-![Формирование отчёта в виде PDF-файла](assets/images/case_4.png)
+![Формирование отчёта в виде PDF-файла](assets\images\new_sequence_4.png)
 
 5. Удаление прогноза из истории
 
-![Удаление прогноза из истории](assets/images/case_5.png)
+![Удаление прогноза из истории](assets\images\new_secuence_5.png)
 
 6. Сортировка в истории
 
-![Сортировка в истории](assets/images/case_6.png)
+![Сортировка в истории](assets\images\new_secuence_6.png)
+
+7. Фильтры во вкладке История
+
+![Фильтры во вкладке История](assets\images\case_7.png)
+
+8. Загрузка анкеты
+
+![Загрузка анкеты](assets\images\case_8.png)
