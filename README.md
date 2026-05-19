@@ -406,6 +406,180 @@ MongoDB имеет смысл, когда:
 
 ---
 
+## 🔌 REST API и контракт взаимодействия
+
+### Общие принципы
+
+- формат обмена: **JSON**
+- загрузка анкеты для OCR: **multipart/form-data**
+- PDF-экспорт: **binary response** (`application/pdf`)
+- основной namespace: **`/api`**
+- спецификация и тестирование: **Swagger / OpenAPI** на `/docs`
+
+### Список endpoint’ов
+
+| Метод | Endpoint | Назначение |
+|---|---|---|
+| `GET` | `/api/health` | Проверка доступности backend |
+| `POST` | `/api/predict` | Создать новый прогноз |
+| `PUT` | `/api/predictions/{prediction_id}/recalculate` | Пересчитать существующий прогноз |
+| `GET` | `/api/predictions/{prediction_id}` | Получить детали прогноза |
+| `GET` | `/api/predictions/{prediction_id}/factors` | Получить топ-факторы |
+| `GET` | `/api/predictions/{prediction_id}/assessment` | Получить категорию риска / перцентиль / рекомендацию |
+| `GET` | `/api/predictions/{prediction_id}/pdf` | Скачать PDF-отчёт |
+| `GET` | `/api/history` | Получить историю прогнозов |
+| `DELETE` | `/api/history/{prediction_id}` | Удалить прогноз |
+| `POST` | `/api/ocr/patient-form` | Распознать поля анкеты |
+| `POST` | `/api/percentile` | Рассчитать перцентиль для заданного `predicted_cost` |
+| `GET` | `/api/stats/overview` | Получить агрегированную статистику для дашборда |
+
+---
+
+### Основные схемы запросов и ответов
+
+#### `POST /api/predict`
+
+Создаёт новый прогноз.
+
+**Request body:**
+```json
+{
+  "full_name": "Иван Иванов",
+  "snils": "123-456-789 00",
+  "phone": "+7-900-000-00-00",
+  "address": "г. Москва",
+  "age": 45,
+  "gender": 1,
+  "bmi": 27.5,
+  "smoker": false,
+  "diabetes": false,
+  "hypertension": false,
+  "heart_disease": false,
+  "asthma": false,
+  "physical_activity_level": "Medium",
+  "daily_steps": 6000,
+  "sleep_hours": 7.0,
+  "stress_level": 4,
+  "doctor_visits_per_year": 2,
+  "hospital_admissions": 0,
+  "medication_count": 1,
+  "city_type": "Urban",
+  "previous_year_cost": 12000.0
+}
+```
+
+**Response:**
+```json
+{
+  "prediction_id": 101,
+  "full_name": "Иван Иванов",
+  "predicted_cost": 14530.42,
+  "patient_id": 5,
+  "created_at": "2026-04-20T10:15:00"
+}
+```
+
+#### `GET /api/predictions/{prediction_id}`
+
+Возвращает полные детали прогноза и список факторов риска.
+
+#### `GET /api/predictions/{prediction_id}/assessment`
+
+Возвращает:
+- перцентиль;
+- категорию риска;
+- текстовую рекомендацию.
+
+#### `GET /api/history`
+
+Поддерживает query-параметр:
+
+- `search` — поиск по ID или ФИО;
+- `limit` — ограничение количества записей.
+
+Пример:
+```text
+GET /api/history?search=Иванов&limit=100
+```
+
+#### `POST /api/ocr/patient-form`
+
+Принимает файл изображения анкеты и возвращает:
+
+- `fields` — распознанные поля;
+- `raw_text` — сырой OCR-текст;
+- `warnings` — предупреждения по распознаванию и валидации.
+
+#### `GET /api/stats/overview`
+
+Возвращает два блока статистики:
+
+- `synthetic` — baseline-метрики по `synthetic_cohort`;
+- `predictions` — live-метрики по пользовательским прогнозам.
+
+---
+
+### Примеры запросов
+
+#### Проверка healthcheck
+```bash
+curl http://localhost:8000/api/health
+```
+
+#### Создание прогноза
+```bash
+curl -X POST http://localhost:8000/api/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "full_name": "Иван Иванов",
+    "snils": "123-456-789 00",
+    "phone": "+7-900-000-00-00",
+    "address": "г. Москва",
+    "age": 45,
+    "gender": 1,
+    "bmi": 27.5,
+    "smoker": false,
+    "diabetes": false,
+    "hypertension": false,
+    "heart_disease": false,
+    "asthma": false,
+    "physical_activity_level": "Medium",
+    "daily_steps": 6000,
+    "sleep_hours": 7.0,
+    "stress_level": 4,
+    "doctor_visits_per_year": 2,
+    "hospital_admissions": 0,
+    "medication_count": 1,
+    "city_type": "Urban",
+    "previous_year_cost": 1200.0
+  }'
+```
+
+#### Получение факторов риска
+```bash
+curl http://localhost:8000/api/predictions/101/factors
+```
+
+#### Получение percentile
+```bash
+curl -X POST http://localhost:8000/api/percentile \
+  -H "Content-Type: application/json" \
+  -d '{"predicted_cost": 14530.42}'
+```
+
+#### Получение OCR-результата
+```bash
+curl -X POST http://localhost:8000/api/ocr/patient-form \
+  -F "file=@patient_form.png"
+```
+
+#### Экспорт PDF
+```bash
+curl http://localhost:8000/api/predictions/101/pdf --output prediction-report.pdf
+```
+
+---
+
 
 
 ## 📈 Алгоритмы машинного обучения
