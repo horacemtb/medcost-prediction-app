@@ -84,9 +84,9 @@ export function DashboardPage() {
       <div className="scroll-transparent flex-1 min-h-0 overflow-auto pr-1">
         <div className="grid gap-4">
           <ExecutiveOverviewWidget overview={overview} />
-          <div className="grid gap-4 min-[1200px]:grid-cols-[35%_65%]">
+          <div className="grid gap-4 min-[1200px]:grid-cols-[35fr_65fr]">
             <RiskProfileWidget overview={overview} />
-            <div className="grid gap-4">
+            <div className="grid min-w-0 gap-4">
               <PopulationPredictionDriftWidget overview={overview} />
               <GenderSegmentationWidget overview={overview} />
             </div>
