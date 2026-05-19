@@ -88,7 +88,7 @@ export function PredictFormWidget({
   };
 
   return (
-    <section className="h-fit">
+    <section className="flex h-full min-h-0 flex-col">
       <input
         ref={ocrInputRef}
         type="file"
@@ -142,7 +142,7 @@ export function PredictFormWidget({
         </div>
       )}
 
-      <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-[1.1fr_1.5fr]">
+      <div className="mt-5 grid flex-1 min-h-0 grid-cols-1 gap-3 overflow-auto pr-1 lg:grid-cols-[1.1fr_1.5fr]">
         <article className="rounded-2xl border border-line/65 bg-white/70 p-4">
           <h4 className="mb-3 inline-flex items-center gap-2 text-ui-lg font-semibold text-txt">
             <UserRound className="size-5 text-[#2f64ef]" />

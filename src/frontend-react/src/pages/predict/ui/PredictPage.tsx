@@ -28,9 +28,9 @@ export function PredictPage() {
           ]
         }
       />
-      <div className="grid h-full min-h-0 grid-cols-1 items-stretch gap-3">
+      <div className="grid h-full min-h-0 grid-cols-1 items-stretch gap-3 overflow-hidden">
         {!state.hasCalculated ? (
-          <div ref={formRef} className="predict-main-column relative h-full min-h-0 overflow-auto pr-1">
+          <div ref={formRef} className="predict-main-column relative h-full min-h-0 overflow-hidden pr-1">
             {state.visibleOcrLoading && (
               <div
                 className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[2px]"
