@@ -20,7 +20,10 @@ export function DashboardPage() {
         if (!cancelled) setOverview(data);
       })
       .catch((err: unknown) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Не удалось загрузить обзор");
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : "Не удалось загрузить обзор",
+          );
       });
 
     return () => {
@@ -41,7 +44,9 @@ export function DashboardPage() {
     return (
       <section className="rounded-3xl border border-[#dfe6f6] bg-white p-6">
         <h1 className="m-0 text-ui-display text-[#13264b]">Дашборд</h1>
-        <p className="mt-3 text-ui-sm text-muted">Загружаем аналитические данные...</p>
+        <p className="mt-3 text-ui-sm text-muted">
+          Загружаем аналитические данные...
+        </p>
       </section>
     );
   }

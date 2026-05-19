@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import {
   ChevronRight,
@@ -53,16 +53,22 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
             ].join(" ")}
             aria-hidden={collapsed}
           >
-              <p className="m-0 text-[1.5rem] font-extrabold leading-none text-[#1f2c44]">
-                PrecisionAI
-              </p>
-              <p className="m-0 mt-1 text-[0.68rem] font-semibold uppercase leading-4 tracking-[0.08em] text-[#8391aa]">
-                Cost Intelligence
-              </p>
+            <p className="m-0 text-[1.5rem] font-extrabold leading-none text-[#1f2c44]">
+              PrecisionAI
+            </p>
+            <p className="m-0 mt-1 text-[0.68rem] font-semibold uppercase leading-4 tracking-[0.08em] text-[#8391aa]">
+              Cost Intelligence
+            </p>
           </div>
         </div>
 
-        <nav className={collapsed ? "flex flex-row justify-center gap-3 md:grid md:grid-cols-1 md:gap-0 md:justify-items-start" : "grid grid-cols-1 gap-0"}>
+        <nav
+          className={
+            collapsed
+              ? "flex flex-row justify-center gap-3 md:grid md:grid-cols-1 md:gap-0 md:justify-items-start"
+              : "grid grid-cols-1 gap-0"
+          }
+        >
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -96,11 +102,23 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
                       strokeWidth={2.2}
                     />
                   </span>
-                  <span className={collapsed ? "hidden whitespace-nowrap leading-tight md:block" : "whitespace-nowrap leading-tight"}>
+                  <span
+                    className={
+                      collapsed
+                        ? "hidden whitespace-nowrap leading-tight md:block"
+                        : "whitespace-nowrap leading-tight"
+                    }
+                  >
                     {item.label}
                   </span>
                   {isActive ? (
-                    <span className={collapsed ? "absolute bottom-0 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-[#4f6ff2] md:bottom-auto md:left-[68px] md:top-1/2 md:h-8 md:w-[3px] md:-translate-x-0 md:-translate-y-1/2" : "absolute right-0 top-1/2 h-12 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]"} />
+                    <span
+                      className={
+                        collapsed
+                          ? "absolute bottom-0 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-[#4f6ff2] md:bottom-auto md:left-[68px] md:top-1/2 md:h-8 md:w-[3px] md:-translate-x-0 md:-translate-y-1/2"
+                          : "absolute right-0 top-1/2 h-12 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]"
+                      }
+                    />
                   ) : null}
                 </>
               )}

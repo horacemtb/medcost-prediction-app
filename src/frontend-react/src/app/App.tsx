@@ -1,5 +1,11 @@
-﻿import { useCallback, useEffect, useState, type CSSProperties } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { medcostApi } from "../shared/api/medcost-api";
 import { DashboardPage } from "../pages/dashboard/ui/DashboardPage";
@@ -28,7 +34,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("sidebar-collapsed", sidebarCollapsed ? "1" : "0");
+    window.localStorage.setItem(
+      "sidebar-collapsed",
+      sidebarCollapsed ? "1" : "0",
+    );
   }, [sidebarCollapsed]);
 
   const handleGlobalSearch = useCallback(async () => {
@@ -39,7 +48,9 @@ export default function App() {
       try {
         const id = Number(query);
         const details = await medcostApi.prediction(id);
-        navigate("/predict", { state: { prefillDetails: details, openReport: true } });
+        navigate("/predict", {
+          state: { prefillDetails: details, openReport: true },
+        });
       } catch {
         navigate(`/history?search=${encodeURIComponent(query)}`);
       }
@@ -111,13 +122,22 @@ export default function App() {
             </header>
             <main className="h-[calc(100vh-78px)] overflow-auto px-8 py-6">
               <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route
+                  path="/"
+                  element={<Navigate to="/dashboard" replace />}
+                />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/predict" element={<PredictPage />} />
                 <Route path="/history" element={<HistoryPage />} />
                 <Route path="/factors" element={<FactorsPage />} />
-                <Route path="/settings" element={<SettingsPage status={status} />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route
+                  path="/settings"
+                  element={<SettingsPage status={status} />}
+                />
+                <Route
+                  path="*"
+                  element={<Navigate to="/dashboard" replace />}
+                />
               </Routes>
             </main>
           </div>
