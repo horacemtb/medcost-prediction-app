@@ -1,9 +1,9 @@
 ﻿import { useEffect, useRef } from "react";
-import { ErrorAlert, KitBreadcrumbs, KitLoader } from "../../../shared/ui/kit";
+import { ErrorAlert, KitBreadcrumbs, LoadingState } from "../../../shared/ui/kit";
 import { PredictFormWidget } from "../../../widgets/predict-form/ui/PredictFormWidget";
+import { PredictionDetailsWidget } from "../../../widgets/prediction-details";
 import { normalizeName } from "../model/predict-form";
 import { usePredictPageState } from "../model/usePredictPageState";
-import { PredictResultView } from "./PredictResultView";
 
 export function PredictPage() {
   const state = usePredictPageState();
@@ -32,16 +32,7 @@ export function PredictPage() {
         {!state.hasCalculated ? (
           <div ref={formRef} className="predict-main-column relative h-full min-h-0 overflow-hidden pr-1">
             {state.visibleOcrLoading && (
-              <div
-                className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center backdrop-blur-[2px]"
-                role="status"
-                aria-live="polite"
-                aria-busy="true"
-              >
-                <div className="loading-card">
-                  <KitLoader label="Загрузка анкеты..." />
-                </div>
-              </div>
+              <LoadingState label="Загрузка анкеты..." />
             )}
             <PredictFormWidget
               tabs={state.predictTabs}
@@ -69,12 +60,10 @@ export function PredictPage() {
           </div>
         ) : (
           state.result && (
-            <PredictResultView
-              result={state.result}
-              previousYearCost={state.form.previous_year_cost}
-              loading={state.visibleLoading}
+            <PredictionDetailsWidget
+              hideCloseButton
+              hideActionsDropdown
               onExport={state.exportPrediction}
-              onCreateNew={state.handleReset}
               onRecalculate={state.recalculate}
               onDelete={state.deleteCurrentPrediction}
             />

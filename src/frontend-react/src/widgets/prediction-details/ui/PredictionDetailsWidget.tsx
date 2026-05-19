@@ -5,7 +5,7 @@ import type {
   PredictionAssessmentResponse,
   PredictionDetailsResponse,
 } from "../../../shared/types/medcost";
-import { KitButton, KitLoader } from "../../../shared/ui/kit";
+import { KitButton, LoadingState, ScrollArea } from "../../../shared/ui/kit";
 import { usePredictionDetails } from "../model/PredictionDetailsContext";
 import { sortRiskFactors } from "../model/prediction-details-helpers";
 import { AnnualForecastBlock } from "./sections/AnnualForecastBlock";
@@ -79,16 +79,7 @@ export function PredictionDetailsWidget({
   return (
     <section className="relative flex h-full min-h-0 min-w-0 flex-col gap-4 overflow-x-hidden">
       {visibleLoading && (
-        <div
-          className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center backdrop-blur-[2px]"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="loading-card">
-            <KitLoader label="Загрузка отчета анализа..." />
-          </div>
-        </div>
+        <LoadingState label="Загрузка отчета анализа..." />
       )}
       {!details && error ? (
         <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 text-center text-muted">
@@ -109,7 +100,7 @@ export function PredictionDetailsWidget({
             onExport={onExport}
           />
 
-          <div className="scroll-transparent min-h-0 flex flex-1 flex-col gap-4 overflow-auto overflow-x-hidden pr-1">
+          <ScrollArea className="flex flex-1 flex-col gap-4 overflow-x-hidden">
             <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_32%]">
               <AnnualForecastBlock
                 predictionId={details.prediction_id}
@@ -143,7 +134,7 @@ export function PredictionDetailsWidget({
                 createdAt={details.created_at}
               />
             </div>
-          </div>
+          </ScrollArea>
         </>
       ) : (
         <div className="min-h-[220px]" />

@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { Search, X } from "lucide-react";
+import { Toaster } from "sonner";
 import { medcostApi } from "../shared/api/medcost-api";
 import { DashboardPage } from "../pages/dashboard/ui/DashboardPage";
 import { PredictPage } from "../pages/predict/ui/PredictPage";
@@ -80,6 +81,21 @@ export default function App() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#f6f8fd] text-txt">
       <PredictionDetailsProvider>
+        <Toaster
+          closeButton
+          richColors
+          position="top-right"
+          toastOptions={{
+            classNames: {
+              toast: "toast-card border border-line/70 bg-white text-txt shadow-lg",
+              content: "toast-card__content",
+              icon: "toast-card__icon",
+              title: "text-ui-sm font-semibold",
+              description: "toast-card__description scroll-transparent text-ui-xs text-muted",
+              closeButton: "toast-card__close",
+            },
+          }}
+        />
         <div
           className="grid min-h-screen w-full grid-cols-1 gap-0 overflow-x-hidden transition-[grid-template-columns] duration-300 ease-in-out md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
           style={shellStyle}

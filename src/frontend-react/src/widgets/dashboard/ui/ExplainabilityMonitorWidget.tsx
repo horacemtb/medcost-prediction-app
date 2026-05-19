@@ -7,9 +7,9 @@
   XAxis,
   YAxis,
 } from "recharts";
-import { CircleHelp } from "lucide-react";
 import { featureMap } from "../../../shared/config/feature-map";
 import type { OverviewResponse } from "../../../shared/types/medcost";
+import { WidgetCard } from "../../../shared/ui/kit";
 
 type Props = {
   overview: OverviewResponse;
@@ -22,20 +22,11 @@ export function ExplainabilityMonitorWidget({ overview }: Props) {
   }));
 
   return (
-    <section className="tile rounded-3xl border border-line/70 bg-white/70 p-5">
-      <div className="flex items-center gap-2">
-        <h2 className="widget-title">Монитор объяснимости</h2>
-        <button
-          type="button"
-          className="group relative inline-grid h-5 w-5 place-items-center rounded-full text-[#6f7e98] hover:text-[#2f64ef]"
-          aria-label="Пояснение к монитору объяснимости"
-        >
-          <CircleHelp className="size-4" />
-          <span className="pointer-events-none absolute left-1/2 top-7 z-20 hidden w-[320px] -translate-x-1/2 rounded-lg border border-line/70 bg-white p-2 text-left text-ui-xs text-[#334766] shadow-md group-hover:block">
-            Показывает, какие признаки чаще всего сильнее влияют на прогноз стоимости лечения. Основано на значениях SHAP: чем выше «Количество», тем чаще признак попадает в топ факторов по пациентам.
-          </span>
-        </button>
-      </div>
+    <WidgetCard
+      title="Монитор объяснимости"
+      tooltipLabel="Пояснение к монитору объяснимости"
+      tooltip="Показывает, какие признаки чаще всего сильнее влияют на прогноз стоимости лечения. Основано на значениях SHAP: чем выше «Количество», тем чаще признак попадает в топ факторов по пациентам."
+    >
 
       <div className="mt-4 rounded-2xl border border-line/70 bg-white p-3">
         <div className="h-72">
@@ -50,6 +41,6 @@ export function ExplainabilityMonitorWidget({ overview }: Props) {
           </ResponsiveContainer>
         </div>
       </div>
-    </section>
+    </WidgetCard>
   );
 }

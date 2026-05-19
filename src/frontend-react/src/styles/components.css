@@ -2,6 +2,7 @@
   .text-ui-xs {
     font-size: 0.75rem;
     line-height: 1rem;
+    font-weight: 400;
   }
 
   .text-ui-sm {
@@ -146,6 +147,32 @@
     background: color-mix(in srgb, var(--bg) 86%, #fff 14%);
   }
 
+  .toast-card {
+    align-items: flex-start !important;
+    gap: 0.625rem !important;
+    padding-right: 2.25rem !important;
+  }
+
+  .toast-card__icon {
+    align-self: flex-start !important;
+    margin-top: 0.125rem !important;
+  }
+
+  .toast-card__content {
+    min-width: 0 !important;
+  }
+
+  .toast-card__description {
+    max-height: 500px;
+    overflow: auto;
+    padding-right: 0.25rem;
+  }
+
+  .toast-card__close {
+    right: 0.5rem !important;
+    top: 0.5rem !important;
+  }
+
   .kpi-up {
     color: var(--danger);
   }
@@ -154,4 +181,8 @@
     @apply text-emerald-500;
   }
 
+  .recharts-cartesian-axis-tick-value {
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
 }

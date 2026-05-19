@@ -7,9 +7,8 @@
   XAxis,
   YAxis,
 } from "recharts";
-import { CircleHelp } from "lucide-react";
 import type { OverviewResponse } from "../../../shared/types/medcost";
-import { MiniStatCard } from "../../../shared/ui/kit/MiniStatCard";
+import { InfoTooltip, MiniStatCard, WidgetCard } from "../../../shared/ui/kit";
 
 type Props = {
   overview: OverviewResponse;
@@ -39,20 +38,11 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
   );
 
   return (
-    <section className="tile rounded-3xl border border-line/70 bg-white/70 p-5">
-      <div className="flex items-center gap-2">
-        <h2 className="widget-title">Сводный обзор</h2>
-        <button
-          type="button"
-          className="group relative inline-grid h-5 w-5 place-items-center rounded-full text-[#6f7e98] hover:text-[#2f64ef]"
-          aria-label="Пояснение к сводному обзору"
-        >
-          <CircleHelp className="size-4" />
-          <span className="pointer-events-none absolute left-1/2 top-7 z-20 hidden w-[320px] -translate-x-1/2 rounded-lg border border-line/70 bg-white p-2 text-left text-ui-xs text-[#334766] shadow-md group-hover:block">
-            Сводные метрики по выборке и прогнозам: объемы данных, средние значения и распределение расходов по диапазонам.
-          </span>
-        </button>
-      </div>
+    <WidgetCard
+      title="Сводный обзор"
+      tooltipLabel="Пояснение к сводному обзору"
+      tooltip="Сводные метрики по выборке и прогнозам: объемы данных, средние значения и распределение расходов по диапазонам."
+    >
 
       <div className="mt-4 grid gap-3 min-[760px]:grid-cols-2 min-[1200px]:grid-cols-4">
         <MiniStatCard label="Исторические данные" value={overview.synthetic.count.toLocaleString()} />
@@ -71,16 +61,9 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
         <article className="rounded-2xl border border-line/70 bg-white p-3">
           <div className="flex items-center gap-2">
             <p className="tiny">Распределение исторических расходов</p>
-            <button
-              type="button"
-              className="group relative inline-grid h-4 w-4 place-items-center rounded-full text-[#6f7e98] hover:text-[#2f64ef]"
-              aria-label="Пояснение к гистограмме расходов"
-            >
-              <CircleHelp className="size-3.5" />
-              <span className="pointer-events-none absolute left-1/2 top-6 z-20 hidden w-[280px] -translate-x-1/2 rounded-lg border border-line/70 bg-white p-2 text-left text-ui-xs normal-case tracking-normal text-[#334766] shadow-md group-hover:block">
-                Показывает распределение годовых расходов по историческим данным. Каждый столбец - число записей в диапазоне расходов.
-              </span>
-            </button>
+            <InfoTooltip label="Пояснение к гистограмме расходов" size="sm">
+              Показывает распределение годовых расходов по историческим данным. Каждый столбец - число записей в диапазоне расходов.
+            </InfoTooltip>
           </div>
           <div className="mt-2 h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -98,16 +81,9 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
         <article className="rounded-2xl border border-line/70 bg-white p-3">
           <div className="flex items-center gap-2">
             <p className="tiny">Распределение прогнозируемых расходов</p>
-            <button
-              type="button"
-              className="group relative inline-grid h-4 w-4 place-items-center rounded-full text-[#6f7e98] hover:text-[#2f64ef]"
-              aria-label="Пояснение к гистограмме прогнозируемых расходов"
-            >
-              <CircleHelp className="size-3.5" />
-              <span className="pointer-events-none absolute left-1/2 top-6 z-20 hidden w-[280px] -translate-x-1/2 rounded-lg border border-line/70 bg-white p-2 text-left text-ui-xs normal-case tracking-normal text-[#334766] shadow-md group-hover:block">
-                Показывает распределение предсказанных годовых расходов. Используется для сравнения формы прогноза с историческими данными.
-              </span>
-            </button>
+            <InfoTooltip label="Пояснение к гистограмме прогнозируемых расходов" size="sm">
+              Показывает распределение предсказанных годовых расходов. Используется для сравнения формы прогноза с историческими данными.
+            </InfoTooltip>
           </div>
           <div className="mt-2 h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -122,6 +98,6 @@ export function ExecutiveOverviewWidget({ overview }: Props) {
           </div>
         </article>
       </div>
-    </section>
+    </WidgetCard>
   );
 }
