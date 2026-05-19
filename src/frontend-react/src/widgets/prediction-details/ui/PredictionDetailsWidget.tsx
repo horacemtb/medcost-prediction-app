@@ -109,7 +109,7 @@ export function PredictionDetailsWidget({
             onExport={onExport}
           />
 
-          <div className="min-h-0 flex flex-1 flex-col gap-4 overflow-auto overflow-x-hidden pr-1">
+          <div className="scroll-transparent min-h-0 flex flex-1 flex-col gap-4 overflow-auto overflow-x-hidden pr-1">
             <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_32%]">
               <AnnualForecastBlock
                 predictionId={details.prediction_id}

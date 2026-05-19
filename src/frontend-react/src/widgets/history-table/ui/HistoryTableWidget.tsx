@@ -145,7 +145,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
             </div>
           </div>
         )}
-        <div className="h-full min-h-0 overflow-auto">
+        <div className="scroll-transparent h-full min-h-0 overflow-auto">
           <table className="min-w-[890px]  duration-300 ease-in-out min-[1400px]:w-full">
             <colgroup>
               <col className="w-[120px]" />

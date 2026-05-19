@@ -24,7 +24,7 @@ export function PredictResultView({
   onDelete,
 }: PredictResultViewProps) {
   return (
-    <div className="predict-main-column h-full min-h-0 overflow-auto">
+    <div className="scroll-transparent predict-main-column h-full min-h-0 overflow-auto">
       <PredictionDetailsWidget
         hideCloseButton
         onExport={onExport}

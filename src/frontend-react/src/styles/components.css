@@ -65,6 +65,31 @@
     height: 0;
   }
 
+  .scroll-transparent {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 135, 160, 0.28) transparent;
+  }
+
+  .scroll-transparent::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scroll-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-transparent::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: rgba(120, 135, 160, 0.28);
+  }
+
+  .scroll-transparent::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   .form-tile {
     background: color-mix(in srgb, var(--bg) 90%, #fff 10%);
   }

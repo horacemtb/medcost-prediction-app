@@ -120,7 +120,7 @@ export default function App() {
                 ) : null}
               </div>
             </header>
-            <main className="h-[calc(100vh-78px)] overflow-auto px-8 py-6">
+            <main className="scroll-transparent h-[calc(100vh-78px)] overflow-auto px-8 py-6">
               <Routes>
                 <Route
                   path="/"
