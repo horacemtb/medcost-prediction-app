@@ -1,4 +1,5 @@
-import type { PredictionDetailsResponse } from "../../../../shared/types/medcost";
+﻿import type { PredictionDetailsResponse } from "../../../../shared/types/medcost";
+import { SectionCard } from "../../../../shared/ui/kit";
 import {
   formatActivity,
   formatCity,
@@ -17,10 +18,7 @@ export function PatientDataCard({ details }: PatientDataCardProps) {
   ].filter((row) => row.value);
 
   return (
-    <article className="rounded-2xl border border-line/70 bg-[#eef4ff] p-5">
-      <p className="m-0 text-ui-xs uppercase tracking-[0.15em] text-[#677da1]">
-        Данные пациента
-      </p>
+    <SectionCard title="Данные пациента" density="lg">
       <p className="m-0 mt-1 text-ui-md font-semibold text-[#1a2741]">
         {details.full_name}
       </p>
@@ -67,6 +65,6 @@ export function PatientDataCard({ details }: PatientDataCardProps) {
           {details.stress_level}
         </p>
       </div>
-    </article>
+    </SectionCard>
   );
 }

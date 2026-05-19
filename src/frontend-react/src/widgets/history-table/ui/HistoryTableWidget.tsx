@@ -1,6 +1,16 @@
 ﻿import { memo, useCallback, type MouseEvent } from "react";
 import type { HistoryItem } from "../../../shared/types/medcost";
-import { KitButton, KitLoader } from "../../../shared/ui/kit";
+import {
+  KitButton,
+  KitTable,
+  KitTableBody,
+  KitTableCell,
+  KitTableHead,
+  KitTableHeaderCell,
+  KitTableRow,
+  KitTableScroll,
+  LoadingState,
+} from "../../../shared/ui/kit";
 import deleteIcon from "../../../shared/assets/delete.svg";
 import refreshIcon from "../../../shared/assets/refresh.svg";
 import calculateIcon from "../../../shared/assets/calculate.svg";
@@ -48,7 +58,7 @@ const HistoryRow = memo(function HistoryRow({
   );
 
   return (
-    <tr
+    <KitTableRow
       className="cursor-pointer hover:[&_td]:bg-accent/10 focus-visible:[&_td]:bg-accent/10"
       role="button"
       tabIndex={0}
@@ -61,12 +71,20 @@ const HistoryRow = memo(function HistoryRow({
         }
       }}
     >
-      <td>{item.id}</td>
-      <td>{item.full_name}</td>
-      <td>{item.age}</td>
-      <td>{item.predicted_cost.toFixed(2)} ₽</td>
-      <td>{new Date(item.created_at).toLocaleString()}</td>
-      <td className="text-left">
+      <KitTableCell>{item.id}</KitTableCell>
+      <KitTableCell>{item.full_name}</KitTableCell>
+      <KitTableCell>{item.age}</KitTableCell>
+      <KitTableCell>{item.predicted_cost.toFixed(2)} ₽</KitTableCell>
+      <KitTableCell>
+        {new Date(item.created_at).toLocaleString("ru-RU", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </KitTableCell>
+      <KitTableCell className="text-left">
         <KitButton
           type="button"
           style={{ padding: "0px" }}
@@ -87,8 +105,8 @@ const HistoryRow = memo(function HistoryRow({
         >
           <img src={deleteIcon} alt="" aria-hidden="true" />
         </KitButton>
-      </td>
-    </tr>
+      </KitTableCell>
+    </KitTableRow>
   );
 });
 
@@ -103,7 +121,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   sortIndicator,
 }: HistoryTableWidgetProps) {
   return (
-    <section className="tile form-tile grid grid-cols-1 h-full min-h-0 gap-2 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
+    <section className="tile grid grid-cols-1 h-full min-h-0 gap-2 bg-white/70 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
       <div className="flex items-center justify-between gap-2">
         <h3 className="widget-title">Таблица истории</h3>
         <KitButton
@@ -126,30 +144,24 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
 
       <div className="relative h-full min-h-0">
         {loading && (
-          <div
-            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center backdrop-blur-[2px]"
-            role="status"
-            aria-live="polite"
-            aria-busy="true"
-          >
-            <div className="history-loading-card loading-card">
-              <KitLoader label="Загрузка истории..." />
-            </div>
-          </div>
+          <LoadingState
+            label="Загрузка истории..."
+            cardClassName="history-loading-card"
+          />
         )}
-        <div className="scroll-hidden h-full min-h-0 overflow-auto">
-          <table className="table-fixed">
+        <KitTableScroll className="h-full">
+          <KitTable className="min-w-[890px] duration-300 ease-in-out min-[1400px]:w-full">
             <colgroup>
-              <col className="w-[100px]" />
-              <col />
+              <col className="w-[120px]" />
+              <col className="w-[200px]" />
               <col className="w-[100px]" />
               <col className="w-[160px]" />
               <col className="w-[190px]" />
-              <col className="w-[100px]" />
+              <col className="w-[120px]" />
             </colgroup>
-            <thead className="sticky top-0 z-20">
-              <tr>
-                <th className="bg-bg">
+            <KitTableHead className="sticky top-0 z-20">
+              <KitTableRow>
+                <KitTableHeaderCell className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -160,8 +172,8 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   >
                     ID {sortIndicator("id")}
                   </KitButton>
-                </th>
-                <th className="bg-bg">
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -172,8 +184,8 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   >
                     ФИО {sortIndicator("full_name")}
                   </KitButton>
-                </th>
-                <th className="bg-bg">
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -184,8 +196,8 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   >
                     Возраст {sortIndicator("age")}
                   </KitButton>
-                </th>
-                <th className="bg-bg">
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -196,8 +208,8 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   >
                     Прогноз {sortIndicator("predicted_cost")}
                   </KitButton>
-                </th>
-                <th className="bg-bg">
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent">
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -208,11 +220,11 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                   >
                     Дата {sortIndicator("created_at")}
                   </KitButton>
-                </th>
-                <th className="bg-bg"></th>
-              </tr>
-            </thead>
-            <tbody>
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent" />
+              </KitTableRow>
+            </KitTableHead>
+            <KitTableBody>
               {items.map((item) => (
                 <HistoryRow
                   key={item.id}
@@ -223,15 +235,15 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                 />
               ))}
               {!loading && !items.length && (
-                <tr>
-                  <td colSpan={6} className="py-4 text-center text-ui-sm text-muted">
+                <KitTableRow>
+                  <KitTableCell colSpan={6} className="py-4 text-center text-ui-sm text-muted">
                     Ничего не найдено по текущим фильтрам.
-                  </td>
-                </tr>
+                  </KitTableCell>
+                </KitTableRow>
               )}
-            </tbody>
-          </table>
-        </div>
+            </KitTableBody>
+          </KitTable>
+        </KitTableScroll>
       </div>
     </section>
   );

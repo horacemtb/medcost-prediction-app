@@ -1,6 +1,7 @@
 import type {
   HistoryResponse,
   OcrPatientFormResponse,
+  OverviewResponse,
   PredictionAssessmentResponse,
   PredictionDetailsResponse,
   PredictionInput,
@@ -72,5 +73,6 @@ export const medcostApi = {
       method: "POST",
       body: JSON.stringify({ predicted_cost }),
     }),
+  overview: () => req<OverviewResponse>("/api/stats/overview"),
   exportPredictionPdf: (id: number) => reqBlob(`/api/predictions/${id}/pdf`),
 };

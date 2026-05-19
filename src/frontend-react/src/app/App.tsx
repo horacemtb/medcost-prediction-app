@@ -1,6 +1,13 @@
-﻿import { useCallback, useEffect, useState, type CSSProperties } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Search, X } from "lucide-react";
+import { Toaster } from "sonner";
 import { medcostApi } from "../shared/api/medcost-api";
 import { DashboardPage } from "../pages/dashboard/ui/DashboardPage";
 import { PredictPage } from "../pages/predict/ui/PredictPage";
@@ -28,7 +35,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("sidebar-collapsed", sidebarCollapsed ? "1" : "0");
+    window.localStorage.setItem(
+      "sidebar-collapsed",
+      sidebarCollapsed ? "1" : "0",
+    );
   }, [sidebarCollapsed]);
 
   const handleGlobalSearch = useCallback(async () => {
@@ -39,7 +49,9 @@ export default function App() {
       try {
         const id = Number(query);
         const details = await medcostApi.prediction(id);
-        navigate("/predict", { state: { prefillDetails: details, openReport: true } });
+        navigate("/predict", {
+          state: { prefillDetails: details, openReport: true },
+        });
       } catch {
         navigate(`/history?search=${encodeURIComponent(query)}`);
       }
@@ -63,21 +75,41 @@ export default function App() {
   }, [location.pathname, navigate]);
 
   const shellStyle = {
-    "--sidebar-width": sidebarCollapsed ? "96px" : "292px",
+    "--sidebar-width": "292px",
   } as CSSProperties;
 
   return (
-    <div className="min-h-screen bg-[#f6f8fd] text-txt">
+    <div className="min-h-screen overflow-x-hidden bg-[#f6f8fd] text-txt">
       <PredictionDetailsProvider>
+        <Toaster
+          closeButton
+          richColors
+          position="top-right"
+          toastOptions={{
+            classNames: {
+              toast: "toast-card border border-line/70 bg-white text-txt shadow-lg",
+              content: "toast-card__content",
+              icon: "toast-card__icon",
+              title: "text-ui-sm font-semibold",
+              description: "toast-card__description scroll-transparent text-ui-xs text-muted",
+              closeButton: "toast-card__close",
+            },
+          }}
+        />
         <div
-          className="grid min-h-screen w-full grid-cols-1 gap-0 md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
+          className="grid min-h-screen w-full grid-cols-1 gap-0 overflow-x-hidden transition-[grid-template-columns] duration-300 ease-in-out md:[grid-template-columns:var(--sidebar-width)_minmax(0,1fr)]"
           style={shellStyle}
         >
           <SideNavigation
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((value) => !value)}
           />
-          <div className="min-w-0 border-l border-[#e8ecf4] bg-[#f6f8fd]">
+          <div
+            className={[
+              "relative z-10 min-w-0 border-l border-[#e8ecf4] bg-[#f6f8fd] transition-[margin-left,width] duration-300 ease-in-out",
+              sidebarCollapsed ? "md:-ml-[196px] md:w-[calc(100%+196px)]" : "",
+            ].join(" ")}
+          >
             <header className="flex h-[78px] items-center justify-between gap-4 border-b border-[#e8ecf4] bg-white px-8">
               <div className="flex h-11 w-full max-w-[680px] items-center rounded-2xl bg-[#f1f4fa] px-4">
                 <Search className="mr-3 size-5 text-[#74839b]" />
@@ -104,15 +136,24 @@ export default function App() {
                 ) : null}
               </div>
             </header>
-            <main className="h-[calc(100vh-78px)] overflow-auto px-8 py-6">
+            <main className="scroll-transparent h-[calc(100vh-78px)] overflow-auto px-8 py-6">
               <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route
+                  path="/"
+                  element={<Navigate to="/dashboard" replace />}
+                />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/predict" element={<PredictPage />} />
                 <Route path="/history" element={<HistoryPage />} />
                 <Route path="/factors" element={<FactorsPage />} />
-                <Route path="/settings" element={<SettingsPage status={status} />} />
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route
+                  path="/settings"
+                  element={<SettingsPage status={status} />}
+                />
+                <Route
+                  path="*"
+                  element={<Navigate to="/dashboard" replace />}
+                />
               </Routes>
             </main>
           </div>

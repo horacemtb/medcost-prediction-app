@@ -1,7 +1,6 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  ChevronLeft,
   ChevronRight,
   ClipboardPlus,
   History as HistoryIcon,
@@ -26,40 +25,60 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
   const asideClassName = useMemo(
     () =>
       [
-        "flex min-h-0 md:min-h-screen flex-col justify-between bg-white py-7 transition-[padding,width] duration-200",
-        collapsed ? "px-3" : "px-6",
+        "flex min-h-0 overflow-hidden bg-white transition-[padding,width] duration-300 ease-in-out md:min-h-screen md:flex-col md:justify-between md:py-7",
+        collapsed
+          ? "flex-row items-center justify-between gap-3 px-4 py-3 md:px-6"
+          : "flex-col justify-between px-6 py-7",
       ].join(" "),
     [collapsed],
   );
 
   return (
     <aside className={asideClassName}>
-      <div>
-        <div className={collapsed ? "mb-12 flex justify-center px-0" : "mb-14 flex items-center gap-3 px-2"}>
-          <span className="inline-grid size-11 place-items-center overflow-hidden rounded-xl bg-[#0d1f49]">
+      <div className={collapsed ? "flex items-center gap-3 md:block" : ""}>
+        <div
+          className={
+            collapsed
+              ? "flex justify-center px-0 md:mb-14 md:grid md:w-[244px] md:grid-cols-[48px_164px] md:items-center md:gap-8"
+              : "mb-14 grid w-[244px] min-w-0 grid-cols-[48px_164px] items-center gap-8"
+          }
+        >
+          <span className="inline-grid size-12 place-items-center overflow-hidden rounded-xl bg-[#0d1f49]">
             <img src="/favicon.svg" alt="" className="size-11" aria-hidden="true" />
           </span>
-          {!collapsed ? (
-            <div className="min-w-0">
-              <p className="m-0 text-ui-brand tracking-tight text-[#1f2c44]">
-                PrecisionAI
-              </p>
-              <p className="m-0 text-ui-xs font-semibold uppercase tracking-[0.26em] text-[#8391aa]">
-                Cost Intelligence
-              </p>
-            </div>
-          ) : null}
+          <div
+            className={[
+              "w-[164px] min-w-[164px] overflow-hidden whitespace-nowrap",
+              collapsed ? "hidden md:block" : "",
+            ].join(" ")}
+            aria-hidden={collapsed}
+          >
+            <p className="m-0 text-[1.5rem] font-extrabold leading-none text-[#1f2c44]">
+              PrecisionAI
+            </p>
+            <p className="m-0 mt-1 text-[0.68rem] font-semibold uppercase leading-4 tracking-[0.08em] text-[#8391aa]">
+              Cost Intelligence
+            </p>
+          </div>
         </div>
 
-        <nav className={collapsed ? "grid grid-cols-1 justify-items-center gap-3" : "grid grid-cols-1 gap-3"}>
+        <nav
+          className={
+            collapsed
+              ? "flex flex-row justify-center gap-3 md:grid md:grid-cols-1 md:gap-0 md:justify-items-start"
+              : "grid grid-cols-1 gap-0"
+          }
+        >
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 [
-                  "relative inline-flex min-h-12 items-center rounded-xl py-2 text-ui-nav transition",
-                  collapsed ? "justify-center px-0 w-12" : "gap-3 px-3 w-full",
+                  "relative inline-flex min-h-12 items-center overflow-hidden rounded-xl py-2 text-ui-nav transition duration-300 ease-in-out",
+                  collapsed
+                    ? "w-12 justify-center px-0 md:grid md:w-[244px] md:grid-cols-[48px_164px] md:justify-start md:gap-8"
+                    : "w-full gap-3 px-2 md:grid md:w-[244px] md:grid-cols-[48px_164px] md:gap-8 md:px-0",
                   isActive
                     ? "text-[#4f6ff2]"
                     : "text-[#78879e] hover:bg-white/80 hover:text-[#526683]",
@@ -71,7 +90,7 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
               {({ isActive }) => (
                 <>
                   <span
-                    className="inline-grid size-5 place-items-center"
+                    className="inline-grid size-5 place-items-center md:size-12"
                     aria-hidden="true"
                   >
                     <item.icon
@@ -83,9 +102,23 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
                       strokeWidth={2.2}
                     />
                   </span>
-                  {!collapsed ? <span className="leading-tight">{item.label}</span> : <span className="sr-only">{item.label}</span>}
+                  <span
+                    className={
+                      collapsed
+                        ? "hidden whitespace-nowrap leading-tight md:block"
+                        : "whitespace-nowrap leading-tight"
+                    }
+                  >
+                    {item.label}
+                  </span>
                   {isActive ? (
-                    <span className={collapsed ? "absolute right-0 top-1/2 h-8 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]" : "absolute right-0 top-1/2 h-12 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]"} />
+                    <span
+                      className={
+                        collapsed
+                          ? "absolute bottom-0 left-1/2 h-[3px] w-8 -translate-x-1/2 rounded-full bg-[#4f6ff2] md:bottom-auto md:left-[68px] md:top-1/2 md:h-8 md:w-[3px] md:-translate-x-0 md:-translate-y-1/2"
+                          : "absolute right-0 top-1/2 h-12 w-[3px] -translate-y-1/2 rounded-full bg-[#4f6ff2]"
+                      }
+                    />
                   ) : null}
                 </>
               )}
@@ -94,17 +127,25 @@ export function SideNavigation({ collapsed, onToggle }: SideNavigationProps) {
         </nav>
       </div>
 
-      <div className={collapsed ? "flex justify-center" : "flex justify-end pr-1"}>
+      <div className="relative z-20 h-10 w-10 md:w-[244px] md:self-start">
         <KitButton
           type="button"
           variant="ghost"
           size={24}
-          className={collapsed ? "h-10 w-10 rounded-full border border-line/70 bg-white/80" : "h-10 w-10 rounded-full border border-line/70 bg-white/80"}
+          className={[
+            "absolute left-0 top-0 h-10 w-10 rounded-full border border-line/70 bg-white/80 transition-transform duration-300 ease-in-out",
+            collapsed ? "md:translate-x-1" : "md:translate-x-[200px]",
+          ].join(" ")}
           onClick={onToggle}
           aria-label={collapsed ? "Развернуть меню" : "Свернуть меню"}
           title={collapsed ? "Развернуть меню" : "Свернуть меню"}
         >
-          {collapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+          <ChevronRight
+            className={[
+              "size-4 transition-transform duration-300 ease-in-out",
+              collapsed ? "rotate-0" : "rotate-180",
+            ].join(" ")}
+          />
         </KitButton>
       </div>
     </aside>
