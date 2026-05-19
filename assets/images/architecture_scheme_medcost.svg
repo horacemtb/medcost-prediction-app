@@ -1,0 +1,341 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Архитектура решения MedCost</title>
+  <desc id="desc">Схема архитектуры веб-приложения для прогнозирования годовых медицинских расходов: React frontend, FastAPI backend, ML inference, PostgreSQL, внешние сервисы, CI/CD и Docker Compose.</desc>
+
+  <defs>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eef6ff"/>
+      <stop offset="48%" stop-color="#f7fbff"/>
+      <stop offset="100%" stop-color="#edf7f2"/>
+    </linearGradient>
+
+    <linearGradient id="cardBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6fbff"/>
+      <stop offset="100%" stop-color="#eef7ff"/>
+    </linearGradient>
+
+    <linearGradient id="cardGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4fff8"/>
+      <stop offset="100%" stop-color="#edf9f2"/>
+    </linearGradient>
+
+    <linearGradient id="cardViolet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#faf7ff"/>
+      <stop offset="100%" stop-color="#f2efff"/>
+    </linearGradient>
+
+    <linearGradient id="cardOrange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff8f3"/>
+      <stop offset="100%" stop-color="#fff1e7"/>
+    </linearGradient>
+
+    <linearGradient id="cardGray" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f6f8fb"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#31516f" flood-opacity="0.13"/>
+    </filter>
+
+    <filter id="smallShadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#31516f" flood-opacity="0.12"/>
+    </filter>
+
+    <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 1 1 L 11 6 L 1 11 Z" fill="#5d7892"/>
+    </marker>
+
+    <style>
+      .title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 34px;
+        font-weight: 800;
+        fill: #123047;
+        letter-spacing: .2px;
+      }
+
+      .subtitle {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        fill: #58718a;
+      }
+
+      .sectionTitle {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        fill: #4e6c85;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+
+      .cardTitle {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 23px;
+        font-weight: 800;
+        fill: #17334b;
+      }
+
+      .tech {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+      }
+
+      .text {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 550;
+        fill: #465f77;
+      }
+
+      .smallText {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        fill: #657d93;
+      }
+
+      .pillText {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        fill: #47657d;
+        letter-spacing: .2px;
+      }
+
+      .arrowLabel {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        fill: #526e87;
+      }
+
+      .mutedLine {
+        stroke: #d7e4ee;
+        stroke-width: 2;
+      }
+
+      .arrowLine {
+        stroke: #5d7892;
+        stroke-width: 4;
+        stroke-linecap: round;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+
+      .arrowLineDashed {
+        stroke: #7c91a6;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-dasharray: 8 9;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+
+      .iconStroke {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 3.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+    </style>
+  </defs>
+
+  <rect width="1600" height="980" fill="url(#pageBg)"/>
+
+  <g opacity="0.38">
+    <path d="M80 132 H1520" class="mutedLine"/>
+    <path d="M80 820 H1520" class="mutedLine"/>
+    <circle cx="121" cy="148" r="3" fill="#bdd1e2"/>
+    <circle cx="1481" cy="836" r="3" fill="#bdd1e2"/>
+  </g>
+
+  <rect x="34" y="34" width="1532" height="912" rx="34" fill="none" stroke="#d9e8f5" stroke-width="2"/>
+
+  <text x="800" y="76" text-anchor="middle" class="title">Архитектура решения MedCost</text>
+  <text x="800" y="108" text-anchor="middle" class="subtitle">Прогноз годовых медицинских расходов: интерфейс, API, ML inference и хранение результатов</text>
+
+  <text x="90" y="158" class="sectionTitle">Основной пользовательский поток</text>
+
+  <!-- Frontend card -->
+  <g filter="url(#softShadow)">
+    <rect x="80" y="188" width="315" height="252" rx="28" fill="url(#cardBlue)" stroke="#b9d9f3" stroke-width="2"/>
+    <rect x="104" y="212" width="54" height="54" rx="16" fill="#dff2ff" stroke="#a8d3f4" stroke-width="1.5"/>
+    <g transform="translate(119 226)" style="color:#1597d3">
+      <path d="M4 16 L13 7 L17 11" class="iconStroke"/>
+      <path d="M17 11 L27 1" class="iconStroke"/>
+      <path d="M4 21 H28" class="iconStroke"/>
+      <path d="M4 27 H19" class="iconStroke"/>
+    </g>
+    <text x="176" y="236" class="cardTitle">Frontend</text>
+    <text x="176" y="261" class="smallText">клиентское приложение</text>
+
+    <text x="237.5" y="322" text-anchor="middle" class="tech" fill="#1597d3">React</text>
+    <text x="237.5" y="351" text-anchor="middle" class="smallText">React.js + Tailwind CSS</text>
+
+    <text x="112" y="390" class="text">• SPA-интерфейс аналитика</text>
+    <text x="112" y="417" class="text">• Формы, история, факторы риска</text>
+  </g>
+
+  <!-- Backend card -->
+  <g filter="url(#softShadow)">
+    <rect x="462" y="188" width="315" height="252" rx="28" fill="url(#cardGreen)" stroke="#bde3cb" stroke-width="2"/>
+    <rect x="486" y="212" width="54" height="54" rx="16" fill="#e4f9eb" stroke="#b4e0c3" stroke-width="1.5"/>
+    <g transform="translate(501 227)" style="color:#16a56b">
+      <path d="M4 7 H28" class="iconStroke"/>
+      <path d="M4 16 H28" class="iconStroke"/>
+      <path d="M4 25 H28" class="iconStroke"/>
+      <path d="M10 7 V25" class="iconStroke"/>
+      <path d="M22 7 V25" class="iconStroke"/>
+    </g>
+    <text x="558" y="236" class="cardTitle">Backend API</text>
+    <text x="558" y="261" class="smallText">валидация и бизнес-логика</text>
+
+    <text x="619.5" y="322" text-anchor="middle" class="tech" fill="#16a56b">FastAPI</text>
+    <text x="619.5" y="351" text-anchor="middle" class="smallText">Python + Pydantic</text>
+
+    <text x="494" y="390" class="text">• REST API, сервисный слой</text>
+    <text x="494" y="417" class="text">• OCR, PDF, интеграция с DaData</text>
+  </g>
+
+  <!-- ML card -->
+  <g filter="url(#softShadow)">
+    <rect x="844" y="188" width="315" height="252" rx="28" fill="url(#cardViolet)" stroke="#d2c8f5" stroke-width="2"/>
+    <rect x="868" y="212" width="54" height="54" rx="16" fill="#f0ebff" stroke="#cabdf2" stroke-width="1.5"/>
+    <g transform="translate(883 226)" style="color:#7357d8">
+      <path d="M7 26 V15" class="iconStroke"/>
+      <path d="M16 26 V8" class="iconStroke"/>
+      <path d="M25 26 V18" class="iconStroke"/>
+      <path d="M4 26 H29" class="iconStroke"/>
+      <path d="M6 9 C10 3 17 4 21 9 C25 8 29 11 29 16 C29 21 25 23 21 23 H8 C3 23 1 19 3 15 C3 12 4 10 6 9 Z" class="iconStroke"/>
+    </g>
+    <text x="940" y="236" class="cardTitle">ML inference</text>
+    <text x="940" y="261" class="smallText">модель прогноза расходов</text>
+
+    <text x="1001.5" y="322" text-anchor="middle" class="tech" fill="#7357d8">Model</text>
+    <text x="1001.5" y="351" text-anchor="middle" class="smallText">preprocessing + predict</text>
+
+    <text x="876" y="390" class="text">• Feature engineering</text>
+    <text x="876" y="417" class="text">• Стоимость + вклад факторов</text>
+  </g>
+
+  <!-- Database card -->
+  <g filter="url(#softShadow)">
+    <rect x="1226" y="188" width="295" height="252" rx="28" fill="url(#cardOrange)" stroke="#f1cfb5" stroke-width="2"/>
+    <rect x="1250" y="212" width="54" height="54" rx="16" fill="#fff0e5" stroke="#efc8aa" stroke-width="1.5"/>
+    <g transform="translate(1265 225)" style="color:#dd7a34">
+      <ellipse cx="16" cy="7" rx="12" ry="5" class="iconStroke"/>
+      <path d="M4 7 V25 C4 28 28 28 28 25 V7" class="iconStroke"/>
+      <path d="M4 16 C4 19 28 19 28 16" class="iconStroke"/>
+    </g>
+    <text x="1322" y="236" class="cardTitle">PostgreSQL</text>
+    <text x="1322" y="261" class="smallText">хранение данных</text>
+
+    <text x="1373.5" y="322" text-anchor="middle" class="tech" fill="#dd7a34">DB</text>
+    <text x="1373.5" y="351" text-anchor="middle" class="smallText">patients, predictions</text>
+
+    <text x="1258" y="390" class="text">• synthetic_cohort</text>
+    <text x="1258" y="417" class="text">• risk_factors, audit data</text>
+  </g>
+
+  <!-- Top arrows -->
+  <path d="M400 314 H455" class="arrowLine"/>
+  <rect x="407" y="281" width="42" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="428" y="298" text-anchor="middle" class="arrowLabel">JSON</text>
+
+  <path d="M782 314 H837" class="arrowLine"/>
+  <rect x="783" y="281" width="52" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="809" y="298" text-anchor="middle" class="arrowLabel">predict</text>
+
+  <path d="M1164 314 H1219" class="arrowLine"/>
+  <rect x="1175" y="281" width="34" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="1192" y="298" text-anchor="middle" class="arrowLabel">SQL</text>
+
+  <!-- External services -->
+  <g filter="url(#smallShadow)">
+    <rect x="520" y="500" width="430" height="120" rx="26" fill="#ffffff" stroke="#d7e5ef" stroke-width="2"/>
+    <rect x="544" y="524" width="46" height="46" rx="14" fill="#edf6ff" stroke="#cfe3f4"/>
+    <g transform="translate(557 537)" style="color:#4d88bd">
+      <path d="M4 5 H24 V27 H4 Z" class="iconStroke"/>
+      <path d="M9 12 H19" class="iconStroke"/>
+      <path d="M9 19 H19" class="iconStroke"/>
+    </g>
+    <text x="610" y="548" class="cardTitle" style="font-size:20px">Внешние сервисы</text>
+    <text x="610" y="577" class="text">OCR / PDF processing, DaData</text>
+  </g>
+
+  <path d="M620 446 V492" class="arrowLineDashed"/>
+  <rect x="641" y="456" width="118" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="700" y="473" text-anchor="middle" class="arrowLabel">enrichment</text>
+
+  <!-- Runtime section -->
+  <text x="90" y="686" class="sectionTitle">Сборка, доставка и запуск</text>
+
+  <g filter="url(#softShadow)">
+    <rect x="80" y="720" width="430" height="150" rx="28" fill="url(#cardGray)" stroke="#d7e5ef" stroke-width="2"/>
+    <rect x="108" y="746" width="52" height="52" rx="16" fill="#f2f5f8" stroke="#d7e1ea"/>
+    <g transform="translate(122 760)" style="color:#30384a">
+      <path d="M15 3 C9 3 5 7 5 13 C5 18 8 22 13 23" class="iconStroke"/>
+      <path d="M17 3 C23 3 27 7 27 13 C27 18 24 22 19 23" class="iconStroke"/>
+      <path d="M16 23 V14" class="iconStroke"/>
+      <path d="M12 18 L16 14 L20 18" class="iconStroke"/>
+    </g>
+    <text x="182" y="766" class="cardTitle">CI/CD</text>
+    <text x="182" y="794" class="tech" style="font-size:24px" fill="#30384a">GitHub Actions</text>
+    <text x="112" y="833" class="text">• Tests, lint, build</text>
+    <text x="112" y="858" class="text">• Docker image / deploy pipeline</text>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="585" y="720" width="430" height="150" rx="28" fill="url(#cardBlue)" stroke="#b9d9f3" stroke-width="2"/>
+    <rect x="613" y="746" width="52" height="52" rx="16" fill="#e2f2ff" stroke="#bfdbf0"/>
+    <g transform="translate(626 762)" style="color:#1d8fd7">
+      <path d="M4 21 H29" class="iconStroke"/>
+      <path d="M7 15 H13 V21 H7 Z" class="iconStroke"/>
+      <path d="M15 15 H21 V21 H15 Z" class="iconStroke"/>
+      <path d="M11 9 H17 V15 H11 Z" class="iconStroke"/>
+      <path d="M19 9 H25 V15 H19 Z" class="iconStroke"/>
+    </g>
+    <text x="687" y="766" class="cardTitle">Runtime stack</text>
+    <text x="687" y="794" class="tech" style="font-size:24px" fill="#1d8fd7">Docker Compose</text>
+    <text x="617" y="833" class="text">• frontend, backend, db</text>
+    <text x="617" y="858" class="text">• .env, volumes, internal network</text>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="1090" y="720" width="430" height="150" rx="28" fill="url(#cardGreen)" stroke="#bde3cb" stroke-width="2"/>
+    <rect x="1118" y="746" width="52" height="52" rx="16" fill="#e7f8ed" stroke="#bfdfcb"/>
+    <g transform="translate(1132 760)" style="color:#159764">
+      <path d="M5 15 H27" class="iconStroke"/>
+      <path d="M20 8 L27 15 L20 22" class="iconStroke"/>
+      <path d="M5 7 V25" class="iconStroke"/>
+    </g>
+    <text x="1192" y="766" class="cardTitle">Edge layer</text>
+    <text x="1192" y="794" class="tech" style="font-size:24px" fill="#159764">NGINX</text>
+    <text x="1122" y="833" class="text">• Reverse proxy</text>
+    <text x="1122" y="858" class="text">• Static files, routing to API</text>
+  </g>
+
+  <path d="M517 795 H578" class="arrowLine"/>
+  <rect x="526" y="762" width="43" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="548" y="779" text-anchor="middle" class="arrowLabel">build</text>
+
+  <path d="M1022 795 H1083" class="arrowLine"/>
+  <rect x="1031" y="762" width="43" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="1053" y="779" text-anchor="middle" class="arrowLabel">serve</text>
+
+  <!-- Connection from runtime to app -->
+  <path d="M800 715 C800 660 810 625 858 600 C910 572 960 553 1001 446" class="arrowLineDashed"/>
+  <rect x="847" y="632" width="114" height="24" rx="12" fill="#ffffff" stroke="#d9e4ef"/>
+  <text x="904" y="649" text-anchor="middle" class="arrowLabel">containers</text>
+
+  <!-- Footer note -->
+  <g opacity="0.92">
+    <rect x="470" y="903" width="660" height="34" rx="17" fill="#ffffff" stroke="#d8e6f0"/>
+    <text x="800" y="925" text-anchor="middle" class="smallText">Слои разделены по ответственности: UI → API → модель → данные; инфраструктура вынесена в отдельный runtime-контур.</text>
+  </g>
+</svg>
