@@ -62,30 +62,37 @@ docker compose down
 ├─ README.md
 ├─ LICENSE
 ├─ .gitignore
+├─ .gitattributes
 ├─ docker-compose.yml
 ├─ assets/
 │  ├─ images/
-│  └─ mockups/
+│  ├─ mockups/
+│  └─ scans/
 ├─ data/
-│  ├─ raw/
-│  └─ processed/
+│  ├─ processed/
+│  └─ raw/
 ├─ docs/
-├─ legacy/
-│  ├─ streamlit_v0/
 ├─ models/
 ├─ notebooks/
+├─ tests/
+│  ├─ __init__.py
+│  └─ backend/
 └─ src/
    ├─ backend/
    │  ├─ Dockerfile
    │  ├─ requirements.txt
    │  ├─ app/
    │  └─ models/
-   └─ frontend/
+   └─ frontend-react/
+      ├─ public/
+      ├─ src/
+      ├─ .gitignore
       ├─ Dockerfile
-      ├─ requirements.txt
-      ├─ .streamlit/
-      │  └─ config.toml
-      └─ app/
+      ├─ index.html
+      ├─ package-lock.json
+      ├─ package.json
+      ├─ tsconfig.json
+      └─ vite.config.ts
 ```
 
 ---
@@ -150,7 +157,7 @@ docker compose down
 
 - **Docker**
 - **Docker Compose**
-- **Nginx** — reverse proxy для frontend и backend.
+- **Nginx** — обратный прокси-сервер для frontend и backend.
 
 ### CI/CD и деплой
 
@@ -177,7 +184,7 @@ docker compose down
 - **Frontend (React + Tailwind CSS)** — пользовательский интерфейс системы: формы ввода, просмотр результатов, история прогнозов, аналитические экраны и работа с OCR-сценарием.
 - **nginx** — входная точка приложения, которая проксирует HTTP-запросы к frontend и backend-сервисам.
 - **Backend (FastAPI)** — центральный серверный слой, который реализует REST API, валидацию входных данных, ML-инференс, интерпретацию факторов риска, PDF-генерацию, OCR-flow и интеграцию с Dadata.
-- **PostgreSQL** — реляционная база данных, в которой хранятся карточки пациентов, история прогнозов, baseline-синтетическая когорта и факторы риска.
+- **PostgreSQL** — реляционная база данных, в которой хранятся карточки пациентов, история прогнозов, исходная синтетическая когорта и факторы риска.
 - **GitHub Actions** — CI-контур, автоматически проверяющий сборку контейнеров и прохождение тестов при изменениях в кодовой базе.
 
 #### 1. Клиентский слой
@@ -218,8 +225,8 @@ Backend организован вокруг модулей:
 1. Пользователь открывает frontend.
 2. React-приложение отправляет запрос на backend `/api/predict`.
 3. Backend валидирует payload.
-4. Backend формирует feature payload для ML-модели.
-5. Загруженный pipeline вычисляет `predicted_cost`.
+4. Backend формирует payload с признаками для ML-модели.
+5. ML-пайплайн вычисляет `predicted_cost`.
 6. Backend сохраняет расчёт в `predictions`.
 7. Backend возвращает `prediction_id` и краткий результат.
 8. Frontend открывает страницу/виджет деталей и при необходимости запрашивает факторы риска.
@@ -285,7 +292,7 @@ MongoDB имеет смысл, когда:
 - структура данных плохо формализуется;
 - нужен документный формат без строгих связей.
 
-В данном проекте, наоборот, данные хорошо структурированы, а связи между сущностями прозрачны. Поэтому PostgreSQL выглядит аккуратнее и проще для объяснения.
+В данном проекте, наоборот, данные хорошо структурированы, а связи между сущностями прозрачны.
 
 ---
 
@@ -320,7 +327,7 @@ MongoDB имеет смысл, когда:
 | Поле | Тип | Описание |
 |---|---|---|
 | `id` | integer, PK | Идентификатор прогноза |
-| `patient_id` | FK → `patients.id`, nullable | Ссылка на карточку пациента |
+| `patient_id` | FK → `patients.id` | Ссылка на карточку пациента |
 | `full_name` | string | Snapshot имени на момент расчёта |
 | `age` | integer | Возраст |
 | `gender` | integer | Пол (`0/1`) |
@@ -1161,14 +1168,14 @@ annual_medical_cost = annual_medical_cost / (1 - insurance_coverage_pct / 100)
 
 | Группа | Признаки |
 |---|---|
-| Демография и социально-экономика | `person_id`, `age`, `sex`, `region`, `urban_rural`, `income`, `education`, `marital_status`, `employment_status`, `household_size`, `dependents` |
+| Демография и социально-экономические показатели | `person_id`, `age`, `sex`, `region`, `urban_rural`, `income`, `education`, `marital_status`, `employment_status`, `household_size`, `dependents` |
 | Образ жизни | `bmi`, `smoker`, `alcohol_freq` |
 | Клинические показатели и риск | `systolic_bp`, `diastolic_bp`, `ldl`, `hba1c`, `risk_score`, `is_high_risk` |
 | Хронические состояния | `chronic_count`, `hypertension`, `diabetes`, `asthma`, `copd`, `cardiovascular_disease`, `cancer_history`, `kidney_disease`, `liver_disease`, `arthritis`, `mental_health` |
 | Медицинская нагрузка | `visits_last_year`, `hospitalizations_last_3yrs`, `days_hospitalized_last_3yrs`, `medication_count` |
 | Медицинские процедуры | `proc_imaging_count`, `proc_surgery_count`, `proc_physio_count`, `proc_consult_count`, `proc_lab_count`, `had_major_procedure` |
-| Policy-признаки | `plan_type`, `network_tier`, `deductible`, `copay`, `policy_term_years`, `policy_changes_last_2yrs`, `provider_quality` |
-| Premium- и claims-признаки | `annual_premium`, `monthly_premium`, `claims_count`, `avg_claim_amount`, `total_claims_paid` |
+| Страховой план | `plan_type`, `network_tier`, `deductible`, `copay`, `policy_term_years`, `policy_changes_last_2yrs`, `provider_quality` |
+| Плата за страховку и стаховые выплаты | `annual_premium`, `monthly_premium`, `claims_count`, `avg_claim_amount`, `total_claims_paid` |
 | Целевая переменная | `annual_medical_cost` |
 
 `person_id` является техническим идентификатором и не используется как признак в моделировании. `annual_medical_cost` используется как целевая переменная.
@@ -1678,7 +1685,7 @@ w_i = softmax(log_prior_i + log_likelihood_i / temperature)
 temperature = 1
 ```
 
-Если одна модель лучше по MSE/RMSE, её преимущество усиливается на большом числе наблюдений. Поэтому веса могут "схлопнуться в одну модель.
+Если одна модель лучше по MSE/RMSE, её преимущество усиливается на большом числе наблюдений. Поэтому веса могут "схлопнуться" в одну модель.
 
 Это ожидаемое поведение, а не ошибка.
 
@@ -1748,7 +1755,7 @@ temperature = n
 
 Этот ноутбук использует расширенный датасет, но в более строгой постановке: без части признаков, которые напрямую связаны с премиями и выплатами или условиями страхового плана.
 
-Итоговые результаты:
+Итоговые результаты на тесте:
 
 | Модель | MAE | RMSE | R² | MAPE |
 |---|---:|---:|---:|---:|
@@ -1760,13 +1767,13 @@ temperature = n
 | CatBoost | 1758.29 | 2799.96 | 0.1721 | 1.0146 |
 | Random Forest | 1761.26 | **2798.88** | **0.1727** | 1.0198 |
 
-Вывод: без сильных предикторов задача становится заметно сложнее. По MAE снова выигрывает `HistGradientBoostingRegressor`, а модели на основе деревьев лучше контролируют RMSE/R².
+Вывод: без сильных предикторов задача становится заметно сложнее. По MAE снова выигрывает `HistGradientBoostingRegressor`, а `CatBoost` и `Random Forest` лучше контролируют RMSE/R². Ансамбли не дают явного преимущества перед одиночными моделями, но имеют сбалансированные показатели по совокупности метрик.
 
 #### 11.2. `additional-research-common-features.ipynb`
 
 В этом ноутбуке использовались только признаки, сопоставимые с исходным синтетическим датасетом. Цель — проверить, можно ли перенести выводы основного исследования на крупный датасет при максимально похожем наборе признаков.
 
-Итоговые результаты:
+Итоговые результаты на тесте:
 
 | Модель | MAE | RMSE | R² | MAPE |
 |---|---:|---:|---:|---:|
@@ -1824,8 +1831,8 @@ PSI = sum_i (p_i - q_i) * ln(p_i / q_i)
 | PSI | Интерпретация |
 |---:|---|
 | `< 0.10` | распределение стабильно |
-| `0.10–0.25` | умеренный drift |
-| `> 0.25` | сильный drift, нужно расследование |
+| `0.10–0.25` | умеренный дрейф |
+| `> 0.25` | сильный дрейф, нужно расследование |
 
 Эти границы не являются строгим математическим правилом, но часто используются как практический ориентир для мониторинга данных.
 
