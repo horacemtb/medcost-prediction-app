@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   Navigate,
   Route,
@@ -9,13 +16,15 @@ import {
 import { Search, X } from "lucide-react";
 import { Toaster } from "sonner";
 import { medcostApi } from "../shared/api/medcost-api";
-import { DashboardPage } from "../pages/dashboard/ui/DashboardPage";
-import { PredictPage } from "../pages/predict/ui/PredictPage";
-import { HistoryPage } from "../pages/history/ui/HistoryPage";
-import { FactorsPage } from "../pages/factors/ui/FactorsPage";
-import { SettingsPage } from "../pages/settings/ui/SettingsPage";
+import { LoadingState } from "../shared/ui/kit";
 import { SideNavigation } from "../widgets/side-navigation/ui/SideNavigation";
 import { PredictionDetailsProvider } from "../widgets/prediction-details";
+
+const DashboardPage = lazy(() => import("../pages/dashboard/ui/DashboardPage"));
+const PredictPage = lazy(() => import("../pages/predict/ui/PredictPage"));
+const HistoryPage = lazy(() => import("../pages/history/ui/HistoryPage"));
+const FactorsPage = lazy(() => import("../pages/factors/ui/FactorsPage"));
+const SettingsPage = lazy(() => import("../pages/settings/ui/SettingsPage"));
 
 export default function App() {
   const navigate = useNavigate();
@@ -137,24 +146,26 @@ export default function App() {
               </div>
             </header>
             <main className="scroll-transparent h-[calc(100vh-78px)] overflow-auto px-8 py-6">
-              <Routes>
-                <Route
-                  path="/"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/predict" element={<PredictPage />} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="/factors" element={<FactorsPage />} />
-                <Route
-                  path="/settings"
-                  element={<SettingsPage status={status} />}
-                />
-                <Route
-                  path="*"
-                  element={<Navigate to="/dashboard" replace />}
-                />
-              </Routes>
+              <Suspense fallback={<LoadingState label="Загрузка раздела..." />}>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Navigate to="/dashboard" replace />}
+                  />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/predict" element={<PredictPage />} />
+                  <Route path="/history" element={<HistoryPage />} />
+                  <Route path="/factors" element={<FactorsPage />} />
+                  <Route
+                    path="/settings"
+                    element={<SettingsPage status={status} />}
+                  />
+                  <Route
+                    path="*"
+                    element={<Navigate to="/dashboard" replace />}
+                  />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </div>

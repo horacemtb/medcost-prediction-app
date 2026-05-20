@@ -23,3 +23,5 @@ export function SettingsPage({ status }: SettingsPageProps) {
     </section>
   );
 }
+
+export default SettingsPage;

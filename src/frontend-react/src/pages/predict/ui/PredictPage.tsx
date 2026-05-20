@@ -73,3 +73,5 @@ export function PredictPage() {
     </section>
   );
 }
+
+export default PredictPage;

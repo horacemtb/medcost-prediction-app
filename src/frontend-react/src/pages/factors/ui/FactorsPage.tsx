@@ -10,3 +10,5 @@ export function FactorsPage() {
     </section>
   );
 }
+
+export default FactorsPage;
