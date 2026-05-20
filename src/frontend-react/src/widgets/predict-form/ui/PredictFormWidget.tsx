@@ -10,6 +10,7 @@
 import { useRef, type ChangeEvent } from "react";
 import { featureMap } from "../../../shared/config/feature-map";
 import {
+  AddressSuggestInput,
   FieldMeta,
   KitButton,
   KitCheckbox,
@@ -186,11 +187,11 @@ export function PredictFormWidget({
 
             <label className="flex flex-col gap-1.5">
               <span className="text-ui-sm font-medium text-txt">Адрес</span>
-              <KitInput
+              <AddressSuggestInput
                 value={form.address}
                 placeholder="г. Москва, ул. Ленина, д. 1"
                 className="h-10 bg-white/70"
-                onChange={(e) => onUpdateField("address", e.target.value)}
+                onChange={(value) => onUpdateField("address", value)}
               />
             </label>
 

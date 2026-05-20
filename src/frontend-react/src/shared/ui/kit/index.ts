@@ -1,3 +1,4 @@
+export { AddressSuggestInput } from "./AddressSuggestInput";
 export { ErrorAlert } from "./ErrorAlert";
 export { FieldMeta } from "./FieldMeta";
 export { FormSection } from "./FormSection";
