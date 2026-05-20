@@ -1,6 +1,6 @@
-import { useEffect, useRef, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "../../../shared/ui/kit";
+import { useEffect, useRef, type ChangeEvent } from "react";
 import type { PredictFormWidgetProps } from "../model/types";
 import { PredictFormActions } from "./PredictFormActions";
 import { RecognizeFormButton } from "./RecognizeFormButton";

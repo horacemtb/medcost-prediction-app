@@ -1,4 +1,5 @@
 import { UserRound } from "lucide-react";
+import { AddressSuggestInput } from "../../../../features/address-suggest/ui/AddressSuggestInput";
 import { parseNumberInput } from "../../../../shared/lib/form-values";
 import {
   FormField,
@@ -49,11 +50,15 @@ export function BasicDataSection({
         </FormField>
 
         <FormField label="Адрес">
-          <KitInput
+          <AddressSuggestInput
+            value={form.address}
+            onChange={(value) => onUpdateField("address", value)}
+          />
+          {/* <KitInput
             value={form.address}
             placeholder="г. Москва, ул. Ленина, д. 1"
             onChange={(e) => onUpdateField("address", e.target.value)}
-          />
+          /> */}
         </FormField>
 
         <FormField label="Возраст" error={errors.age}>
