@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from statistics import median
+from statistics import median, quantiles
 from collections import Counter
 from typing import List
 
@@ -9,6 +9,24 @@ from ..database import get_db
 from ..models import SyntheticCohort, PredictionRecord, RiskFactor
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
+
+
+def _percentile(values: List[float], percentile: float) -> float:
+    if not values:
+        return 0.0
+    if len(values) == 1:
+        return float(values[0])
+    percentile_index = int(percentile * 100) - 1
+    return float(quantiles(values, n=100, method="inclusive")[percentile_index])
+
+
+def _compute_high_cost_prediction_share(pred_values: List[float], synthetic_values: List[float]) -> float:
+    if not pred_values or not synthetic_values:
+        return 0.0
+
+    synthetic_p90 = _percentile(synthetic_values, 0.9)
+    high_cost_count = sum(1 for value in pred_values if value > synthetic_p90)
+    return (high_cost_count / len(pred_values)) * 100
 
 
 def _compute_histogram(values: List[float], bins: int = 5):
@@ -66,6 +84,7 @@ def overview(db: Session = Depends(get_db)):
     predictions_count = db.query(func.count(PredictionRecord.id)).scalar() or 0
     predictions_avg = float(sum(pred_values) / len(pred_values)) if pred_values else 0.0
     predictions_median = float(median(pred_values)) if pred_values else 0.0
+    high_cost_prediction_share = _compute_high_cost_prediction_share(pred_values, synthetic_values)
     predictions_hist = _compute_histogram(pred_values, bins=5)
 
     
@@ -94,6 +113,7 @@ def overview(db: Session = Depends(get_db)):
             "count": int(predictions_count),
             "avg_predicted_cost": predictions_avg,
             "median_predicted_cost": predictions_median,
+            "high_cost_prediction_share": high_cost_prediction_share,
             "predicted_cost_histogram": predictions_hist,
             "top_factors": top_factors,
         },

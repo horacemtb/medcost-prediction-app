@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, type InputHTMLAttributes } from "react";
-import { medcostApi, type DadataSuggestion } from "../../api/medcost-api";
+import { medcostApi, type DadataSuggestion } from "../../../shared/api/medcost-api";
+import { KitInput } from "../../../shared/ui/kit";
 
 type AddressSuggestInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> & {
   value: string;
@@ -81,13 +82,13 @@ export function AddressSuggestInput({ value, onChange, className = "", placehold
 
   return (
     <div ref={containerRef} className="relative">
-      <input
+      <KitInput
         value={value}
         placeholder={placeholder}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onFocus={() => { if (suggestions.length > 0) setOpen(true); }}
-        className={`h-8 w-full rounded-xl border border-line/70 bg-transparent px-3 text-ui-sm text-txt outline-none transition placeholder:[color:var(--placeholder)] focus:border-accent/70 focus:ring-2 focus:ring-accent/25 ${className}`.trim()}
+        className={`h-8 bg-transparent ${className}`}
         {...props}
       />
       {open && suggestions.length > 0 && (

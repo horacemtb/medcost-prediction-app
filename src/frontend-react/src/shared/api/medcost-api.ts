@@ -1,6 +1,7 @@
 import type {
   HistoryResponse,
   OcrPatientFormResponse,
+  OverviewResponse,
   PredictionAssessmentResponse,
   PredictionDetailsResponse,
   PredictionInput,
@@ -77,6 +78,7 @@ export const medcostApi = {
       method: "POST",
       body: JSON.stringify({ predicted_cost }),
     }),
+  overview: () => req<OverviewResponse>("/api/stats/overview"),
   exportPredictionPdf: (id: number) => reqBlob(`/api/predictions/${id}/pdf`),
   suggestAddress: (query: string, count = 5) =>
     req<{ suggestions: DadataSuggestion[] }>(`/api/dadata/suggestions?query=${encodeURIComponent(query)}&count=${count}`),

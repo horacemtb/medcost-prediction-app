@@ -1,4 +1,5 @@
-import { ShieldAlert } from "lucide-react";
+﻿import { ShieldAlert } from "lucide-react";
+import { Panel } from "../../../../shared/ui/kit";
 import { formatDate } from "../../model/prediction-details-helpers";
 
 type RecommendationCardProps = {
@@ -16,16 +17,22 @@ export function RecommendationCard({
 }: RecommendationCardProps) {
   if (!riskProfileCategory || !title || !description) {
     return (
-      <article className="min-w-0 rounded-2xl border border-[#e5e7eb] bg-white p-5">
+      <Panel
+        as="article"
+        borderClassName="border-[#e5e7eb]"
+        surfaceClassName="bg-white"
+        className="min-w-0"
+      >
         <p className="m-0 text-ui-sm text-[#6b7280]">Нет данных</p>
-      </article>
+      </Panel>
     );
   }
 
   const tone =
     riskProfileCategory === "Низкий"
       ? {
-          card: "border-[#cae8d2] bg-[#effcf3]",
+          border: "border-[#cae8d2]",
+          surface: "bg-[#effcf3]",
           title: "text-[#14532d]",
           text: "text-[#2f5f43]",
           muted: "text-[#5f8c6f]",
@@ -34,7 +41,8 @@ export function RecommendationCard({
         }
       : riskProfileCategory === "Стандартный"
         ? {
-            card: "border-[#f0d7bb] bg-[#fff5e8]",
+            border: "border-[#f0d7bb]",
+            surface: "bg-[#fff5e8]",
             title: "text-[#2c1f13]",
             text: "text-[#5f4f3c]",
             muted: "text-[#8d6b49]",
@@ -43,7 +51,8 @@ export function RecommendationCard({
           }
         : riskProfileCategory === "Высокий риск"
           ? {
-              card: "border-[#ffd7b2] bg-[#fff0e3]",
+              border: "border-[#ffd7b2]",
+              surface: "bg-[#fff0e3]",
               title: "text-[#5e2d0d]",
               text: "text-[#744725]",
               muted: "text-[#9a6034]",
@@ -51,7 +60,8 @@ export function RecommendationCard({
               icon: "text-[#c95f1c]",
             }
           : {
-              card: "border-[#f3c4c4] bg-[#fff0f0]",
+              border: "border-[#f3c4c4]",
+              surface: "bg-[#fff0f0]",
               title: "text-[#7a1f1f]",
               text: "text-[#7f3535]",
               muted: "text-[#a54d4d]",
@@ -60,7 +70,12 @@ export function RecommendationCard({
             };
 
   return (
-    <article className={`min-w-0 rounded-2xl border p-5 ${tone.card}`}>
+    <Panel
+      as="article"
+      borderClassName={tone.border}
+      surfaceClassName={tone.surface}
+      className="min-w-0"
+    >
       <p className={`m-0 inline-flex items-center gap-2 text-ui-xs uppercase tracking-[0.2em] ${tone.muted}`}>
         <ShieldAlert className={`size-4 ${tone.icon}`} />
         Рекомендация
@@ -76,6 +91,6 @@ export function RecommendationCard({
       <p className={`m-0 text-ui-xs ${tone.muted}`}>
         Сформировано автоматически на основании отчета от {formatDate(createdAt)}.
       </p>
-    </article>
+    </Panel>
   );
 }
