@@ -5,11 +5,19 @@ type Props = {
   overview: OverviewResponse;
 };
 
-function getHighBinShare(counts: number[]) {
-  if (!counts.length) return 0;
-  const total = counts.reduce((sum, value) => sum + value, 0);
-  if (!total) return 0;
-  return (counts[counts.length - 1] / total) * 100;
+function formatSignedMoney(value: number) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${Math.round(value).toLocaleString()} ₽`;
+}
+
+function formatSignedPercent(value: number) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(1)}%`;
+}
+
+function formatSignedPp(value: number) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(1)} п.п.`;
 }
 
 export function PopulationPredictionDriftWidget({ overview }: Props) {
@@ -23,28 +31,27 @@ export function PopulationPredictionDriftWidget({ overview }: Props) {
   const medianDiff = predictionMedian - syntheticMedian;
   const medianDiffPct = syntheticMedian === 0 ? 0 : (medianDiff / syntheticMedian) * 100;
 
-  const highBinPred = getHighBinShare(overview.predictions.predicted_cost_histogram.counts);
-  const highBinSynth = getHighBinShare(overview.synthetic.annual_cost_histogram.counts);
-  const highBinDiff = highBinPred - highBinSynth;
+  const highCostPredictionShare = overview.predictions.high_cost_prediction_share;
+  const highCostShareDiff = highCostPredictionShare - 10;
 
   return (
     <WidgetCard
-      title="Смещение прогноза относительно выборки"
+      title="Отклонение прогноза от исторической выборки"
       tooltipLabel="Пояснение к смещению прогноза"
-      tooltip="Сравнение распределения прогнозов с базовой выборкой: различия по среднему, медиане и доле самых дорогих случаев (верхний бин гистограммы)."
+      tooltip="Сравнение распределения прогнозов с исторической выборкой: различия по среднему, медиане и доле прогнозов выше 90-го перцентиля исторических расходов."
     >
       <div className="mt-4 grid gap-3">
         <MiniStatCard
-          label="Смещение среднего"
-          value={`${Math.round(meanDiff).toLocaleString()} (${meanDiffPct.toFixed(1)}%)`}
+          label="Средний расход на человека"
+          value={`${formatSignedMoney(meanDiff)} / ${formatSignedPercent(meanDiffPct)}`}
         />
         <MiniStatCard
-          label="Смещение медианы"
-          value={`${Math.round(medianDiff).toLocaleString()} (${medianDiffPct.toFixed(1)}%)`}
+          label="Медианный расход"
+          value={`${formatSignedMoney(medianDiff)} / ${formatSignedPercent(medianDiffPct)}`}
         />
         <MiniStatCard
-          label="Сдвиг верхнего бина"
-          value={`${highBinDiff.toFixed(1)} п.п.`}
+          label="Доля дорогих случаев"
+          value={`${highCostPredictionShare.toFixed(1)}% (${formatSignedPp(highCostShareDiff)})`}
         />
       </div>
     </WidgetCard>

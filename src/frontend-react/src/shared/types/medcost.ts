@@ -129,6 +129,8 @@ export type OverviewResponse = {
     avg_predicted_cost: number;
     // Медиана предсказанной стоимости.
     median_predicted_cost: number;
+    // Доля прогнозов выше 90-го перцентиля исторических расходов.
+    high_cost_prediction_share: number;
     predicted_cost_histogram: {
       // Границы бинов гистограммы предсказанных значений.
       bins: number[];
