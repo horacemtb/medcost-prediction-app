@@ -558,7 +558,7 @@ curl -X POST http://localhost:8000/api/predict \
     "hospital_admissions": 0,
     "medication_count": 1,
     "city_type": "Urban",
-    "previous_year_cost": 1200.0
+    "previous_year_cost": 12000.0
   }'
 ```
 
