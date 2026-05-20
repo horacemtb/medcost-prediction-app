@@ -1,4 +1,5 @@
 import { ChartColumnBig } from "lucide-react";
+import { KitBadge } from "../../../../shared/ui/kit";
 import { formatMoney } from "../../model/prediction-details-helpers";
 
 type AnnualForecastBlockProps = {
@@ -30,11 +31,9 @@ export function AnnualForecastBlock({
             </p>
           </div>
         </div>
-        <span
-          className={`inline-flex rounded-full px-3 py-1 text-ui-xs font-semibold ${riskTone}`}
-        >
+        <KitBadge className={riskTone}>
           {riskLevel}
-        </span>
+        </KitBadge>
       </div>
 
       <div className="mt-8">

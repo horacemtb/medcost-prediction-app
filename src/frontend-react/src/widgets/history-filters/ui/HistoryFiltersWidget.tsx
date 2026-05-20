@@ -42,46 +42,53 @@ export function HistoryFiltersWidget({
   }
 
   return (
-    <section className="tile form-tile grid w-full max-w-[420px] gap-3 grid-cols-1">
+    <section className="tile grid w-full max-w-[420px] gap-3 grid-cols-1 bg-white/70">
       <h3 className="widget-title">Фильтры</h3>
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         <KitInput type="number" placeholder="Прогноз от" value={costMin} onChange={(e) => onCostMinChange(e.target.value)} />
         <KitInput type="number" placeholder="Прогноз до" value={costMax} onChange={(e) => onCostMaxChange(e.target.value)} />
-        <div className="relative">
+
+        <label className="relative">
+          <span className="text-ui-xs text-muted">Дата от</span>
           <KitInput
             ref={fromInputRef}
             type="date"
+            lang="ru"
             className="pr-9"
             value={dateFrom}
             onChange={(e) => onDateFromChange(e.target.value)}
           />
           <button
             type="button"
-            className="absolute right-1.5 top-1/2 inline-grid h-6 w-6 -translate-y-1/2 place-items-center rounded-md"
+            className="absolute right-1.5 top-[26px] inline-grid h-6 w-6 place-items-center rounded-md"
             aria-label="Открыть календарь: дата от"
             onClick={() => openDatePicker(fromInputRef.current)}
           >
             <img src={calendarIcon} alt="" aria-hidden="true" className="h-3.5 w-3.5" />
           </button>
-        </div>
-        <div className="relative">
+        </label>
+
+        <label className="relative">
+          <span className="text-ui-xs text-muted">Дата до</span>
           <KitInput
             ref={toInputRef}
             type="date"
+            lang="ru"
             className="pr-9"
             value={dateTo}
             onChange={(e) => onDateToChange(e.target.value)}
           />
           <button
             type="button"
-            className="absolute right-1.5 top-1/2 inline-grid h-6 w-6 -translate-y-1/2 place-items-center rounded-md"
+            className="absolute right-1.5 top-[26px] inline-grid h-6 w-6 place-items-center rounded-md"
             aria-label="Открыть календарь: дата до"
             onClick={() => openDatePicker(toInputRef.current)}
           >
             <img src={calendarIcon} alt="" aria-hidden="true" className="h-3.5 w-3.5" />
           </button>
-        </div>
+        </label>
       </div>
+
       <div className="flex flex-wrap items-center justify-between gap-2 text-ui-xs text-muted">
         <span>Показано: {shownCount}</span>
         {hasFilters && (

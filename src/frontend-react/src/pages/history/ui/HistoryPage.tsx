@@ -45,3 +45,5 @@ export function HistoryPage() {
     </section>
   );
 }
+
+export default HistoryPage;
