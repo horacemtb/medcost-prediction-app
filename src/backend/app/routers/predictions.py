@@ -149,7 +149,7 @@ def normalize_snils(snils: str | None) -> str | None:
     return digits
 
 
-def format_snils(snils: str | None) -> str | None:
+def format_snils(snils: str) -> str:
     digits = normalize_snils(snils)
     if digits is None:
         return snils
@@ -194,11 +194,19 @@ def _resolve_display_name(record: PredictionRecord) -> str:
     return record.patient.full_name if record.patient and record.patient.full_name else record.full_name
 
 
+def _require_patient(record: PredictionRecord) -> Patient:
+    patient = record.patient
+    if patient is None:
+        raise HTTPException(status_code=500, detail="Patient data is missing for prediction")
+    return patient
+
+
 def _build_history_item(record: PredictionRecord) -> PredictionHistoryItem:
+    patient = _require_patient(record)
     return PredictionHistoryItem(
         id=record.id,
         full_name=_resolve_display_name(record),
-        snils=format_snils(record.patient.snils) if record.patient else None,
+        snils=format_snils(patient.snils),
         age=record.age,
         gender=record.gender,
         predicted_cost=record.predicted_cost,
@@ -265,15 +273,15 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Prediction not found")
 
     factors = _build_or_create_risk_factors(record, db)
-    patient = record.patient
+    patient = _require_patient(record)
 
     return PredictionDetailsResponse(
         prediction_id=record.id,
         patient_id=record.patient_id,
         full_name=_resolve_display_name(record),
-        snils=format_snils(patient.snils) if patient else None,
-        phone=patient.phone if patient else None,
-        address=patient.address if patient else None,
+        snils=format_snils(patient.snils),
+        phone=patient.phone,
+        address=patient.address,
         age=record.age,
         gender=record.gender,
         bmi=record.bmi,

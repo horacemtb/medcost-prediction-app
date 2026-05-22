@@ -49,7 +49,7 @@ export const HistoryRow = memo(function HistoryRow({
     >
       <KitTableCell>{item.id}</KitTableCell>
       <KitTableCell>{item.full_name}</KitTableCell>
-      <KitTableCell>{item.snils || "-"}</KitTableCell>
+      <KitTableCell>{item.snils}</KitTableCell>
       <KitTableCell>{item.age}</KitTableCell>
       <KitTableCell>{item.predicted_cost.toFixed(2)} ₽</KitTableCell>
       <KitTableCell>

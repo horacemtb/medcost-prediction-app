@@ -41,7 +41,7 @@ export type PredictionDetailsResponse = {
   prediction_id: number;
   patient_id?: number | null;
   full_name: string;
-  snils?: string | null;
+  snils: string;
   phone?: string | null;
   address?: string | null;
   age: number;
@@ -69,7 +69,7 @@ export type PredictionDetailsResponse = {
 export type HistoryItem = {
   id: number;
   full_name: string;
-  snils?: string | null;
+  snils: string;
   age: number;
   gender: number;
   predicted_cost: number;

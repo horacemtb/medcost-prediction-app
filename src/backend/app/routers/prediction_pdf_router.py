@@ -9,7 +9,7 @@ from ..database import get_db
 from ..models import PredictionRecord
 from ..services.pdf_report_service import create_report_data, export_report_to_pdf_bytes
 from .ml_stats import calculate_percentile
-from .predictions import _build_recommendation, _risk_category_by_percentile, _resolve_display_name, format_snils
+from .predictions import _build_recommendation, _risk_category_by_percentile, _require_patient, _resolve_display_name, format_snils
 
 router = APIRouter(prefix="/api", tags=["predictions"])
 
@@ -59,30 +59,18 @@ def export_prediction_pdf(prediction_id: int, db: Session = Depends(get_db)) -> 
     record = db.query(PredictionRecord).filter(PredictionRecord.id == prediction_id).first()
     if not record:
         raise HTTPException(status_code=404, detail="Prediction not found")
+    patient = _require_patient(record)
 
-    
-    if getattr(record, "patient_id", None):
-        previous = (
-            db.query(PredictionRecord)
-            .filter(
-                PredictionRecord.patient_id == record.patient_id,
-                PredictionRecord.id != record.id,
-                PredictionRecord.created_at < record.created_at,
-            )
-            .order_by(PredictionRecord.created_at.desc())
-            .first()
+    previous = (
+        db.query(PredictionRecord)
+        .filter(
+            PredictionRecord.patient_id == record.patient_id,
+            PredictionRecord.id != record.id,
+            PredictionRecord.created_at < record.created_at,
         )
-    else:
-        previous = (
-            db.query(PredictionRecord)
-            .filter(
-                PredictionRecord.full_name == record.full_name,
-                PredictionRecord.id != record.id,
-                PredictionRecord.created_at < record.created_at,
-            )
-            .order_by(PredictionRecord.created_at.desc())
-            .first()
-        )
+        .order_by(PredictionRecord.created_at.desc())
+        .first()
+    )
 
     factors = sorted(record.risk_factors, key=lambda x: x.rank)[:3]
     total_abs_shap = sum(abs(f.shap_value) for f in factors) or 1.0
@@ -109,9 +97,9 @@ def export_prediction_pdf(prediction_id: int, db: Session = Depends(get_db)) -> 
             "created_at": record.created_at,
         },
         patient_data={
-            "snils": format_snils(record.patient.snils) if record.patient else None,
-            "phone": record.patient.phone if record.patient else None,
-            "address": record.patient.address if record.patient else None,
+            "snils": format_snils(patient.snils),
+            "phone": patient.phone,
+            "address": patient.address,
             "age": record.age,
             "gender_label": _gender_label(record.gender),
             "bmi": record.bmi,

@@ -65,7 +65,7 @@ class PredictionDetailsResponse(BaseModel):
     prediction_id: int
     patient_id: int | None = None
     full_name: str
-    snils: str | None = None
+    snils: str
     phone: str | None = None
     address: str | None = None
     age: int
@@ -101,7 +101,7 @@ class PredictionAssessmentResponse(BaseModel):
 class PredictionHistoryItem(BaseModel):
     id: int
     full_name: str
-    snils: str | None = None
+    snils: str
     age: int
     gender: int
     predicted_cost: float
@@ -138,7 +138,7 @@ class PatientCreate(BaseModel):
 class PatientResponse(BaseModel):
     id: int
     full_name: str
-    snils: str | None = None
+    snils: str
     phone: str | None = None
     address: str | None = None
     created_at: datetime

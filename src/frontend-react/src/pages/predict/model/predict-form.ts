@@ -108,7 +108,7 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
 export function mapPredictionDetailsToForm(details: PredictionDetailsResponse): PredictFormState {
   return {
     full_name: details.full_name,
-    snils: details.snils ?? "",
+    snils: details.snils,
     phone: details.phone ?? "",
     address: details.address ?? "",
     age: details.age,
