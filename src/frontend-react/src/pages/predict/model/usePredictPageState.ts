@@ -13,6 +13,7 @@ import {
   initialPredictForm,
   mapPredictionDetailsToForm,
   normalizeName,
+  normalizeSnils,
   parseMoney,
   predictTabs,
   toPredictionPayload,
@@ -410,7 +411,7 @@ export function usePredictPageState() {
     const normalized = {
       ...form,
       full_name: normalizeName(form.full_name),
-      snils: form.snils.trim(),
+      snils: normalizeSnils(form.snils),
       phone: form.phone.trim(),
       address: form.address.trim(),
     };

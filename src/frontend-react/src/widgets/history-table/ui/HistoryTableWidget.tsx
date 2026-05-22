@@ -14,7 +14,7 @@ import {
 import refreshIcon from "../../../shared/assets/refresh.svg";
 import { HistoryRow } from "./HistoryRow";
 
-type SortKey = "id" | "full_name" | "age" | "predicted_cost" | "created_at";
+type SortKey = "id" | "full_name" | "snils" | "age" | "predicted_cost" | "created_at";
 
 type HistoryTableWidgetProps = {
   items: HistoryItem[];
@@ -38,7 +38,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   sortIndicator,
 }: HistoryTableWidgetProps) {
   return (
-    <section className="tile grid grid-cols-1 h-full min-h-0 gap-2 bg-white/70 md:grid-cols-1 [grid-template-rows:auto_minmax(0,1fr)]">
+    <section className="tile grid h-full min-h-0 grid-cols-1 gap-2 bg-white/70 [grid-template-rows:auto_minmax(0,1fr)]">
       <div className="flex items-center justify-between gap-2">
         <h3 className="widget-title">Таблица истории</h3>
         <KitButton
@@ -67,10 +67,11 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
           />
         )}
         <KitTableScroll className="h-full">
-          <KitTable className="min-w-[890px] duration-300 ease-in-out min-[1400px]:w-full">
+          <KitTable className="min-w-[1020px] duration-300 ease-in-out min-[1400px]:w-full">
             <colgroup>
               <col className="w-[120px]" />
-              <col className="w-[200px]" />
+              <col className="w-[220px]" />
+              <col className="w-[170px]" />
               <col className="w-[100px]" />
               <col className="w-[160px]" />
               <col className="w-[190px]" />
@@ -100,6 +101,18 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     onClick={() => onSort("full_name")}
                   >
                     ФИО {sortIndicator("full_name")}
+                  </KitButton>
+                </KitTableHeaderCell>
+                <KitTableHeaderCell className="bg-transparent">
+                  <KitButton
+                    type="button"
+                    style={{ padding: 0 }}
+                    className="sort-btn w-full justify-start text-left"
+                    variant="sort"
+                    size={24}
+                    onClick={() => onSort("snils")}
+                  >
+                    СНИЛС {sortIndicator("snils")}
                   </KitButton>
                 </KitTableHeaderCell>
                 <KitTableHeaderCell className="bg-transparent">
@@ -153,7 +166,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
               ))}
               {!loading && !items.length && (
                 <KitTableRow>
-                  <KitTableCell colSpan={6} className="py-4 text-center text-ui-sm text-muted">
+                  <KitTableCell colSpan={7} className="py-4 text-center text-ui-sm text-muted">
                     Ничего не найдено по текущим фильтрам.
                   </KitTableCell>
                 </KitTableRow>

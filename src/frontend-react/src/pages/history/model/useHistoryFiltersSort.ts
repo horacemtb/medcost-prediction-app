@@ -64,6 +64,7 @@ export function useHistoryFiltersSort(
     const sorted = [...filtered].sort((a, b) => {
       let cmp = 0;
       if (sortKey === "full_name") cmp = a.full_name.localeCompare(b.full_name, "ru");
+      if (sortKey === "snils") cmp = (a.snils ?? "").localeCompare(b.snils ?? "", "ru");
       if (sortKey === "id") cmp = a.id - b.id;
       if (sortKey === "age") cmp = a.age - b.age;
       if (sortKey === "predicted_cost") cmp = a.predicted_cost - b.predicted_cost;

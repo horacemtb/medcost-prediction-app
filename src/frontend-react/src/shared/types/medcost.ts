@@ -1,6 +1,6 @@
-﻿export type PredictionInput = {
+export type PredictionInput = {
   full_name: string;
-  snils?: string | null;
+  snils: string;
   phone?: string | null;
   address?: string | null;
   age: number;
@@ -69,6 +69,7 @@ export type PredictionDetailsResponse = {
 export type HistoryItem = {
   id: number;
   full_name: string;
+  snils?: string | null;
   age: number;
   gender: number;
   predicted_cost: number;
