@@ -61,7 +61,7 @@ class Patient(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    snils: Mapped[Optional[str]] = mapped_column(String(64), unique=True, nullable=True, index=True)
+    snils: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
     phone: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

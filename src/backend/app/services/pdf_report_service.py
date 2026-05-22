@@ -254,6 +254,9 @@ def create_report_data(
         "percentile": percentile_value,
         "risk_category": risk_category,
         "patient_data": {
+            "snils": str(patient_data.get("snils", "-") or "-"),
+            "phone": str(patient_data.get("phone", "-") or "-"),
+            "address": str(patient_data.get("address", "-") or "-"),
             "age": str(patient_data.get("age", "-")),
             "gender": str(patient_data.get("gender_label", patient_data.get("gender", "-"))),
             "bmi": f"{bmi:.1f}",
@@ -288,11 +291,14 @@ def build_pdf(report_data: dict[str, Any]) -> PDFReport:
     pdf.section_title("1. Информация о пациенте")
     pdf.add_label_value("ФИО:", report_data.get("full_name", "-"))
     pdf.add_label_value("ID запроса:", report_data.get("report_id", "-"))
+    patient = report_data.get("patient_data", {}) or {}
+    pdf.add_label_value("СНИЛС:", patient.get("snils", "-"))
+    pdf.add_label_value("Телефон:", patient.get("phone", "-"))
+    pdf.add_label_value("Адрес:", patient.get("address", "-"))
     pdf.add_label_value("Дата расчёта:", str(report_data.get("date", "-")))
     pdf.ln(5)
 
     pdf.section_title("2. Данные о пациенте")
-    patient = report_data.get("patient_data", {}) or {}
     pdf.add_label_value("Возраст:", f"{patient.get('age', '-')} лет")
     pdf.add_label_value("Пол:", patient.get("gender", "-"))
     pdf.add_label_value("ИМТ:", f"{patient.get('bmi', '-')} ({patient.get('bmi_interpret', '-')})")
