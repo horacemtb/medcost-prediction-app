@@ -37,6 +37,9 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
   onSort,
   sortIndicator,
 }: HistoryTableWidgetProps) {
+  const stickyHeaderCellClass =
+    "sticky top-0 z-20 bg-[#f6f8fd]/95 backdrop-blur supports-[backdrop-filter]:bg-[#f6f8fd]/80";
+
   return (
     <section className="tile grid h-full min-h-0 grid-cols-1 gap-2 bg-white/70 [grid-template-rows:auto_minmax(0,1fr)]">
       <div className="flex items-center justify-between gap-2">
@@ -77,9 +80,9 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
               <col className="w-[190px]" />
               <col className="w-[120px]" />
             </colgroup>
-            <KitTableHead className="sticky top-0 z-20">
+            <KitTableHead>
               <KitTableRow>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -91,7 +94,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     ID {sortIndicator("id")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -103,7 +106,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     ФИО {sortIndicator("full_name")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -115,7 +118,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     СНИЛС {sortIndicator("snils")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -127,7 +130,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Возраст {sortIndicator("age")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -139,7 +142,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Прогноз {sortIndicator("predicted_cost")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent">
+                <KitTableHeaderCell className={stickyHeaderCellClass}>
                   <KitButton
                     type="button"
                     style={{ padding: 0 }}
@@ -151,7 +154,7 @@ export const HistoryTableWidget = memo(function HistoryTableWidget({
                     Дата {sortIndicator("created_at")}
                   </KitButton>
                 </KitTableHeaderCell>
-                <KitTableHeaderCell className="bg-transparent" />
+                <KitTableHeaderCell className={stickyHeaderCellClass} />
               </KitTableRow>
             </KitTableHead>
             <KitTableBody>
