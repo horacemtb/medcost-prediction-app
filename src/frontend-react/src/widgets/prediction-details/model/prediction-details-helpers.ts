@@ -1,8 +1,10 @@
 import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
 
 export function formatMoney(value: number) {
-  const v = value.toLocaleString("ru-RU", { maximumFractionDigits: 2 });
-  if(value === 0) return "0";
+  const v = Math.abs(value).toLocaleString("ru-RU", {
+    maximumFractionDigits: 2,
+  });
+  if (value === 0) return "0";
   if (value > 0) return `+${v}`;
   return `-${v}`;
 }
