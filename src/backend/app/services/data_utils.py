@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 DATASET_PATH = (
     Path(__file__).resolve().parents[1]
-    / "routers"
+    / "data"
     / "medical_cost_prediction_dataset.csv"
 )
 
