@@ -1,12 +1,7 @@
 import os
-import sys
 import unittest
-from pathlib import Path
 
-BACKEND_ROOT = Path(__file__).resolve().parents[4] / "src" / "backend"
-sys.path.insert(0, str(BACKEND_ROOT))
-
-from app.services.dadata_service import clean_full_name, clean_address, clean_phone
+from app.services.dadata_service import clean_address, clean_full_name, clean_phone
 
 
 class DadataLiveTest(unittest.TestCase):

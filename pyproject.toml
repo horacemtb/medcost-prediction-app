@@ -1,0 +1,24 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = ["src/backend/app", "tests/backend"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/backend"]
+pythonpath = ["src/backend"]
+addopts = "-ra -p no:cacheprovider"
+
+[tool.coverage.run]
+source = ["src/backend/app"]
+branch = true
+omit = [
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+skip_covered = true

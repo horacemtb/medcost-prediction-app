@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /workspace
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-rus fonts-dejavu-core ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY src/backend/requirements.txt /tmp/requirements.txt
+COPY src/backend/requirements-dev.txt /tmp/requirements-dev.txt
+RUN pip install --no-cache-dir -r /tmp/requirements-dev.txt
+
+ENV PYTHONPATH=/workspace/src/backend
+
+CMD ["pytest", "--cov=app", "--cov-report=term-missing", "--cov-report=xml", "--cov-fail-under=70"]

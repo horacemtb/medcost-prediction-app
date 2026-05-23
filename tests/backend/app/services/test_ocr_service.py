@@ -1,10 +1,4 @@
-import sys
 import unittest
-from pathlib import Path
-
-
-BACKEND_ROOT = Path(__file__).resolve().parents[4] / "src" / "backend"
-sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.services.ocr_service import (
     OCR_LANGUAGE,

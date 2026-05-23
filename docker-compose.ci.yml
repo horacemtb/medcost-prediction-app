@@ -1,0 +1,13 @@
+services:
+  backend-ci:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile.ci
+    environment:
+      DATABASE_URL: sqlite:////tmp/medcost-ci.db
+      MODEL_PATH: /workspace/src/backend/models/rf_pipeline.joblib
+      DADATA_API_KEY: ""
+      DADATA_API_SECRET: ""
+    volumes:
+      - .:/workspace
+    working_dir: /workspace

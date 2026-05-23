@@ -1,0 +1,37 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  backend:
+    name: Ruff and pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend CI image
+        run: docker compose -f docker-compose.ci.yml build backend-ci
+
+      - name: Ruff
+        run: docker compose -f docker-compose.ci.yml run --rm backend-ci ruff check src/backend/app tests/backend
+
+      - name: Pytest with coverage
+        run: docker compose -f docker-compose.ci.yml run --rm backend-ci pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: coverage.xml
+          if-no-files-found: ignore
