@@ -1,22 +1,20 @@
-import sys
-import unittest
-from pathlib import Path
+import pytest
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-
-BACKEND_ROOT = Path(__file__).resolve().parents[4] / "src" / "backend"
-sys.path.insert(0, str(BACKEND_ROOT))
-
-from app.database import Base
-from app.models import PredictionRecord, SyntheticCohort
+from app.models import Patient, PredictionRecord, RiskFactor, SyntheticCohort
 from app.routers import stats
 
 
-def prediction_record(predicted_cost):
+def add_patient(db):
+    patient = Patient(full_name="Test Patient", snils="12345678901")
+    db.add(patient)
+    db.flush()
+    return patient
+
+
+def prediction_record(patient_id, predicted_cost):
     return PredictionRecord(
         full_name="Test Patient",
+        patient_id=patient_id,
         age=45,
         gender=1,
         bmi=27.5,
@@ -38,50 +36,61 @@ def prediction_record(predicted_cost):
     )
 
 
-class StatsOverviewTest(unittest.TestCase):
-    def setUp(self):
-        self.engine = create_engine("sqlite:///:memory:")
-        Base.metadata.create_all(bind=self.engine)
-        self.Session = sessionmaker(bind=self.engine)
-        self.db = self.Session()
+def test_overview_compares_prediction_share_to_historical_90th_percentile(db_session):
+    patient = add_patient(db_session)
+    for cost in range(1000, 11000, 1000):
+        db_session.add(
+            SyntheticCohort(
+                annual_medical_cost=float(cost),
+                smoker=cost % 2000 == 0,
+                diabetes=False,
+                hypertension=False,
+                heart_disease=False,
+                asthma=False,
+                gender="Male",
+            )
+        )
+    for cost in [8500.0, 9200.0, 11000.0, 12000.0]:
+        db_session.add(prediction_record(patient.id, cost))
+    db_session.add(RiskFactor(prediction_id=1, feature_name="bmi", feature_value="27", shap_value=1.0, rank=1))
+    db_session.commit()
 
-    def tearDown(self):
-        self.db.close()
-        self.engine.dispose()
+    response = stats.overview(db_session)
 
-    def test_overview_compares_prediction_share_to_historical_90th_percentile(self):
-        for cost in range(1000, 11000, 1000):
-            self.db.add(SyntheticCohort(annual_medical_cost=float(cost)))
-        for cost in [8500.0, 9200.0, 11000.0, 12000.0]:
-            self.db.add(prediction_record(cost))
-        self.db.commit()
-
-        response = stats.overview(self.db)
-
-        self.assertEqual(response["predictions"]["high_cost_prediction_share"], 75.0)
-
-    def test_high_cost_prediction_share_uses_historical_90th_percentile_threshold(self):
-        synthetic_values = [float(cost) for cost in range(1000, 11000, 1000)]
-        pred_values = [8500.0, 9200.0, 11000.0, 12000.0]
-
-        share = stats._compute_high_cost_prediction_share(pred_values, synthetic_values)
-
-        self.assertEqual(share, 75.0)
-
-    def test_high_cost_prediction_share_returns_zero_without_enough_data(self):
-        self.assertEqual(stats._compute_high_cost_prediction_share([], [1000.0, 2000.0]), 0.0)
-        self.assertEqual(stats._compute_high_cost_prediction_share([1200.0], []), 0.0)
-
-    def test_high_cost_prediction_share_uses_single_historical_value_as_threshold(self):
-        share = stats._compute_high_cost_prediction_share([900.0, 1100.0, 1200.0], [1000.0])
-
-        self.assertAlmostEqual(share, 100 * 2 / 3)
-
-    def test_high_cost_prediction_share_handles_negative_values_consistently(self):
-        share = stats._compute_high_cost_prediction_share([-20.0, 90.0, 100.0], [-100.0, 0.0, 100.0])
-
-        self.assertAlmostEqual(share, 100 * 2 / 3)
+    assert response["synthetic"]["count"] == 10
+    assert response["predictions"]["high_cost_prediction_share"] == 75.0
+    assert response["predictions"]["top_factors"] == [{"feature_name": "bmi", "count": 1}]
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_high_cost_prediction_share_uses_historical_90th_percentile_threshold():
+    synthetic_values = [float(cost) for cost in range(1000, 11000, 1000)]
+    pred_values = [8500.0, 9200.0, 11000.0, 12000.0]
+
+    share = stats._compute_high_cost_prediction_share(pred_values, synthetic_values)
+
+    assert share == 75.0
+
+
+def test_high_cost_prediction_share_returns_zero_without_enough_data():
+    assert stats._compute_high_cost_prediction_share([], [1000.0, 2000.0]) == 0.0
+    assert stats._compute_high_cost_prediction_share([1200.0], []) == 0.0
+
+
+def test_high_cost_prediction_share_uses_single_historical_value_as_threshold():
+    share = stats._compute_high_cost_prediction_share([900.0, 1100.0, 1200.0], [1000.0])
+
+    assert share == pytest.approx(100 * 2 / 3)
+
+
+def test_high_cost_prediction_share_handles_negative_values_consistently():
+    share = stats._compute_high_cost_prediction_share([-20.0, 90.0, 100.0], [-100.0, 0.0, 100.0])
+
+    assert share == pytest.approx(100 * 2 / 3)
+
+
+def test_compute_histogram_handles_empty_single_and_multiple_values():
+    assert stats._compute_histogram([]) == {"bins": [], "counts": []}
+    assert stats._compute_histogram([5.0]) == {"bins": [5.0, 5.0], "counts": [1]}
+    result = stats._compute_histogram([0.0, 10.0], bins=2)
+    assert result["bins"] == [0.0, 5.0, 10.0]
+    assert result["counts"] == [1, 1]
