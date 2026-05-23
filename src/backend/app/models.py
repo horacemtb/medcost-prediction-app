@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -33,8 +33,8 @@ class PredictionRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     
-    patient_id: Mapped[Optional[int]] = mapped_column(ForeignKey("patients.id"), nullable=True, index=True)
-    patient: Mapped[Optional["Patient"]] = relationship("Patient", back_populates="predictions")
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), nullable=False, index=True)
+    patient: Mapped["Patient"] = relationship("Patient", back_populates="predictions")
 
     risk_factors: Mapped[List["RiskFactor"]] = relationship(
         back_populates="prediction",

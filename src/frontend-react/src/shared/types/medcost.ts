@@ -26,7 +26,7 @@ export type PredictionResponse = {
   prediction_id: number;
   full_name: string;
   predicted_cost: number;
-  patient_id?: number | null;
+  patient_id: number;
   created_at: string;
 };
 
@@ -39,7 +39,7 @@ export type RiskFactor = {
 
 export type PredictionDetailsResponse = {
   prediction_id: number;
-  patient_id?: number | null;
+  patient_id: number;
   full_name: string;
   snils: string;
   phone?: string | null;

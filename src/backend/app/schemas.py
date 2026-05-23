@@ -50,7 +50,7 @@ class PredictionResponse(BaseModel):
     prediction_id: int
     full_name: str
     predicted_cost: float
-    patient_id: int | None = None
+    patient_id: int
     created_at: datetime
 
 
@@ -63,7 +63,7 @@ class RiskFactorResponse(BaseModel):
 
 class PredictionDetailsResponse(BaseModel):
     prediction_id: int
-    patient_id: int | None = None
+    patient_id: int
     full_name: str
     snils: str
     phone: str | None = None
