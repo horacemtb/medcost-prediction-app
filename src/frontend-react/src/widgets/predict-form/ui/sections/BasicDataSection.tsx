@@ -1,12 +1,8 @@
 import { UserRound } from "lucide-react";
 import { AddressSuggestInput } from "../../../../features/address-suggest/ui/AddressSuggestInput";
 import { parseNumberInput } from "../../../../shared/lib/form-values";
-import {
-  FormField,
-  KitInput,
-  KitSelect,
-  SectionCard,
-} from "../../../../shared/ui/kit";
+import { FormField, KitInput, KitSelect, SectionCard } from "../../../../shared/ui/kit";
+import { normalizeSnils } from "../../../../pages/predict/model/predict-form";
 import type { PredictFormWidgetProps } from "../../model/types";
 
 type BasicDataSectionProps = Pick<
@@ -33,11 +29,13 @@ export function BasicDataSection({
           />
         </FormField>
 
-        <FormField label="СНИЛС">
+        <FormField label="СНИЛС" error={errors.snils}>
           <KitInput
             value={form.snils}
             placeholder="123-456-789 01"
+            aria-invalid={Boolean(errors.snils)}
             onChange={(e) => onUpdateField("snils", e.target.value)}
+            onBlur={(e) => onUpdateField("snils", normalizeSnils(e.target.value))}
           />
         </FormField>
 
@@ -54,11 +52,6 @@ export function BasicDataSection({
             value={form.address}
             onChange={(value) => onUpdateField("address", value)}
           />
-          {/* <KitInput
-            value={form.address}
-            placeholder="г. Москва, ул. Ленина, д. 1"
-            onChange={(e) => onUpdateField("address", e.target.value)}
-          /> */}
         </FormField>
 
         <FormField label="Возраст" error={errors.age}>
@@ -69,17 +62,12 @@ export function BasicDataSection({
             step={1}
             value={form.age === 0 ? "" : form.age}
             aria-invalid={Boolean(errors.age)}
-            onChange={(e) =>
-              onUpdateField("age", parseNumberInput(e.target.value))
-            }
+            onChange={(e) => onUpdateField("age", parseNumberInput(e.target.value))}
           />
         </FormField>
 
         <FormField label="Пол" error={errors.gender}>
-          <KitSelect
-            value={form.gender}
-            onChange={(e) => onUpdateField("gender", e.target.value)}
-          >
+          <KitSelect value={form.gender} onChange={(e) => onUpdateField("gender", e.target.value)}>
             <option value="">Не выбрано</option>
             <option>Женский</option>
             <option>Мужской</option>
@@ -94,9 +82,7 @@ export function BasicDataSection({
             step={0.1}
             value={form.bmi === 0 ? "" : form.bmi}
             aria-invalid={Boolean(errors.bmi)}
-            onChange={(e) =>
-              onUpdateField("bmi", parseNumberInput(e.target.value))
-            }
+            onChange={(e) => onUpdateField("bmi", parseNumberInput(e.target.value))}
           />
         </FormField>
 
@@ -106,9 +92,7 @@ export function BasicDataSection({
         >
           <KitSelect
             value={form.physical_activity_label}
-            onChange={(e) =>
-              onUpdateField("physical_activity_label", e.target.value)
-            }
+            onChange={(e) => onUpdateField("physical_activity_label", e.target.value)}
           >
             <option value="">Не выбрано</option>
             <option>Низкий</option>
@@ -117,14 +101,8 @@ export function BasicDataSection({
           </KitSelect>
         </FormField>
 
-        <FormField
-          label="Тип населенного пункта"
-          error={errors.city_type_label}
-        >
-          <KitSelect
-            value={form.city_type_label}
-            onChange={(e) => onUpdateField("city_type_label", e.target.value)}
-          >
+        <FormField label="Тип населенного пункта" error={errors.city_type_label}>
+          <KitSelect value={form.city_type_label} onChange={(e) => onUpdateField("city_type_label", e.target.value)}>
             <option value="">Не выбрано</option>
             <option>Город</option>
             <option>Пригород</option>
@@ -140,9 +118,7 @@ export function BasicDataSection({
             step={100}
             value={form.daily_steps === 0 ? "" : form.daily_steps}
             aria-invalid={Boolean(errors.daily_steps)}
-            onChange={(e) =>
-              onUpdateField("daily_steps", parseNumberInput(e.target.value))
-            }
+            onChange={(e) => onUpdateField("daily_steps", parseNumberInput(e.target.value))}
           />
         </FormField>
 
@@ -154,9 +130,7 @@ export function BasicDataSection({
             step={0.5}
             value={form.sleep_hours === 0 ? "" : form.sleep_hours}
             aria-invalid={Boolean(errors.sleep_hours)}
-            onChange={(e) =>
-              onUpdateField("sleep_hours", parseNumberInput(e.target.value))
-            }
+            onChange={(e) => onUpdateField("sleep_hours", parseNumberInput(e.target.value))}
           />
         </FormField>
       </div>

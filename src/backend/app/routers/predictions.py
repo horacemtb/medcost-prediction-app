@@ -149,7 +149,7 @@ def normalize_snils(snils: str | None) -> str | None:
     return digits
 
 
-def format_snils(snils: str | None) -> str | None:
+def format_snils(snils: str) -> str:
     digits = normalize_snils(snils)
     if digits is None:
         return snils
@@ -164,20 +164,20 @@ def _clean_optional_text(value: str | None) -> str | None:
 
 
 def _apply_patient_data(patient: Patient, payload: PredictionInput) -> None:
-    patient.full_name = clean_full_name(payload.full_name)
+    patient.full_name = clean_full_name(payload.full_name) or payload.full_name
     patient.phone = clean_phone(_clean_optional_text(payload.phone))
     patient.address = clean_address(_clean_optional_text(payload.address))
 
 
-def _resolve_patient(payload: PredictionInput, db: Session) -> Patient | None:
+def _resolve_patient(payload: PredictionInput, db: Session) -> Patient:
     snils = normalize_snils(payload.snils)
     if not snils:
-        return None
+        raise HTTPException(status_code=422, detail="SNILS is required")
 
     patient = db.query(Patient).filter(Patient.snils == snils).first()
     if patient is None:
         patient = Patient(
-            full_name=clean_full_name(payload.full_name),
+            full_name=clean_full_name(payload.full_name) or payload.full_name,
             snils=snils,
             phone=clean_phone(_clean_optional_text(payload.phone)),
             address=clean_address(_clean_optional_text(payload.address)),
@@ -188,6 +188,31 @@ def _resolve_patient(payload: PredictionInput, db: Session) -> Patient | None:
         _apply_patient_data(patient, payload)
 
     return patient
+
+
+def _resolve_display_name(record: PredictionRecord) -> str:
+    return record.patient.full_name if record.patient and record.patient.full_name else record.full_name
+
+
+def _require_patient(record: PredictionRecord) -> Patient:
+    patient = record.patient
+    if patient is None:
+        raise HTTPException(status_code=500, detail="Patient data is missing for prediction")
+    return patient
+
+
+def _build_history_item(record: PredictionRecord) -> PredictionHistoryItem:
+    patient = _require_patient(record)
+    return PredictionHistoryItem(
+        id=record.id,
+        full_name=_resolve_display_name(record),
+        snils=format_snils(patient.snils),
+        age=record.age,
+        gender=record.gender,
+        predicted_cost=record.predicted_cost,
+        previous_year_cost=record.previous_year_cost,
+        created_at=record.created_at,
+    )
 
 @router.get("/health")
 def healthcheck():
@@ -203,17 +228,21 @@ def create_prediction(
     db: Session = Depends(get_db),
 ):
     patient = _resolve_patient(payload, db)
-    
+
     ml_service = get_ml_service()
     feature_payload = payload.model_dump(include=set(FEATURE_FIELDS))
     predicted_cost = ml_service.predict(feature_payload)
 
-    
-    record_payload = {k: v for k, v in payload.model_dump().items() if k in set(FEATURE_FIELDS + ["full_name", "previous_year_cost"]) }
+    record_payload = {
+        k: v
+        for k, v in payload.model_dump().items()
+        if k in set(FEATURE_FIELDS + ["previous_year_cost"])
+    }
     record = PredictionRecord(
         **record_payload,
+        full_name=patient.full_name,
         predicted_cost=predicted_cost,
-        patient_id=patient.id if patient else None,
+        patient_id=patient.id,
     )
     db.add(record)
     db.commit()
@@ -221,7 +250,7 @@ def create_prediction(
 
     return PredictionResponse(
         prediction_id=record.id,
-        full_name=record.full_name,
+        full_name=_resolve_display_name(record),
         predicted_cost=record.predicted_cost,
         patient_id=record.patient_id,
         created_at=record.created_at,
@@ -244,15 +273,15 @@ def get_prediction_details(prediction_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Prediction not found")
 
     factors = _build_or_create_risk_factors(record, db)
-    patient = record.patient
+    patient = _require_patient(record)
 
     return PredictionDetailsResponse(
         prediction_id=record.id,
         patient_id=record.patient_id,
-        full_name=record.full_name,
-        snils=format_snils(patient.snils) if patient else None,
-        phone=patient.phone if patient else None,
-        address=patient.address if patient else None,
+        full_name=_resolve_display_name(record),
+        snils=format_snils(patient.snils),
+        phone=patient.phone,
+        address=patient.address,
         age=record.age,
         gender=record.gender,
         bmi=record.bmi,
@@ -303,11 +332,12 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
     ml_service = get_ml_service()
     payload_data = payload.model_dump()
     patient = _resolve_patient(payload, db)
-    record.patient_id = patient.id if patient is not None else None
-    
+    record.patient_id = patient.id
+
     for key, value in payload_data.items():
-        if key in set(FEATURE_FIELDS + ["full_name", "previous_year_cost"]):
+        if key in set(FEATURE_FIELDS + ["previous_year_cost"]):
             setattr(record, key, value)
+    record.full_name = patient.full_name
 
     feature_payload = {field: payload_data[field] for field in FEATURE_FIELDS}
     record.predicted_cost = ml_service.predict(feature_payload)
@@ -320,7 +350,7 @@ def recalculate_prediction(payload: PredictionInput, prediction_id: int, db: Ses
 
     return PredictionResponse(
         prediction_id=record.id,
-        full_name=record.full_name,
+        full_name=_resolve_display_name(record),
         predicted_cost=record.predicted_cost,
         patient_id=record.patient_id,
         created_at=record.created_at,
@@ -333,22 +363,27 @@ def get_history(
     limit: int = Query(default=100, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
-    query = db.query(PredictionRecord)
-    if search:
-        if search.isdigit():
+    query = db.query(PredictionRecord).outerjoin(Patient, PredictionRecord.patient_id == Patient.id)
+    normalized_search = search.strip() if search else ""
+    if normalized_search:
+        normalized_snils = normalize_snils(normalized_search)
+        if normalized_snils:
+            query = query.filter(Patient.snils == normalized_snils)
+        elif normalized_search.isdigit():
+            query = query.filter(PredictionRecord.id == int(normalized_search))
+        else:
+            search_pattern = f"%{normalized_search}%"
             query = query.filter(
                 or_(
-                    PredictionRecord.id == int(search),
-                    PredictionRecord.full_name.ilike(f"%{search}%"),
+                    Patient.full_name.ilike(search_pattern),
+                    PredictionRecord.full_name.ilike(search_pattern),
                 )
             )
-        else:
-            query = query.filter(PredictionRecord.full_name.ilike(f"%{search}%"))
 
     total = query.with_entities(func.count(PredictionRecord.id)).scalar() or 0
     items = query.order_by(PredictionRecord.created_at.desc()).limit(limit).all()
     return HistoryResponse(
-        items=[PredictionHistoryItem.model_validate(item) for item in items],
+        items=[_build_history_item(item) for item in items],
         total=total,
     )
 

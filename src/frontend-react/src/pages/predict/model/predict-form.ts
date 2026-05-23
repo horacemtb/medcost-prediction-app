@@ -1,5 +1,4 @@
-﻿import type { PredictionInput } from "../../../shared/types/medcost";
-import type { PredictionDetailsResponse } from "../../../shared/types/medcost";
+import type { PredictionDetailsResponse, PredictionInput } from "../../../shared/types/medcost";
 
 export const predictTabs = ["Пациент", "Образ жизни", "Факторы", "Расходы"] as const;
 
@@ -36,6 +35,12 @@ export function normalizeName(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+export function normalizeSnils(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 11) return value.trim();
+  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 9)} ${digits.slice(9)}`;
+}
+
 export function parseMoney(value: string) {
   const cleaned = value.replace(/[^\d]/g, "");
   return cleaned ? Number(cleaned) : 0;
@@ -44,7 +49,10 @@ export function parseMoney(value: string) {
 export function validatePredictForm(values: PredictFormState): PredictFormErrors {
   const next: PredictFormErrors = {};
   const fullName = normalizeName(values.full_name);
+  const snilsDigits = values.snils.replace(/\D/g, "");
+
   if (!fullName || fullName.length < 5) next.full_name = "Укажите полное ФИО (минимум 5 символов).";
+  if (snilsDigits.length !== 11) next.snils = "Укажите СНИЛС из 11 цифр.";
   if (!values.gender) next.gender = "Укажите пол.";
   if (!values.physical_activity_label) next.physical_activity_label = "Укажите уровень физической активности.";
   if (!values.city_type_label) next.city_type_label = "Укажите тип населенного пункта.";
@@ -74,7 +82,7 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
 
   return {
     full_name: form.full_name,
-    snils: form.snils.trim() || null,
+    snils: normalizeSnils(form.snils),
     phone: form.phone.trim() || null,
     address: form.address.trim() || null,
     age: form.age,
@@ -100,7 +108,7 @@ export function toPredictionPayload(form: PredictFormState): PredictionInput {
 export function mapPredictionDetailsToForm(details: PredictionDetailsResponse): PredictFormState {
   return {
     full_name: details.full_name,
-    snils: details.snils ?? "",
+    snils: details.snils,
     phone: details.phone ?? "",
     address: details.address ?? "",
     age: details.age,

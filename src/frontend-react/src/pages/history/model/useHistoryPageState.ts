@@ -71,7 +71,7 @@ export function useHistoryPageState() {
     setCostMax,
     setDateFrom,
     setDateTo,
-    loadHistory,
+    loadHistory: () => loadHistory(searchQuery || undefined),
     removeItem: (id: number) => removeItem(id, searchQuery || undefined),
     handleOpenFromTable,
     handleRecalculateFromTable,

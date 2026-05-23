@@ -1,7 +1,8 @@
+import re
 from datetime import datetime
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class PredictionInput(BaseModel):
@@ -23,17 +24,33 @@ class PredictionInput(BaseModel):
     medication_count: int = Field(..., ge=0, le=100)
     city_type: Literal["Urban", "Semi-Urban", "Rural"]
     previous_year_cost: float = Field(..., ge=0)
-    
-    snils: str | None = Field(None, example="123-456-789 00")
+
+    snils: str = Field(..., example="123-456-789 00")
     phone: str | None = Field(None, example="+7-900-000-00-00")
     address: str | None = Field(None, example="г. Москва, ул. Ленина, д.1")
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, value: str) -> str:
+        normalized = " ".join(value.split())
+        if len(normalized) < 2:
+            raise ValueError("full_name is required")
+        return normalized
+
+    @field_validator("snils")
+    @classmethod
+    def validate_snils(cls, value: str) -> str:
+        normalized = re.sub(r"\D", "", value or "")
+        if len(normalized) != 11:
+            raise ValueError("snils must contain 11 digits")
+        return value
 
 
 class PredictionResponse(BaseModel):
     prediction_id: int
     full_name: str
     predicted_cost: float
-    patient_id: int | None = None
+    patient_id: int
     created_at: datetime
 
 
@@ -46,9 +63,9 @@ class RiskFactorResponse(BaseModel):
 
 class PredictionDetailsResponse(BaseModel):
     prediction_id: int
-    patient_id: int | None = None
+    patient_id: int
     full_name: str
-    snils: str | None = None
+    snils: str
     phone: str | None = None
     address: str | None = None
     age: int
@@ -82,10 +99,9 @@ class PredictionAssessmentResponse(BaseModel):
 
 
 class PredictionHistoryItem(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     id: int
     full_name: str
+    snils: str
     age: int
     gender: int
     predicted_cost: float
@@ -114,7 +130,7 @@ class ErrorResponse(BaseModel):
 
 class PatientCreate(BaseModel):
     full_name: str
-    snils: str | None = None
+    snils: str
     phone: str | None = None
     address: str | None = None
 
@@ -122,7 +138,7 @@ class PatientCreate(BaseModel):
 class PatientResponse(BaseModel):
     id: int
     full_name: str
-    snils: str | None = None
+    snils: str
     phone: str | None = None
     address: str | None = None
     created_at: datetime

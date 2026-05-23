@@ -1,29 +1,15 @@
 import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Search, X } from "lucide-react";
-import { medcostApi } from "../../../shared/api/medcost-api";
 
 export function GlobalPatientSearch() {
   const navigate = useNavigate();
   const location = useLocation();
   const [globalSearch, setGlobalSearch] = useState("");
 
-  const handleGlobalSearch = useCallback(async () => {
+  const handleGlobalSearch = useCallback(() => {
     const query = globalSearch.trim();
     if (!query) return;
-
-    if (/^\d+$/.test(query)) {
-      try {
-        const id = Number(query);
-        const details = await medcostApi.prediction(id);
-        navigate("/predict", {
-          state: { prefillDetails: details, openReport: true },
-        });
-      } catch {
-        navigate(`/history?search=${encodeURIComponent(query)}`);
-      }
-      return;
-    }
 
     navigate(`/history?search=${encodeURIComponent(query)}`);
   }, [globalSearch, navigate]);
@@ -46,12 +32,12 @@ export function GlobalPatientSearch() {
       <Search className="mr-3 size-5 text-[#74839b]" />
       <input
         className="w-full bg-transparent text-ui-sm text-[#30425f] outline-none placeholder:text-[#74839b]"
-        placeholder="Поиск по имени или ID пациента"
+        placeholder="Поиск по ID прогноза, ФИО или СНИЛС"
         value={globalSearch}
         onChange={(event) => setGlobalSearch(event.target.value)}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
-            void handleGlobalSearch();
+            handleGlobalSearch();
           }
         }}
       />
