@@ -7,7 +7,7 @@ import deleteIcon from "../../../shared/assets/delete.svg";
 type HistoryRowProps = {
   item: HistoryItem;
   onOpen: (id: number) => void;
-  onDelete: (id: number) => void;
+  onDelete: () => void;
   onRecalculate: (id: number) => void;
 };
 
@@ -21,9 +21,9 @@ export const HistoryRow = memo(function HistoryRow({
   const handleDelete = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
-      onDelete(item.id);
+      onDelete();
     },
-    [item.id, onDelete],
+    [onDelete],
   );
   const handleRecalculate = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
