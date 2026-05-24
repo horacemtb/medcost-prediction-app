@@ -389,6 +389,14 @@ export function usePredictPageState() {
     );
   }, [form.previous_year_cost]);
 
+  useEffect(() => {
+    setCostInput(
+      form.previous_year_cost
+        ? form.previous_year_cost.toLocaleString("ru-RU")
+        : "",
+    );
+  }, [form.previous_year_cost]);
+
   const handleReset = useCallback(() => {
     setForm(initialPredictForm);
     setCostInput(
