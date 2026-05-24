@@ -5,7 +5,7 @@ services:
       dockerfile: src/backend/Dockerfile.ci
     environment:
       DATABASE_URL: sqlite:////tmp/medcost-ci.db
-      MODEL_PATH: /workspace/src/backend/models/rf_pipeline.joblib
+      MODEL_PATH: /workspace/src/backend/models/CatBoostRegressor.joblib
       DADATA_API_KEY: ""
       DADATA_API_SECRET: ""
     volumes:
